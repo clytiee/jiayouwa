@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}我的主页 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    
+    <!-- ===== 用户信息卡片 ===== -->
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-8">
+            <div class="flex items-center space-x-5">
+                <!-- 头像 -->
+                <div class="avatar-frog avatar-frog-lg border-4 border-white shadow-lg">
+                    🐸
+                </div>
+                <div class="text-white">
+                    <h1 class="text-2xl font-bold">{{ user.first_name|default:user.username }}</h1>
+                    <div class="flex items-center space-x-3 text-sm text-green-100">
+                        <span>🐸 Lv.{{ user.level }} {{ user.level_title|default:"小蝌蚪" }}</span>
+                        <span>|</span>
+                        <span>💰 {{ user.oil_balance }} 油滴</span>
+                        <span>|</span>
+                        <span>📅 加入于 {{ user.date_joined|date:"Y-m-d" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-gray-50/50">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800">{{ resource_count }}</div>
+                <div class="text-xs text-gray-400">📦 我的资源</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800">{{ collect_count }}</div>
+                <div class="text-xs text-gray-400">❤️ 收藏</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800">{{ download_count }}</div>
+                <div class="text-xs text-gray-400">📥 下载</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800">{{ follower_count }}</div>
+                <div class="text-xs text-gray-400">👥 粉丝</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800">{{ following_count }}</div>
+                <div class="text-xs text-gray-400">👤 关注</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== 快捷入口 ===== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <a href="{% url 'users:my_resources' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">📦</div>
+            <div class="text-sm font-medium text-gray-700">我的资源</div>
+        </a>
+        <a href="{% url 'users:my_collections' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">❤️</div>
+            <div class="text-sm font-medium text-gray-700">我的收藏</div>
+        </a>
+        <a href="{% url 'users:my_downloads' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">📥</div>
+            <div class="text-sm font-medium text-gray-700">我的下载</div>
+        </a>
+        <a href="{% url 'users:my_follows' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">👤</div>
+            <div class="text-sm font-medium text-gray-700">我的关注</div>
+        </a>
+    </div>
+    
+    <!-- ===== 第二行快捷入口 ===== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <a href="{% url 'users:my_history' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">📖</div>
+            <div class="text-sm font-medium text-gray-700">浏览历史</div>
+        </a>
+        <a href="{% url 'users:my_shares' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">🔗</div>
+            <div class="text-sm font-medium text-gray-700">分享历史</div>
+        </a>
+        <a href="{% url 'users:my_earnings' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">💰</div>
+            <div class="text-sm font-medium text-gray-700">收益统计</div>
+        </a>
+        <a href="{% url 'users:profile_edit' %}" 
+           class="bg-white rounded-xl card-shadow p-4 text-center hover:shadow-lg transition frog-hover">
+            <div class="text-3xl mb-1">⚙️</div>
+            <div class="text-sm font-medium text-gray-700">账号设置</div>
+        </a>
+    </div>
+    
+    <!-- ===== 最近动态 ===== -->
+    <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
+        <h3 class="text-sm font-medium text-gray-700 mb-4">📌 最近动态</h3>
+        <div class="text-center text-gray-400 text-sm py-6">
+            <p>🐸 还没有动态</p>
+            <p class="text-xs mt-1">发布资源或互动后，这里会显示你的最新动态</p>
+        </div>
+        <a href="{% url 'resources:upload' %}" 
+           class="block text-center text-green-600 hover:text-green-700 text-sm mt-2">
+            📤 发布第一个资源 →
+        </a>
+    </div>
+    
+</div>
+{% endblock %}

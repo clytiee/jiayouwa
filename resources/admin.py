@@ -1,0 +1,104 @@
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import Resource, Collect, Download, Comment, CommentVote
+
+
+@admin.register(Resource)
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'title_preview', 'uploader', 'grade', 'price', 'status', 'view_count', 'created_at']
+    list_filter = ['status', 'grade', 'resource_type', 'created_at']
+    search_fields = ['title', 'description', 'uploader__username', 'uploader__email']
+    readonly_fields = ['view_count', 'download_count', 'collect_count', 'upvote_count', 'downvote_count', 'avg_rating']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('基本信息', {
+            'fields': ('title', 'description', 'uploader', 'price')
+        }),
+        ('分类信息', {
+            'fields': ('tags', 'grade', 'resource_type')
+        }),
+        ('文件信息', {
+            'fields': ('cover_images', 'download_url')
+        }),
+        ('状态审核', {
+            'fields': ('status', 'ai_risk_score', 'ai_risk_reason', 'reject_reason')
+        }),
+        ('统计数据', {
+            'fields': ('view_count', 'download_count', 'collect_count', 'upvote_count', 'downvote_count', 'avg_rating')
+        }),
+        ('时间信息', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def title_preview(self, obj):
+        """标题预览"""
+        if len(obj.title) > 30:
+            return obj.title[:30] + '...'
+        return obj.title
+    title_preview.short_description = '标题'
+    
+    actions = ['approve_resources', 'reject_resources', 'mark_expired']
+    
+    def approve_resources(self, request, queryset):
+        """批量审核通过"""
+        count = queryset.update(status='published')
+        self.message_user(request, f'已通过 {count} 个资源的审核')
+    approve_resources.short_description = '审核通过所选资源'
+    
+    def reject_resources(self, request, queryset):
+        """批量审核不通过"""
+        count = queryset.update(status='rejected')
+        self.message_user(request, f'已驳回 {count} 个资源')
+    reject_resources.short_description = '审核不通过所选资源'
+    
+    def mark_expired(self, request, queryset):
+        """批量标记失效"""
+        count = queryset.update(status='expired')
+        self.message_user(request, f'已标记 {count} 个资源为失效')
+    mark_expired.short_description = '标记为失效'
+
+
+@admin.register(Collect)
+class CollectAdmin(admin.ModelAdmin):
+    list_display = ['user', 'resource', 'created_at']
+    search_fields = ['user__username', 'resource__title']
+    list_filter = ['created_at']
+
+
+@admin.register(Download)
+class DownloadAdmin(admin.ModelAdmin):
+    list_display = ['user', 'resource', 'downloaded_at', 'last_downloaded_at', 'is_free_trial', 'oil_paid']
+    search_fields = ['user__username', 'resource__title']
+    list_filter = ['is_free_trial', 'downloaded_at']
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'resource', 'content_preview', 'audit_status', 'ai_risk_score', 'created_at']
+    list_filter = ['audit_status', 'created_at']
+    search_fields = ['user__username', 'resource__title', 'content']
+    actions = ['approve_comments', 'reject_comments']
+    
+    def content_preview(self, obj):
+        if len(obj.content) > 30:
+            return obj.content[:30] + '...'
+        return obj.content
+    content_preview.short_description = '评论内容'
+    
+    def approve_comments(self, request, queryset):
+        count = queryset.update(audit_status='visible')
+        self.message_user(request, f'已通过 {count} 条评论')
+    approve_comments.short_description = '审核通过所选评论'
+    
+    def reject_comments(self, request, queryset):
+        count = queryset.update(audit_status='rejected')
+        self.message_user(request, f'已驳回 {count} 条评论')
+    reject_comments.short_description = '审核不通过所选评论'
+
+
+@admin.register(CommentVote)
+class CommentVoteAdmin(admin.ModelAdmin):
+    list_display = ['user', 'comment', 'vote_type', 'created_at']
+    list_filter = ['vote_type', 'created_at']

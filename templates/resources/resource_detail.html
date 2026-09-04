@@ -1,0 +1,583 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ resource.title }} - 加油哇 🐸{% endblock %}
+
+{% block extra_css %}
+<style>
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 10;
+    }
+    .carousel-btn:hover {
+        background: rgba(0,0,0,0.8);
+    }
+    .carousel-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+    .image-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.4);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .image-dot.active {
+        background: white;
+        width: 24px;
+        border-radius: 4px;
+    }
+    .comment-item:hover .comment-actions {
+        opacity: 1;
+    }
+    .comment-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .vote-btn {
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .vote-btn:hover {
+        transform: scale(1.15);
+    }
+    .vote-btn.active-up {
+        color: #4CAF50;
+    }
+    .vote-btn.active-down {
+        color: #EF5350;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="resourceDetail()" x-init="init()" class="max-w-4xl mx-auto py-4">
+    
+    <!-- ===== 顶部导航 ===== -->
+    <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-4">
+        <a href="/" class="hover:text-green-600">首页</a>
+        <span>›</span>
+        {% if resource.tags %}
+        <a href="/search/?q={{ resource.tags.0 }}" class="hover:text-green-600">#{{ resource.tags.0 }}</a>
+        {% endif %}
+        <span>›</span>
+        <span class="text-gray-600 truncate">{{ resource.title }}</span>
+    </nav>
+
+    <!-- ===== 主内容 ===== -->
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+        
+        <!-- ===== 预览图轮播 ===== -->
+        <div class="relative bg-gray-100" style="aspect-ratio: 16/9;">
+            {% if resource.cover_images and resource.cover_images|length > 0 %}
+            <div class="relative w-full h-full overflow-hidden" x-ref="carousel">
+                <div class="flex h-full transition-transform duration-300 ease-out"
+                     :style="`transform: translateX(-${currentIndex * 100}%)`">
+                    {% for img in resource.cover_images %}
+                    <div class="min-w-full h-full flex items-center justify-center bg-gray-100">
+                        <img src="{{ img }}" alt="预览图 {{ forloop.counter }}" 
+                             class="max-w-full max-h-full object-contain">
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- 左右按钮 -->
+                {% if resource.cover_images|length > 1 %}
+                <button class="carousel-btn left-4" @click="prev()" :disabled="currentIndex === 0">
+                    ‹
+                </button>
+                <button class="carousel-btn right-4" @click="next()" :disabled="currentIndex === {{ resource.cover_images|length|add:'-1' }}">
+                    ›
+                </button>
+                <!-- 指示点 -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+                    {% for img in resource.cover_images %}
+                    <button class="image-dot" :class="{ 'active': currentIndex === {{ forloop.counter0 }} }"
+                            @click="currentIndex = {{ forloop.counter0 }}"></button>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- 图片计数器 -->
+                {% if resource.cover_images|length > 1 %}
+                <div class="absolute top-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
+                    <span x-text="currentIndex + 1"></span> / {{ resource.cover_images|length }}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-6xl bg-gray-50">
+                📄
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- ===== 信息区 ===== -->
+        <div class="p-6">
+            
+            <!-- 标题 -->
+            <h1 class="text-2xl font-bold text-gray-800">{{ resource.title }}</h1>
+            
+            <!-- 标签 -->
+            <div class="flex flex-wrap gap-1.5 mt-3">
+                {% for tag in resource.tags %}
+                <span class="bg-green-50 text-green-700 text-xs px-3 py-1 rounded-full">#{{ tag }}</span>
+                {% endfor %}
+                {% if resource.grade %}
+                <span class="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full">📚 {{ resource.grade }}</span>
+                {% endif %}
+                {% if resource.resource_type %}
+                <span class="bg-purple-50 text-purple-700 text-xs px-3 py-1 rounded-full">📁 {{ resource.resource_type }}</span>
+                {% endif %}
+            </div>
+            
+            <!-- 上传者信息 -->
+            <div class="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <span class="avatar-frog">🐸</span>
+                    <div>
+                        <div class="font-medium text-gray-800">
+                            {{ resource.uploader.first_name|default:resource.uploader.username }}
+                            <span class="text-xs text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            发布于 {{ resource.created_at|date:"Y-m-d" }}
+                            · 👁️ {{ resource.view_count }} 浏览
+                            · 📥 {{ resource.download_count }} 下载
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关注按钮 -->
+                {% if user.is_authenticated and not is_uploader %}
+                <button @click="toggleFollow()" 
+                        :class="isFollowing ? 'bg-gray-100 text-gray-700' : 'btn-primary'"
+                        class="text-sm px-4 py-1.5 rounded-full transition">
+                    <span x-text="isFollowing ? '✓ 已关注' : '➕ 关注'"></span>
+                </button>
+                {% endif %}
+            </div>
+            
+            <!-- 描述 -->
+            <div class="mt-4 p-4 bg-gray-50 rounded-xl">
+                <p class="text-gray-600 text-sm whitespace-pre-wrap">{{ resource.description }}</p>
+            </div>
+            
+            <!-- ===== 操作栏 ===== -->
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+                
+                <!-- 评分（👍/👎） -->
+                <div class="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+                    <button @click="rate('up')" 
+                            class="vote-btn text-gray-400 hover:text-green-500 text-lg px-1"
+                            :class="userRating === 'up' ? 'active-up' : ''">
+                        👍
+                    </button>
+                    <span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
+                          x-text="upCount"></span>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
+                          x-text="downCount"></span>
+                    <button @click="rate('down')" 
+                            class="vote-btn text-gray-400 hover:text-red-500 text-lg px-1"
+                            :class="userRating === 'down' ? 'active-down' : ''">
+                        👎
+                    </button>
+                    <span class="text-xs text-gray-400 ml-1" x-show="avgRating !== 0" x-text="'⭐ ' + avgRating.toFixed(1)"></span>
+                </div>
+                
+                <!-- 收藏 -->
+                <button @click="toggleCollect()" 
+                        class="flex items-center space-x-1 px-4 py-1.5 rounded-full border transition"
+                        :class="isCollected ? 'border-red-400 bg-red-50 text-red-500' : 'border-gray-200 hover:border-gray-300'">
+                    <span x-text="isCollected ? '❤️' : '🤍'"></span>
+                    <span x-text="collectCount"></span>
+                </button>
+                
+                <!-- 分享 -->
+                <button @click="shareResource()" 
+                        class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 transition">
+                    📤 分享
+                </button>
+                
+                <!-- 油滴价格 & 下载 -->
+                <div class="ml-auto flex items-center space-x-3">
+                    {% if resource.price == 0 %}
+                    <span class="text-green-600 font-bold text-lg">🆓 免费</span>
+                    {% else %}
+                    <span class="text-amber-600 font-bold text-lg">💰 {{ resource.price }} 油滴</span>
+                    {% endif %}
+                    
+                    <!-- 下载按钮 -->
+                    {% if is_uploader %}
+                    <!-- 上传者本人 -->
+                    <button @click="download()" 
+                            class="btn-primary px-6 py-2">
+                        📥 下载（本人资源）
+                    </button>
+                    {% elif has_purchased %}
+                    <!-- 已购买 -->
+                    <button @click="download()" 
+                            class="btn-primary px-6 py-2">
+                        📥 重新下载
+                    </button>
+                    {% elif user.is_authenticated %}
+                    <!-- 登录用户，未购买 -->
+                    <button @click="download()" 
+                            class="btn-primary px-6 py-2"
+                            :disabled="downloading">
+                        <span x-show="!downloading">📥 下载</span>
+                        <span x-show="downloading">⏳ 处理中...</span>
+                    </button>
+                    {% else %}
+                    <!-- 游客 -->
+                    <button @click="freeDownload()" 
+                            class="btn-primary px-6 py-2"
+                            :disabled="freeTrialUsed">
+                        <span x-show="!freeTrialUsed">🎁 免费试用下载</span>
+                        <span x-show="freeTrialUsed">✅ 已使用免费机会</span>
+                    </button>
+                    <span class="text-xs text-gray-400">首次访问可免费下载1次</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 下载链接显示区 -->
+            <div x-show="showDownload" x-transition.duration.300 
+                 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                <p class="text-sm text-green-700 font-medium mb-2">✅ 下载链接：</p>
+                <div class="flex items-center space-x-2">
+                    <input type="text" :value="downloadUrl" readonly 
+                           class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-mono">
+                    <button @click="copyDownloadUrl()" 
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
+                        📋 复制
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2" x-show="downloadMessage" x-text="downloadMessage"></p>
+            </div>
+            
+            <!-- 错误信息 -->
+            <div x-show="errorMessage" x-transition.duration.300 
+                 class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                <span x-text="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== 评论区 ===== -->
+    <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">
+            💬 评论（{{ comment_count }}）
+        </h3>
+        
+        <!-- 评论表单 -->
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'resources:add_comment' resource.id %}" class="mb-6">
+            {% csrf_token %}
+            <textarea name="content" rows="3" 
+                      placeholder="写下你的想法...（支持顶/踩，优质评论会获得油滴奖励）"
+                      class="input-field" required></textarea>
+            <button type="submit" class="btn-primary mt-2 px-6 py-2 text-sm">
+                📤 发布评论
+            </button>
+        </form>
+        {% else %}
+        <div class="text-center py-4 text-gray-400">
+            <a href="{% url 'users:login' %}?next={{ request.path }}" class="text-green-600 hover:underline">登录</a>
+            后发表评论
+        </div>
+        {% endif %}
+        
+        <!-- 评论列表 -->
+        <div class="space-y-4">
+            {% for comment in comments %}
+            <div class="comment-item p-4 bg-gray-50 rounded-xl">
+                <div class="flex items-start space-x-3">
+                    <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-medium text-gray-800 text-sm">
+                                {{ comment.user.first_name|default:comment.user.username }}
+                            </span>
+                            <span class="text-xs text-gray-400">🐸 Lv.{{ comment.user.level }}</span>
+                            <span class="text-xs text-gray-400">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                        </div>
+                        <p class="text-gray-700 text-sm mt-1">{{ comment.content }}</p>
+                        <!-- 评论操作 -->
+                        <div class="flex items-center space-x-4 mt-2 text-xs">
+                            <button @click="voteComment({{ comment.id }}, 'up')" 
+                                    class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
+                                👍 <span class="comment-up-{{ comment.id }}">{{ comment.up_count|default:0 }}</span>
+                            </button>
+                            <button @click="voteComment({{ comment.id }}, 'down')" 
+                                    class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
+                                👎 <span class="comment-down-{{ comment.id }}">{{ comment.down_count|default:0 }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-6 text-gray-400 text-sm">
+                还没有评论，来做第一个评论的人吧 🐸
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- 评论分页 -->
+        {% if comments.has_other_pages %}
+        <div class="flex justify-center space-x-2 mt-4">
+            {% if comments.has_previous %}
+            <a href="?comment_page={{ comments.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+            {% endif %}
+            <span class="px-3 py-1 text-sm text-gray-600">第 {{ comments.number }} / {{ comments.paginator.num_pages }} 页</span>
+            {% if comments.has_next %}
+            <a href="?comment_page={{ comments.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- ===== 相关资源 ===== -->
+    {% if related_resources %}
+    <div class="mt-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">🔗 相关资源</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {% for rel in related_resources %}
+            <a href="{% url 'resources:detail' rel.id %}" 
+               class="bg-white rounded-xl card-shadow overflow-hidden hover:shadow-lg transition frog-hover">
+                <div class="aspect-video bg-gray-100">
+                    {% if rel.cover_images %}
+                    <img src="{{ rel.cover_images.0 }}" alt="{{ rel.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-3xl">📄</div>
+                    {% endif %}
+                </div>
+                <div class="p-3">
+                    <h4 class="text-sm font-medium text-gray-800 truncate">{{ rel.title }}</h4>
+                    <div class="text-xs text-gray-400 mt-1">
+                        {% if rel.price == 0 %}🆓 免费{% else %}💰 {{ rel.price }}油滴{% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+</div>
+
+<script>
+function resourceDetail() {
+    return {
+        // 轮播
+        currentIndex: 0,
+        
+        // 收藏
+        isCollected: {{ is_collected|yesno:"true,false" }},
+        collectCount: {{ resource.collect_count }},
+        
+        // 关注
+        isFollowing: {{ is_following|yesno:"true,false" }},
+        
+        // 评分
+        upCount: {{ resource.upvote_count }},
+        downCount: {{ resource.downvote_count }},
+        avgRating: {{ resource.avg_rating|floatformat:2 }},
+        userRating: null,
+        
+        // 下载
+        downloading: false,
+        showDownload: false,
+        downloadUrl: '',
+        downloadMessage: '',
+        errorMessage: '',
+        freeTrialUsed: {{ can_download_free_trial|yesno:"false,true" }},
+        
+        init() {
+            // 检查session中是否有评分记录
+            // 简化处理
+        },
+        
+        prev() {
+            if (this.currentIndex > 0) this.currentIndex--;
+        },
+        
+        next() {
+            const total = {{ resource.cover_images|length|default:1 }};
+            if (this.currentIndex < total - 1) this.currentIndex++;
+        },
+        
+        // 收藏
+        async toggleCollect() {
+            try {
+                const resp = await fetch("{% url 'resources:toggle_collect' resource.id %}", {
+                    method: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'}
+                });
+                const data = await resp.json();
+                this.isCollected = data.collected;
+                this.collectCount = data.count;
+            } catch(e) {
+                console.error(e);
+            }
+        },
+        
+        // 关注
+        async toggleFollow() {
+            try {
+                const resp = await fetch("{% url 'resources:toggle_follow' resource.uploader.id %}", {
+                    method: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'}
+                });
+                const data = await resp.json();
+                this.isFollowing = data.following;
+            } catch(e) {
+                console.error(e);
+            }
+        },
+        
+        // 评分
+        async rate(type) {
+            if (this.userRating === type) {
+                // 取消评分（简化处理）
+                return;
+            }
+            try {
+                const resp = await fetch("{% url 'resources:rate_resource' resource.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `vote_type=${type}`
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.upCount = data.up_count;
+                    this.downCount = data.down_count;
+                    this.avgRating = data.avg_rating;
+                    this.userRating = type;
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        },
+        
+        // 下载（登录用户）
+        async download() {
+            this.errorMessage = '';
+            this.downloading = true;
+            try {
+                const resp = await fetch("{% url 'resources:download' resource.id %}", {
+                    method: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'}
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.downloadUrl = data.download_url;
+                    this.showDownload = true;
+                    this.downloadMessage = data.is_free ? '🎉 免费下载成功！' : `✅ 已支付 ${data.oil_paid || ''} 油滴`;
+                } else {
+                    this.errorMessage = data.error || '下载失败，请稍后重试';
+                }
+            } catch(e) {
+                this.errorMessage = '网络错误，请稍后重试';
+            }
+            this.downloading = false;
+        },
+        
+        // 游客免费下载
+        async freeDownload() {
+            if (this.freeTrialUsed) return;
+            this.errorMessage = '';
+            try {
+                const resp = await fetch("{% url 'resources:free_download' resource.id %}", {
+                    method: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'}
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.downloadUrl = data.download_url;
+                    this.showDownload = true;
+                    this.downloadMessage = data.message || '🎉 免费下载成功！';
+                    this.freeTrialUsed = true;
+                } else {
+                    this.errorMessage = data.error || '下载失败';
+                }
+            } catch(e) {
+                this.errorMessage = '网络错误，请稍后重试';
+            }
+        },
+        
+        // 复制下载链接
+        copyDownloadUrl() {
+            navigator.clipboard.writeText(this.downloadUrl).then(() => {
+                this.downloadMessage = '✅ 链接已复制到剪贴板！';
+                setTimeout(() => {
+                    this.downloadMessage = '';
+                }, 3000);
+            });
+        },
+        
+        // 评论投票
+        async voteComment(commentId, type) {
+            try {
+                const resp = await fetch(`/resources/comment/${commentId}/vote/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `vote_type=${type}`
+                });
+                const data = await resp.json();
+                if (data.up_count !== undefined) {
+                    document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
+                    document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        },
+        
+        // 分享
+        shareResource() {
+            const url = window.location.href;
+            const title = '{{ resource.title }}';
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: `🐸 我在加油哇发现了一个好资源：${title}`,
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(`${title}\n${url}`).then(() => {
+                    this.downloadMessage = '📋 链接已复制，快去分享吧！';
+                    setTimeout(() => {
+                        this.downloadMessage = '';
+                    }, 3000);
+                });
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

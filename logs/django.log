@@ -1,0 +1,469 @@
+INFO 2026-09-04 18:48:19,602 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 18:48:26,841 log "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:48:27,156 log "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4094
+INFO 2026-09-04 18:48:27,487 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3538
+INFO 2026-09-04 18:48:27,487 log "GET /static/admin/css/base.css HTTP/1.1" 200 23100
+INFO 2026-09-04 18:48:27,543 log "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2026-09-04 18:48:27,552 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 16273
+INFO 2026-09-04 18:48:27,560 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2026-09-04 18:48:27,560 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2026-09-04 18:48:27,621 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+WARNING 2026-09-04 18:48:28,376 log Not Found: /favicon.ico
+WARNING 2026-09-04 18:48:28,378 log "GET /favicon.ico HTTP/1.1" 404 6261
+INFO 2026-09-04 18:48:35,255 log "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:48:35,312 log "GET /admin/ HTTP/1.1" 200 11257
+INFO 2026-09-04 18:48:35,483 log "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2026-09-04 18:48:35,587 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+INFO 2026-09-04 18:48:35,591 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 978
+ERROR 2026-09-04 18:48:54,834 log Internal Server Error: /register/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 28, in register_view
+    return redirect('index')
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 51, in redirect
+    resolve_url(to, *args, **kwargs),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 184, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\urls\resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'index' not found. 'index' is not a valid view function or pattern name.
+ERROR 2026-09-04 18:48:54,841 log "GET /register/ HTTP/1.1" 500 86135
+INFO 2026-09-04 18:51:20,085 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 18:51:21,187 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 18:51:39,690 log "GET /admin/ HTTP/1.1" 200 11257
+INFO 2026-09-04 18:52:57,552 log "GET /register/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:52:57,562 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:02,656 log "GET /register/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:53:02,673 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:04,146 log "GET /register/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:53:04,152 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:22,899 log "GET /login/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:53:22,908 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:26,452 log "GET /login/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:53:26,465 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:27,142 log "GET /register/ HTTP/1.1" 302 0
+INFO 2026-09-04 18:53:27,153 log "GET / HTTP/1.1" 200 315
+INFO 2026-09-04 18:53:39,106 log "GET /admin/users/user/add/ HTTP/1.1" 200 16111
+INFO 2026-09-04 18:53:39,204 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,240 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,243 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,244 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,291 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,439 log "GET /static/admin/css/forms.css HTTP/1.1" 200 8831
+INFO 2026-09-04 18:53:39,459 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-09-04 18:53:39,497 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-04 18:53:39,521 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 11811
+INFO 2026-09-04 18:53:39,544 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+INFO 2026-09-04 18:53:39,550 log "GET /static/admin/css/unusable_password_field.css HTTP/1.1" 200 663
+INFO 2026-09-04 18:53:39,571 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-09-04 18:53:39,582 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8077
+INFO 2026-09-04 18:53:39,606 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-09-04 18:53:39,616 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-09-04 18:53:39,632 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2026-09-04 18:53:39,636 log "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2026-09-04 18:53:39,647 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2026-09-04 18:53:39,688 log "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2026-09-04 18:53:39,789 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-09-04 18:53:42,521 log "GET /admin/ HTTP/1.1" 200 11257
+INFO 2026-09-04 18:53:42,727 log "GET /admin/ HTTP/1.1" 200 11257
+INFO 2026-09-04 18:53:42,837 log "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+INFO 2026-09-04 18:55:25,231 autoreload C:\Users\Chinasoft\jiayouwa\resources\admin.py changed, reloading.
+INFO 2026-09-04 18:55:26,488 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 18:56:28,947 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 18:56:30,106 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 18:57:41,532 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 18:59:55,104 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:00:21,404 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:02:57,036 autoreload Watching for file changes with StatReloader
+ERROR 2026-09-04 19:03:06,557 log Internal Server Error: /resources/upload/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\resources\views.py", line 52, in resource_upload
+    return render(request, 'resources/resource_upload.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\urls\resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'ranking' not found. 'ranking' is not a valid view function or pattern name.
+ERROR 2026-09-04 19:03:06,568 log "GET /resources/upload/ HTTP/1.1" 500 146272
+INFO 2026-09-04 19:04:06,828 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 19:04:08,102 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:04:17,561 log "GET /resources/upload/ HTTP/1.1" 200 22491
+INFO 2026-09-04 19:06:28,764 log "POST /resources/upload/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:06:28,775 log "GET / HTTP/1.1" 200 339
+INFO 2026-09-04 19:08:32,530 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 19:08:33,737 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:08:45,135 autoreload C:\Users\Chinasoft\jiayouwa\core\views.py changed, reloading.
+INFO 2026-09-04 19:08:46,432 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:08:57,165 log "GET / HTTP/1.1" 200 99206
+INFO 2026-09-04 19:08:58,638 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+WARNING 2026-09-04 19:09:06,897 log Not Found: /resource/1/
+WARNING 2026-09-04 19:09:06,897 log "GET /resource/1/ HTTP/1.1" 404 6913
+INFO 2026-09-04 19:09:08,902 log "GET / HTTP/1.1" 200 98981
+INFO 2026-09-04 19:09:09,456 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+ERROR 2026-09-04 19:09:16,632 log Internal Server Error: /toggle-mode/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\core\views.py", line 34, in toggle_view_mode
+    return render(request, 'partials/view_mode_switch.html', {'view_mode': mode})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: partials/view_mode_switch.html
+ERROR 2026-09-04 19:09:16,638 log "POST /toggle-mode/ HTTP/1.1" 500 83192
+ERROR 2026-09-04 19:09:18,462 log Internal Server Error: /toggle-mode/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\core\views.py", line 34, in toggle_view_mode
+    return render(request, 'partials/view_mode_switch.html', {'view_mode': mode})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: partials/view_mode_switch.html
+ERROR 2026-09-04 19:09:18,466 log "POST /toggle-mode/ HTTP/1.1" 500 83192
+INFO 2026-09-04 19:11:58,932 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:12:04,446 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:05,345 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:12:07,052 log "POST /toggle-mode/ HTTP/1.1" 200 745
+INFO 2026-09-04 19:12:07,120 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:07,613 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:12:08,649 log "POST /toggle-mode/ HTTP/1.1" 200 745
+INFO 2026-09-04 19:12:08,696 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:09,230 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:12:10,168 log "POST /toggle-mode/ HTTP/1.1" 200 745
+INFO 2026-09-04 19:12:10,220 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:10,772 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:12:51,182 log "POST /toggle-mode/ HTTP/1.1" 200 745
+INFO 2026-09-04 19:12:51,262 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:51,946 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:12:52,739 log "POST /toggle-mode/ HTTP/1.1" 200 745
+INFO 2026-09-04 19:12:52,802 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:12:53,283 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:13:16,387 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:13:16,871 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+INFO 2026-09-04 19:14:17,878 autoreload C:\Users\Chinasoft\jiayouwa\resources\views.py changed, reloading.
+INFO 2026-09-04 19:14:19,149 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:17:10,165 autoreload C:\Users\Chinasoft\jiayouwa\resources\urls.py changed, reloading.
+INFO 2026-09-04 19:17:11,485 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:17:43,414 autoreload C:\Users\Chinasoft\jiayouwa\resources\views.py changed, reloading.
+INFO 2026-09-04 19:17:44,433 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:17:49,581 log "GET / HTTP/1.1" 200 98922
+INFO 2026-09-04 19:17:50,649 log "GET /?page=2&mode=list HTTP/1.1" 200 84299
+WARNING 2026-09-04 19:17:51,594 log Not Found: /resource/1/
+WARNING 2026-09-04 19:17:51,595 log "GET /resource/1/ HTTP/1.1" 404 6913
+INFO 2026-09-04 19:18:47,040 autoreload C:\Users\Chinasoft\jiayouwa\resources\urls.py changed, reloading.
+INFO 2026-09-04 19:18:47,897 autoreload Watching for file changes with StatReloader
+WARNING 2026-09-04 19:18:53,629 log Not Found: /resource/1/
+WARNING 2026-09-04 19:18:53,632 log "GET /resource/1/ HTTP/1.1" 404 6913
+WARNING 2026-09-04 19:18:54,697 log Not Found: /resource/1/
+WARNING 2026-09-04 19:18:54,699 log "GET /resource/1/ HTTP/1.1" 404 6913
+INFO 2026-09-04 19:19:00,940 log "GET /resources/1/ HTTP/1.1" 200 109702
+INFO 2026-09-04 19:19:09,140 autoreload Watching for file changes with StatReloader
+WARNING 2026-09-04 19:19:10,731 log Not Found: /resource/1/
+WARNING 2026-09-04 19:19:10,732 log "GET /resource/1/ HTTP/1.1" 404 6913
+INFO 2026-09-04 19:19:13,958 log "GET /resources/1/ HTTP/1.1" 200 109702
+INFO 2026-09-04 19:19:45,426 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 19:19:46,342 autoreload Watching for file changes with StatReloader
+WARNING 2026-09-04 19:20:08,217 log Not Found: /resources/1/
+WARNING 2026-09-04 19:20:08,218 log "GET /resources/1/ HTTP/1.1" 404 6915
+INFO 2026-09-04 19:20:14,438 log "GET /resource/1/ HTTP/1.1" 200 109696
+INFO 2026-09-04 19:20:42,750 log "POST /resource/1/rate/ HTTP/1.1" 200 68
+INFO 2026-09-04 19:20:48,710 log "GET /resource/1/ HTTP/1.1" 200 109696
+WARNING 2026-09-04 19:20:51,203 log Bad Request: /resource/1/rate/
+WARNING 2026-09-04 19:20:51,203 log "POST /resource/1/rate/ HTTP/1.1" 400 55
+INFO 2026-09-04 19:20:58,646 log "POST /resource/1/collect/ HTTP/1.1" 200 31
+INFO 2026-09-04 19:21:08,181 log "GET /resource/1/ HTTP/1.1" 200 109695
+INFO 2026-09-04 19:21:16,392 log "POST /resource/1/comment/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:21:16,450 log "GET /resource/1/ HTTP/1.1" 200 111267
+INFO 2026-09-04 19:21:24,907 log "GET / HTTP/1.1" 200 99127
+INFO 2026-09-04 19:21:25,499 log "GET /?page=2&mode=list HTTP/1.1" 200 84504
+INFO 2026-09-04 19:21:26,644 log "GET /resource/1/ HTTP/1.1" 200 111106
+INFO 2026-09-04 19:21:34,023 log "POST /resource/1/download/ HTTP/1.1" 200 77
+INFO 2026-09-04 19:22:01,939 log "GET / HTTP/1.1" 200 99127
+INFO 2026-09-04 19:22:02,780 log "GET /?page=2&mode=list HTTP/1.1" 200 84504
+INFO 2026-09-04 19:22:35,858 autoreload C:\Users\Chinasoft\jiayouwa\core\views.py changed, reloading.
+INFO 2026-09-04 19:22:37,216 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:23:22,505 autoreload C:\Users\Chinasoft\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-04 19:23:23,846 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:23:26,416 log "GET /ranking/ HTTP/1.1" 200 16246
+INFO 2026-09-04 19:24:22,934 log "GET /logout/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:24:22,964 log "GET / HTTP/1.1" 200 95455
+INFO 2026-09-04 19:24:23,825 log "GET /?page=2&mode=list HTTP/1.1" 200 84504
+INFO 2026-09-04 19:24:25,114 log "GET /register/ HTTP/1.1" 200 10651
+INFO 2026-09-04 19:24:49,749 log "POST /register/ HTTP/1.1" 200 10651
+INFO 2026-09-04 19:26:54,799 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:27:09,214 log "POST /register/ HTTP/1.1" 200 10651
+INFO 2026-09-04 19:27:26,570 log "POST /register/ HTTP/1.1" 200 10651
+INFO 2026-09-04 19:28:45,705 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:28:47,484 log "GET /login/ HTTP/1.1" 200 11120
+INFO 2026-09-04 19:29:03,988 log "POST /login/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:29:04,022 log "GET / HTTP/1.1" 200 99311
+INFO 2026-09-04 19:29:04,659 log "GET /?page=2&mode=list HTTP/1.1" 200 84504
+INFO 2026-09-04 19:29:08,758 log "GET /resource/1/ HTTP/1.1" 200 111622
+INFO 2026-09-04 19:29:12,277 log "POST /resource/1/comment/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:29:12,339 log "GET /resource/1/ HTTP/1.1" 200 113366
+INFO 2026-09-04 19:29:18,899 log "POST /resource/1/rate/ HTTP/1.1" 200 68
+INFO 2026-09-04 19:29:23,001 log "POST /resource/1/collect/ HTTP/1.1" 200 31
+INFO 2026-09-04 19:29:26,813 log "POST /resource/1/download/ HTTP/1.1" 200 93
+INFO 2026-09-04 19:29:30,752 log "GET /resource/1/ HTTP/1.1" 200 113032
+INFO 2026-09-04 19:29:36,641 log "GET / HTTP/1.1" 200 99142
+INFO 2026-09-04 19:29:37,161 log "GET /?page=2&mode=list HTTP/1.1" 200 84505
+ERROR 2026-09-04 19:29:50,396 log Internal Server Error: /profile/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 152, in profile_view
+    return render(request, 'users/profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/profile.html
+ERROR 2026-09-04 19:29:50,399 log "GET /profile/ HTTP/1.1" 500 88968
+INFO 2026-09-04 19:29:52,907 log "GET / HTTP/1.1" 200 99142
+INFO 2026-09-04 19:29:53,433 log "GET /?page=2&mode=list HTTP/1.1" 200 84505
+INFO 2026-09-04 19:29:58,060 log "GET / HTTP/1.1" 200 99142
+INFO 2026-09-04 19:29:58,492 log "GET /?page=2&mode=list HTTP/1.1" 200 84505
+INFO 2026-09-04 19:30:18,670 log "GET /resource/upload/ HTTP/1.1" 200 22505
+INFO 2026-09-04 19:30:39,552 log "POST /resource/upload/ HTTP/1.1" 302 0
+INFO 2026-09-04 19:30:39,589 log "GET / HTTP/1.1" 200 330182
+INFO 2026-09-04 19:30:40,266 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-04 19:30:46,712 log "GET /resource/2/ HTTP/1.1" 200 256338
+INFO 2026-09-04 19:30:51,275 log "GET / HTTP/1.1" 200 329959
+INFO 2026-09-04 19:30:51,951 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-04 19:30:53,592 log "POST /toggle-mode/ HTTP/1.1" 200 16
+INFO 2026-09-04 19:30:53,667 log "GET / HTTP/1.1" 200 329959
+INFO 2026-09-04 19:30:54,186 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-04 19:30:54,999 log "POST /toggle-mode/ HTTP/1.1" 200 16
+INFO 2026-09-04 19:30:55,052 log "GET / HTTP/1.1" 200 329959
+INFO 2026-09-04 19:30:55,537 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+ERROR 2026-09-04 19:30:58,920 log Internal Server Error: /my-resources/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 171, in my_resources_view
+    return render(request, 'users/my_resources.html', {'resources': resources_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_resources.html
+ERROR 2026-09-04 19:30:58,922 log "GET /my-resources/ HTTP/1.1" 500 88377
+INFO 2026-09-04 19:31:00,661 log "GET / HTTP/1.1" 200 329959
+INFO 2026-09-04 19:31:01,228 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-04 19:32:23,176 log "GET /resource/1/ HTTP/1.1" 200 113033
+INFO 2026-09-04 19:32:25,712 log "POST /resource/user/1/follow/ HTTP/1.1" 200 19
+ERROR 2026-09-04 19:32:31,204 log Internal Server Error: /profile/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 152, in profile_view
+    return render(request, 'users/profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/profile.html
+ERROR 2026-09-04 19:32:31,207 log "GET /profile/ HTTP/1.1" 500 88979
+INFO 2026-09-04 19:32:33,859 log "GET /resource/1/ HTTP/1.1" 200 113032
+INFO 2026-09-04 19:33:00,545 log "GET /ranking/ HTTP/1.1" 200 17658
+INFO 2026-09-04 19:34:23,719 log "GET /profile/ HTTP/1.1" 200 16419
+ERROR 2026-09-04 19:34:39,349 log Internal Server Error: /my-history/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 211, in my_history_view
+    return render(request, 'users/my_history.html', {'history': history_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_history.html
+ERROR 2026-09-04 19:34:39,352 log "GET /my-history/ HTTP/1.1" 500 88301
+INFO 2026-09-04 19:34:41,921 log "GET /profile/ HTTP/1.1" 200 16419
+ERROR 2026-09-04 19:34:43,095 log Internal Server Error: /my-resources/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 171, in my_resources_view
+    return render(request, 'users/my_resources.html', {'resources': resources_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_resources.html
+ERROR 2026-09-04 19:34:43,097 log "GET /my-resources/ HTTP/1.1" 500 88385
+INFO 2026-09-04 19:34:44,928 log "GET /profile/ HTTP/1.1" 200 16419
+INFO 2026-09-04 19:36:56,437 autoreload C:\Users\Chinasoft\jiayouwa\resources\urls.py changed, reloading.
+INFO 2026-09-04 19:36:57,400 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:37:07,583 autoreload Watching for file changes with StatReloader
+INFO 2026-09-04 19:37:12,356 log "GET /profile/ HTTP/1.1" 200 16419
+INFO 2026-09-04 19:37:14,406 log "GET /my-resources/ HTTP/1.1" 200 244981
+INFO 2026-09-04 19:37:19,231 log "GET /profile/ HTTP/1.1" 200 16419
+ERROR 2026-09-04 19:37:20,122 log Internal Server Error: /my-collections/
+Traceback (most recent call last):
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\users\views.py", line 181, in my_collections_view
+    return render(request, 'users/my_collections.html', {'collections': collections_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Chinasoft\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_collections.html
+ERROR 2026-09-04 19:37:20,125 log "GET /my-collections/ HTTP/1.1" 500 88542
+INFO 2026-09-04 19:37:21,768 log "GET /profile/ HTTP/1.1" 200 16419
+INFO 2026-09-04 19:38:41,276 log "GET /my-collections/ HTTP/1.1" 200 96654
+INFO 2026-09-04 19:38:46,645 log "GET /profile/ HTTP/1.1" 200 16419
+INFO 2026-09-04 19:39:01,362 log "GET /ranking/ HTTP/1.1" 200 17658

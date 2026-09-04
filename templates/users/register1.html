@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}注册 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-200px)] flex items-center justify-center py-12">
+    <div class="w-full max-w-md">
+        
+        <!-- 顶部青蛙 + 标题 -->
+        <div class="text-center mb-8">
+            <div class="avatar-frog avatar-frog-lg mx-auto mb-3 shadow-lg">🐸</div>
+            <h1 class="text-2xl font-bold text-gray-800">加入加油哇</h1>
+            <p class="text-gray-400 text-sm mt-1">学习路上，一起加油哇！</p>
+        </div>
+
+        <!-- 注册卡片 -->
+        <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                
+                <!-- 用户名 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">👤 用户名</label>
+                    <input type="text" name="username" value="{{ form.username.value|default:'' }}"
+                           placeholder="4-20位字母数字下划线，以字母开头"
+                           class="input-field {% if form.username.errors %}error{% endif %}"
+                           required>
+                    {% if form.username.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-400 text-xs mt-1">用于登录，建议使用英文或拼音</p>
+                </div>
+
+                <!-- 邮箱 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">📧 邮箱地址</label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+                           placeholder="请输入邮箱地址"
+                           class="input-field {% if form.email.errors %}error{% endif %}"
+                           required>
+                    {% if form.email.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- 昵称 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">🏷️ 昵称</label>
+                    <input type="text" name="nickname" value="{{ form.nickname.value|default:'' }}"
+                           placeholder="2-12位中英文或数字"
+                           class="input-field {% if form.nickname.errors %}error{% endif %}"
+                           required>
+                    {% if form.nickname.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.nickname.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-400 text-xs mt-1">显示在网站上的名字</p>
+                </div>
+
+                <!-- 密码 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">🔒 密码</label>
+                    <input type="password" name="password1" placeholder="至少8位，含字母和数字"
+                           class="input-field {% if form.password1.errors %}error{% endif %}"
+                           required>
+                    {% if form.password1.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- 确认密码 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">🔒 确认密码</label>
+                    <input type="password" name="password2" placeholder="请再次输入密码"
+                           class="input-field {% if form.password2.errors %}error{% endif %}"
+                           required>
+                    {% if form.password2.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- 邀请码 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">🎁 邀请码（选填）</label>
+                    <input type="text" name="invite_code" placeholder="如果有邀请码请填写"
+                           class="input-field">
+                    <p class="text-gray-400 text-xs mt-1">邀请好友注册，双方都有奖励哦！</p>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn-primary w-full py-3 text-center text-base">
+                    📧 发送验证邮件
+                </button>
+
+                <!-- 登录链接 -->
+                <p class="text-center text-sm text-gray-400 mt-4">
+                    已有账号？ <a href="{% url 'users:login' %}" class="text-green-600 hover:text-green-700 font-medium">立即登录 →</a>
+                </p>
+
+                <!-- 协议 -->
+                <p class="text-center text-xs text-gray-400 mt-4">
+                    注册即表示同意《用户协议》和《隐私政策》
+                </p>
+            </form>
+        </div>
+
+        <!-- 底部小青蛙装饰 -->
+        <div class="text-center mt-6 text-2xl opacity-20 select-none">
+            🐸 🐸 🐸
+        </div>
+    </div>
+</div>
+{% endblock %}

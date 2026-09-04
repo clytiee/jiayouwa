@@ -1,0 +1,13 @@
+<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1" 
+     x-data="{ mode: '{{ view_mode }}' }">
+    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            :class="mode === 'list' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+            @click="mode = 'list'; htmx.ajax('POST', '/toggle-mode/', {values: {mode: 'list'}})">
+        📋 列表
+    </button>
+    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            :class="mode === 'card' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+            @click="mode = 'card'; htmx.ajax('POST', '/toggle-mode/', {values: {mode: 'card'}})">
+        🎴 卡片
+    </button>
+</div>

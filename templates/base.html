@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}加油哇 - 学习路上，一起加油哇！🐸{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        * { font-family: 'Noto Sans SC', sans-serif; }
+        .frog-gradient { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+        .frog-hover:hover { transform: scale(1.02); transition: all 0.2s; }
+        .avatar-frog {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #66BB6A, #388E3C);
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .avatar-frog-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+        }
+        .avatar-frog-lg {
+            width: 80px;
+            height: 80px;
+            font-size: 44px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #66BB6A, #388E3C);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #C8E6C9;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #66BB6A;
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
+        }
+        .input-field.error {
+            border-color: #EF5350;
+        }
+        .card-shadow {
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+        }
+        .message-success {
+            background: #E8F5E9;
+            border-left: 4px solid #4CAF50;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #2E7D32;
+        }
+        .message-error {
+            background: #FFEBEE;
+            border-left: 4px solid #EF5350;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #C62828;
+        }
+        .message-info {
+            background: #E3F2FD;
+            border-left: 4px solid #42A5F5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #0D47A1;
+        }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F5F5F5; }
+        ::-webkit-scrollbar-thumb { background: #A5D6A7; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #66BB6A; }
+        /* 通知徽标 */
+        .badge-dot {
+            position: relative;
+        }
+        .badge-dot::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #EF5350;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        /* 悬停显示工具类 */
+        .hover-show .hover-content {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .hover-show:hover .hover-content {
+            opacity: 1;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body x-data="{ mobileMenu: false, notificationOpen: false, userMenuOpen: false }" class="bg-gray-50">
+
+    <!-- ========== 顶部导航 ========== -->
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50 card-shadow">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2 flex-shrink-0">
+                    <span class="text-3xl">🐸</span>
+                    <span class="text-xl font-bold text-gray-800">加油哇</span>
+                    <span class="hidden sm:inline text-sm text-gray-400">学习路上，一起加油哇！</span>
+                </a>
+
+                <!-- 搜索框 -->
+                <div class="flex-1 max-w-md mx-4 hidden md:block">
+                    <form action="/search/" method="GET" class="relative">
+                        <input type="text" name="q" placeholder="搜索资源、标签、用户..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full bg-gray-50 focus:bg-white focus:border-green-400 focus:outline-none transition-all text-sm">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                    </form>
+                </div>
+
+                <!-- 右侧操作 -->
+                <div class="flex items-center space-x-3">
+                    
+                    {% if user.is_authenticated %}
+                        <!-- 消息通知 -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="relative p-2 rounded-full hover:bg-gray-100 transition">
+                                <span class="text-xl">🔔</span>
+                                {% if unread_count > 0 %}
+                                <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                                    {{ unread_count }}
+                                </span>
+                                {% endif %}
+                            </button>
+                            <!-- 下拉通知 -->
+                            <div x-show="open" @click.away="open = false" 
+                                 x-transition:enter.duration.200ms.opacity
+                                 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+                                <div class="p-3 border-b border-gray-100 font-medium text-gray-700">📬 消息中心</div>
+                                <div class="max-h-64 overflow-y-auto">
+                                    {% for notice in recent_notifications %}
+                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition">
+                                        <div class="text-sm text-gray-800">{{ notice.title }}</div>
+                                        <div class="text-xs text-gray-400">{{ notice.created_at|date:"Y-m-d H:i" }}</div>
+                                    </a>
+                                    {% empty %}
+                                    <div class="px-4 py-6 text-center text-gray-400 text-sm">暂无消息</div>
+                                    {% endfor %}
+                                </div>
+                                <a href="/notifications/" class="block text-center text-sm text-green-600 py-2 hover:bg-gray-50 transition">查看全部消息 →</a>
+                            </div>
+                        </div>
+
+                        <!-- 用户菜单 -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition">
+                                <span class="avatar-frog">🐸</span>
+                                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ user.first_name|default:user.username }}</span>
+                            </button>
+                            <div x-show="open" @click.away="open = false"
+                                 x-transition:enter.duration.200ms.opacity
+                                 class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="avatar-frog avatar-frog-sm">🐸</span>
+                                        <div>
+                                            <div class="font-medium text-gray-800">{{ user.first_name|default:user.username }}</div>
+                                            <div class="text-xs text-gray-400">🐸 Lv.{{ user.level }} {{ user.level_title }} · 💰 {{ user.oil_balance }}油滴</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">👤 我的主页</a>
+                                <a href="{% url 'users:my_resources' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📦 我的资源</a>
+                                <a href="{% url 'users:my_collections' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">❤️ 我的收藏</a>
+                                <a href="{% url 'users:my_downloads' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📥 我的下载</a>
+                                <a href="{% url 'users:my_history' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📖 浏览历史</a>
+                                <a href="{% url 'users:my_shares' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">🔗 分享历史</a>
+                                <a href="{% url 'users:my_earnings' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">💰 收益统计</a>
+                                <div class="border-t border-gray-100"></div>
+                                <a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-500">🚪 退出登录</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="text-gray-600 hover:text-green-600 text-sm font-medium">登录</a>
+                        <a href="{% url 'users:register' %}" class="btn-primary text-sm py-2 px-4">免费注册</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== 消息提示 ========== -->
+    {% if messages %}
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% for message in messages %}
+        <div class="message-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ========== 主内容 ========== -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ========== 底部 ========== -->
+    <footer class="bg-white border-t border-gray-100 mt-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-400">
+                <div class="flex items-center space-x-2">
+                    <span>🐸</span>
+                    <span>© 2026 加油哇 · 学习路上，一起加油哇！</span>
+                </div>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="hover:text-green-600">关于我们</a>
+                    <a href="#" class="hover:text-green-600">用户协议</a>
+                    <a href="#" class="hover:text-green-600">隐私政策</a>
+                    <a href="{% url 'ranking' %}" class="hover:text-green-600">🏆 排行榜</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- htmx CSRF Token -->
+    <script>
+        document.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

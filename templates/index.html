@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}首页 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <!-- 视图切换 -->
+<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1" 
+     x-data="{ mode: '{{ view_mode }}' }">
+    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            :class="mode === 'list' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+            @click="mode = 'list'; fetch('/toggle-mode/', {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}, body: 'mode=list'}).then(() => location.reload())">
+        📋 列表
+    </button>
+    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            :class="mode === 'card' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+            @click="mode = 'card'; fetch('/toggle-mode/', {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}, body: 'mode=card'}).then(() => location.reload())">
+        🎴 卡片
+    </button>
+</div>
+    
+    <!-- 资源列表 -->
+    <div id="resource-list">
+        {% include 'partials/resource_list.html' %}
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 无限滚动：当用户滚动到底部时加载更多
+    let page = 1;
+    let loading = false;
+    let hasMore = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const list = document.getElementById('resource-list');
+        if (!list) return;
+        
+        const observer = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting && !loading && hasMore) {
+                loadMore();
+            }
+        }, { rootMargin: '200px' });
+        
+        // 观察列表底部
+        const sentinel = document.createElement('div');
+        sentinel.id = 'scroll-sentinel';
+        sentinel.className = 'h-4';
+        list.appendChild(sentinel);
+        observer.observe(sentinel);
+    });
+    
+    function loadMore() {
+        loading = true;
+        page += 1;
+        
+        fetch(`/?page=${page}&mode={{ view_mode }}`, {
+            headers: {
+                'HX-Request': 'true'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContent = doc.getElementById('resource-list');
+            if (newContent) {
+                const list = document.getElementById('resource-list');
+                const sentinel = document.getElementById('scroll-sentinel');
+                // 移除旧哨兵
+                if (sentinel) sentinel.remove();
+                // 移除新内容中的哨兵
+                const newSentinel = newContent.querySelector('#scroll-sentinel');
+                if (newSentinel) newSentinel.remove();
+                // 追加新内容
+                list.insertAdjacentHTML('beforeend', newContent.innerHTML);
+                // 重新添加哨兵
+                const newSentinel2 = document.createElement('div');
+                newSentinel2.id = 'scroll-sentinel';
+                newSentinel2.className = 'h-4';
+                list.appendChild(newSentinel2);
+                observer.observe(newSentinel2);
+            } else {
+                hasMore = false;
+            }
+            loading = false;
+        })
+        .catch(() => {
+            loading = false;
+        });
+    }
+</script>
+{% endblock %}
