@@ -138,5 +138,24 @@
 		{% endif %}
 	</div>
     
+	<!-- 等级进度 -->
+	<div class="mt-3">
+		<div class="flex items-center justify-between text-xs text-gray-700">
+			<span>🐸 Lv.{{ user.level }} {{ user.level_title|default:"小蝌蚪" }}</span>
+			<span>{{ exp_progress|floatformat:0 }}%</span>
+		</div>
+		<div class="w-full h-2 bg-gray-200 rounded-full mt-1 overflow-hidden">
+			<div class="h-full bg-green-500 rounded-full transition-all duration-500" 
+				 style="width: {{ exp_progress|floatformat:0 }}%;"></div>
+		</div>
+		<div class="flex items-center justify-between text-[10px] text-gray-500 mt-0.5">
+			<span>{{ exp_current }}/{{ exp_next }} 经验</span>
+			{% if exp_next > exp_current %}
+			<span>还需 {{ exp_needed }} 经验升级</span>
+			{% else %}
+			<span>🏆 已满级！</span>
+			{% endif %}
+		</div>
+	</div>
 </div>
 {% endblock %}

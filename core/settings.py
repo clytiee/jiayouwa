@@ -182,3 +182,17 @@ LOGGING = {
         },
     },
 }
+
+# ===== 用户等级配置 =====
+LEVELS = [
+    {'level': 1, 'title': '小蝌蚪', 'exp_required': 0},
+    {'level': 2, 'title': '小青蛙', 'exp_required': 30},
+    {'level': 3, 'title': '跳跳蛙', 'exp_required': 80},
+    {'level': 4, 'title': '探险蛙', 'exp_required': 160},
+    {'level': 5, 'title': '学霸蛙', 'exp_required': 280},
+    {'level': 6, 'title': '智慧蛙', 'exp_required': 450},
+    {'level': 7, 'title': '领航蛙', 'exp_required': 680},
+    {'level': 8, 'title': '传奇蛙', 'exp_required': 1000},
+    {'level': 9, 'title': '蛙博士', 'exp_required': 1500},
+    {'level': 10, 'title': '加油蛙王', 'exp_required': 2200},
+]

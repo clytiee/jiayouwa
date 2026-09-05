@@ -19,6 +19,7 @@ from transactions.models import OilTransaction
 from transactions.services import OilService
 from shares.models import Share
 from notifications.models import Notification
+from users.services import ExpService
 
 logger = logging.getLogger(__name__)
 
@@ -142,6 +143,10 @@ def profile_view(request):
     download_count = Download.objects.filter(user=user).count()
     follower_count = Follow.objects.filter(following=user).count()
     following_count = Follow.objects.filter(follower=user).count()
+    # 等级进度
+    exp_current, exp_next, exp_progress = ExpService.get_exp_progress(user)
+    # 计算还需多少经验升级
+    exp_needed = exp_next - exp_current if exp_next > exp_current else 0
     
     # ===== 最近动态（合并多种行为） =====
     from itertools import chain
@@ -202,6 +207,12 @@ def profile_view(request):
         'follower_count': follower_count,
         'following_count': following_count,
         'recent_activities': recent_activities,
+        'exp_current': exp_current,
+        'exp_next': exp_next,
+        'exp_current': exp_current,
+        'exp_next': exp_next,
+        'exp_progress': exp_progress,
+        'exp_needed': exp_needed,  # ← 直接计算好差值
     }
     return render(request, 'users/profile.html', context)
 
