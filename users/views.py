@@ -18,6 +18,7 @@ from recommendations.models import BrowseHistory
 from transactions.models import OilTransaction
 from transactions.services import OilService
 from shares.models import Share
+from notifications.models import Notification
 
 logger = logging.getLogger(__name__)
 
