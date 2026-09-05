@@ -341,11 +341,11 @@
                         <p class="text-gray-700 text-sm mt-1">{{ comment.content }}</p>
                         <!-- 评论操作 -->
                         <div class="flex items-center space-x-4 mt-2 text-xs">
-                            <button @click="voteComment({{ comment.id }}, 'up')" 
+                            <button onclick="window.voteComment({{ comment.id }}, 'up')" 
                                     class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
                                 👍 <span class="comment-up-{{ comment.id }}">{{ comment.up_count|default:0 }}</span>
                             </button>
-                            <button @click="voteComment({{ comment.id }}, 'down')" 
+                            <button onclick="window.voteComment({{ comment.id }}, 'down')" 
                                     class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
                                 👎 <span class="comment-down-{{ comment.id }}">{{ comment.down_count|default:0 }}</span>
                             </button>
@@ -556,24 +556,24 @@ function resourceDetail() {
         
         // 评论投票
         async voteComment(commentId, type) {
-            try {
-                const resp = await fetch(`/resources/comment/${commentId}/vote/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `vote_type=${type}`
-                });
-                const data = await resp.json();
-                if (data.up_count !== undefined) {
-                    document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
-                    document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
-                }
-            } catch(e) {
-                console.error(e);
-            }
-        },
+			try {
+				const resp = await fetch(`/resources/comment/${commentId}/vote/`, {
+					method: 'POST',
+					headers: {
+						'X-CSRFToken': '{{ csrf_token }}',
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body: `vote_type=${type}`
+				});
+				const data = await resp.json();
+				if (data.up_count !== undefined) {
+					document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
+					document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+				}
+			} catch(e) {
+				console.error('投票错误:', e);
+			}
+		},
         
         // 分享
         shareResource() {
@@ -607,6 +607,27 @@ function resourceDetail() {
         }
     }
 }
+
+// ===== 全局投票函数（供动态插入的评论使用） =====
+window.voteComment = async function(commentId, type) {
+    try {
+        const resp = await fetch(`/resource/comment/${commentId}/vote/`, {  // ← 改成 /resource/
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `vote_type=${type}`
+        });
+        const data = await resp.json();
+        if (data.up_count !== undefined) {
+            document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
+            document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+        }
+    } catch(e) {
+        console.error('投票错误:', e);
+    }
+};
 
 // ===== AJAX 评论提交 =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -714,10 +735,10 @@ function createCommentHTML(comment) {
                     </div>
                     <p class="text-gray-700 text-sm mt-1">${comment.content}</p>
                     <div class="flex items-center space-x-4 mt-2 text-xs">
-                        <button onclick="voteComment(${comment.id}, 'up')" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
+                        <button onclick="window.voteComment(${comment.id}, 'up')" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
                             👍 <span class="comment-up-${comment.id}">0</span>
                         </button>
-                        <button onclick="voteComment(${comment.id}, 'down')" class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
+                        <button onclick="window.voteComment(${comment.id}, 'down')" class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
                             👎 <span class="comment-down-${comment.id}">0</span>
                         </button>
                     </div>
