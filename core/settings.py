@@ -196,3 +196,6 @@ LEVELS = [
     {'level': 9, 'title': '蛙博士', 'exp_required': 1500},
     {'level': 10, 'title': '加油蛙王', 'exp_required': 2200},
 ]
+
+# ===== AI 配置 =====
+ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY', '')

@@ -18,6 +18,8 @@ from .models import Resource, Collect, Download, Comment, CommentVote
 from transactions.services import OilService
 from users.models import User, Follow
 from recommendations.models import BrowseHistory
+from .ai_service import AIService
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +35,7 @@ def resource_upload(request):
             resource.uploader = request.user
             resource.save()
             
-            # 处理预览图（通过隐藏字段传递Base64图片）
+            # 处理预览图
             images_data = request.POST.get('images_data', '')
             if images_data:
                 processed_images = _process_images(images_data)
@@ -41,8 +43,30 @@ def resource_upload(request):
                     resource.cover_images = processed_images
                     resource.save()
             
-            messages.success(request, f'🎉 资源《{resource.title}》发布成功！AI正在自动生成标签，请稍后查看。')
-            return redirect('index')
+            # 🆕 异步调用 AI 生成标签（不阻塞响应）
+            # 使用 Django 的线程或后台任务
+            import threading
+            def generate_ai_tags():
+                try:
+                    ai_result = AIService.generate_resource_tags(
+                        resource.title, 
+                        resource.description
+                    )
+                    if ai_result:
+                        resource.tags = ai_result.get('tags', [])
+                        resource.grade = ai_result.get('grade', '')
+                        resource.resource_type = ai_result.get('resource_type', '')
+                        resource.ai_tags_generated = True
+                        resource.save()
+                        logger.info(f'AI 标签生成成功: 资源 {resource.id}')
+                except Exception as e:
+                    logger.error(f'AI 标签生成失败: {e}')
+            
+            thread = threading.Thread(target=generate_ai_tags)
+            thread.start()
+            
+            messages.success(request, f'🎉 资源《{resource.title}》发布成功！AI 正在自动生成标签，请稍后刷新查看。')
+            return redirect('resources:detail', resource_id=resource.id)
         else:
             messages.error(request, '发布失败，请检查表单中的错误。')
     else:
