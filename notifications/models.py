@@ -14,18 +14,43 @@ class Notification(models.Model):
         ('like', '点赞通知'),
     )
     
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
-                                  related_name='received_notifications', verbose_name='接收者')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
-                               on_delete=models.SET_NULL, related_name='sent_notifications', verbose_name='发送者')
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='received_notifications',
+        verbose_name='接收者'
+    )
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        null=True, 
+        blank=True,
+        on_delete=models.SET_NULL, 
+        related_name='sent_notifications',
+        verbose_name='发送者'
+    )
     title = models.CharField(max_length=100, verbose_name='标题')
     content = models.TextField(verbose_name='内容')
     is_read = models.BooleanField(default=False, verbose_name='是否已读')
-    message_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default='system', verbose_name='消息类型')
-    related_resource = models.ForeignKey('resources.Resource', null=True, blank=True,
-                                         on_delete=models.SET_NULL, verbose_name='关联资源')
-    related_comment = models.ForeignKey('resources.Comment', null=True, blank=True,
-                                        on_delete=models.SET_NULL, verbose_name='关联评论')
+    message_type = models.CharField(
+        max_length=30, 
+        choices=TYPE_CHOICES, 
+        default='system',
+        verbose_name='消息类型'
+    )
+    related_resource = models.ForeignKey(
+        'resources.Resource', 
+        null=True, 
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name='关联资源'
+    )
+    related_comment = models.ForeignKey(
+        'resources.Comment', 
+        null=True, 
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name='关联评论'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='发送时间')
     
     class Meta:

@@ -188,6 +188,11 @@ def profile_view(request):
     activities.sort(key=lambda x: x['time'], reverse=True)
     recent_activities = activities[:10]
     
+    # 获取最近5条通知
+    recent_notifications = Notification.objects.filter(
+        recipient=request.user
+    ).order_by('-created_at')[:5]
+    
     context = {
         'user': user,
         'resource_count': resource_count,

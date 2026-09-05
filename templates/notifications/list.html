@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}消息中心 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-6">
+    
+    <!-- 页面头部 -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">📬 消息中心</h1>
+            <p class="text-sm text-gray-400 mt-1">
+                共 {{ notifications.paginator.count }} 条消息
+                {% if unread_count > 0 %}
+                · <span class="text-red-500 font-medium">{{ unread_count }} 条未读</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="flex space-x-3">
+            {% if unread_count > 0 %}
+            <button onclick="markAllRead()" 
+                    class="text-sm text-green-600 hover:text-green-700 transition">
+                ✅ 全部已读
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 消息列表 -->
+    {% if notifications %}
+    <div class="space-y-3">
+        {% for notice in notifications %}
+        <div id="notification-{{ notice.id }}" 
+             class="bg-white rounded-xl card-shadow p-4 hover:shadow-lg transition {% if not notice.is_read %}border-l-4 border-green-500{% endif %}">
+            <div class="flex items-start space-x-3">
+                <!-- 图标 -->
+                <span class="text-2xl flex-shrink-0 mt-0.5">
+                    {% if notice.message_type == 'comment' %}💬
+                    {% elif notice.message_type == 'follow' %}👤
+                    {% elif notice.message_type == 'like' %}❤️
+                    {% elif notice.message_type == 'audit_pass' %}✅
+                    {% elif notice.message_type == 'audit_reject' %}❌
+                    {% else %}📢{% endif %}
+                </span>
+                
+                <!-- 内容 -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-800 text-sm">{{ notice.title }}</span>
+                        {% if not notice.is_read %}
+                        <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">新</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-600 text-sm mt-0.5">{{ notice.content }}</p>
+                    {% if notice.related_resource %}
+                    <a href="{% url 'resources:detail' notice.related_resource.id %}" 
+                       class="text-xs text-green-600 hover:underline mt-1 inline-block">
+                        📎 查看相关资源 →
+                    </a>
+                    {% endif %}
+                    <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                        <span>{{ notice.created_at|date:"Y-m-d H:i" }}</span>
+                        {% if not notice.is_read %}
+                        <button onclick="markRead({{ notice.id }})" 
+                                class="text-green-500 hover:text-green-700 transition">
+                            标记已读
+                        </button>
+                        {% endif %}
+                        <button onclick="deleteNotification({{ notice.id }})" 
+                                class="text-red-400 hover:text-red-600 transition">
+                            删除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- 分页 -->
+    {% if notifications.has_other_pages %}
+    <div class="flex justify-center space-x-2 mt-6">
+        {% if notifications.has_previous %}
+        <a href="?page={{ notifications.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+        {% endif %}
+        <span class="px-3 py-1 text-sm text-gray-600">第 {{ notifications.number }} / {{ notifications.paginator.num_pages }} 页</span>
+        {% if notifications.has_next %}
+        <a href="?page={{ notifications.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- 空状态 -->
+    <div class="bg-white rounded-2xl card-shadow p-12 text-center">
+        <div class="text-6xl mb-4">📭</div>
+        <h3 class="text-xl font-medium text-gray-600">暂无消息</h3>
+        <p class="text-gray-400 mt-2">当有人评论、关注或系统有通知时，这里会显示</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function markRead(notificationId) {
+    fetch(`/notifications/${notificationId}/read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function markAllRead() {
+    if (!confirm('确定要将所有消息标记为已读吗？')) return;
+    
+    fetch('/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function deleteNotification(notificationId) {
+    if (!confirm('确定要删除这条消息吗？')) return;
+    
+    fetch(`/notifications/${notificationId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`notification-${notificationId}`).remove();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

@@ -189,7 +189,7 @@
                     
                     {% if user.is_authenticated %}
                         <!-- 消息通知 -->
-                        <div x-data="{ open: false }" class="relative">
+						<div x-data="{ open: false }" class="relative">
 							<button @click="open = !open" 
 									@click.away="open = false"
 									class="relative p-2 rounded-full hover:bg-gray-100 transition">
@@ -206,10 +206,33 @@
 								 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
 								<div class="p-3 border-b border-gray-100 font-medium text-gray-700">📬 消息中心</div>
 								<div class="max-h-64 overflow-y-auto">
-									<!-- 消息列表 -->
-									<div class="px-4 py-3 text-center text-gray-400 text-sm">暂无消息</div>
+									{% if recent_notifications %}
+									{% for notice in recent_notifications %}
+									<a href="{% url 'notifications:list' %}" 
+									   class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition {% if not notice.is_read %}bg-green-50/30{% endif %}">
+										<div class="flex items-center gap-2">
+											<span>
+												{% if notice.message_type == 'comment' %}💬
+												{% elif notice.message_type == 'follow' %}👤
+												{% elif notice.message_type == 'like' %}❤️
+												{% else %}📢{% endif %}
+											</span>
+											<span class="text-sm text-gray-800 flex-1 truncate">{{ notice.title }}</span>
+											{% if not notice.is_read %}
+											<span class="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></span>
+											{% endif %}
+										</div>
+										<div class="text-xs text-gray-400 truncate">{{ notice.content }}</div>
+									</a>
+									{% endfor %}
+									{% else %}
+									<div class="px-4 py-6 text-center text-gray-400 text-sm">暂无消息</div>
+									{% endif %}
 								</div>
-								<a href="#" class="block text-center text-sm text-green-600 py-2 hover:bg-gray-50 transition">查看全部消息 →</a>
+								<a href="{% url 'notifications:list' %}" 
+								   class="block text-center text-sm text-green-600 py-2 hover:bg-gray-50 transition border-t border-gray-100">
+									查看全部消息 →
+								</a>
 							</div>
 						</div>
 
