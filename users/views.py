@@ -135,11 +135,58 @@ def profile_view(request):
     """用户个人主页"""
     user = request.user
     
+    # 统计数据
     resource_count = Resource.objects.filter(uploader=user, status='published').count()
     collect_count = Collect.objects.filter(user=user).count()
     download_count = Download.objects.filter(user=user).count()
     follower_count = Follow.objects.filter(following=user).count()
     following_count = Follow.objects.filter(follower=user).count()
+    
+    # ===== 最近动态（合并多种行为） =====
+    from itertools import chain
+    from django.utils import timezone
+    
+    activities = []
+    
+    # 1. 发布资源
+    for r in Resource.objects.filter(uploader=user, status='published').order_by('-created_at')[:5]:
+        activities.append({
+            'icon': '📤',
+            'text': '发布了资源',
+            'resource': r,
+            'time': r.created_at,
+        })
+    
+    # 2. 收藏资源
+    for c in Collect.objects.filter(user=user).order_by('-created_at')[:5]:
+        activities.append({
+            'icon': '❤️',
+            'text': '收藏了资源',
+            'resource': c.resource,
+            'time': c.created_at,
+        })
+    
+    # 3. 下载资源
+    for d in Download.objects.filter(user=user).order_by('-downloaded_at')[:5]:
+        activities.append({
+            'icon': '📥',
+            'text': '下载了资源',
+            'resource': d.resource,
+            'time': d.downloaded_at,
+        })
+    
+    # 4. 评论
+    for c in Comment.objects.filter(user=user).order_by('-created_at')[:5]:
+        activities.append({
+            'icon': '💬',
+            'text': '评论了资源',
+            'resource': c.resource,
+            'time': c.created_at,
+        })
+    
+    # 按时间排序，取最近10条
+    activities.sort(key=lambda x: x['time'], reverse=True)
+    recent_activities = activities[:10]
     
     context = {
         'user': user,
@@ -148,6 +195,7 @@ def profile_view(request):
         'download_count': download_count,
         'follower_count': follower_count,
         'following_count': following_count,
+        'recent_activities': recent_activities,
     }
     return render(request, 'users/profile.html', context)
 

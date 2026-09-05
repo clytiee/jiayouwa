@@ -100,18 +100,43 @@
         </a>
     </div>
     
-    <!-- ===== 最近动态 ===== -->
-    <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
-        <h3 class="text-sm font-medium text-gray-700 mb-4">📌 最近动态</h3>
-        <div class="text-center text-gray-400 text-sm py-6">
-            <p>🐸 还没有动态</p>
-            <p class="text-xs mt-1">发布资源或互动后，这里会显示你的最新动态</p>
-        </div>
-        <a href="{% url 'resources:upload' %}" 
-           class="block text-center text-green-600 hover:text-green-700 text-sm mt-2">
-            📤 发布第一个资源 →
-        </a>
-    </div>
+	<!-- ===== 最近动态 ===== -->
+	<div class="mt-6 bg-white rounded-2xl card-shadow p-6">
+		<h3 class="text-sm font-medium text-gray-700 mb-4">📌 最近动态</h3>
+		{% if recent_activities %}
+		<div class="space-y-3">
+			{% for activity in recent_activities %}
+			<div class="flex items-center space-x-3 text-sm">
+				<span class="text-lg flex-shrink-0">{{ activity.icon }}</span>
+				<div class="flex-1 min-w-0">
+					<span class="text-gray-600">
+						{{ activity.text }}
+						{% if activity.resource %}
+						<a href="{% url 'resources:detail' activity.resource.id %}" class="text-green-600 hover:underline">
+							《{{ activity.resource.title }}》
+						</a>
+						{% endif %}
+					</span>
+				</div>
+				<span class="text-xs text-gray-400 flex-shrink-0">{{ activity.time|date:"Y-m-d H:i" }}</span>
+			</div>
+			{% endfor %}
+		</div>
+		{% else %}
+		<div class="text-center text-gray-400 text-sm py-6">
+			<p>🐸 还没有动态</p>
+			<p class="text-xs mt-1">发布资源或互动后，这里会显示你的最新动态</p>
+		</div>
+		{% endif %}
+		
+		<!-- 只在没有资源时才显示"发布第一个资源" -->
+		{% if resource_count == 0 %}
+		<a href="{% url 'resources:upload' %}" 
+		   class="block text-center text-green-600 hover:text-green-700 text-sm mt-3">
+			📤 发布第一个资源 →
+		</a>
+		{% endif %}
+	</div>
     
 </div>
 {% endblock %}
