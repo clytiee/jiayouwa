@@ -63,6 +63,18 @@
     .vote-btn.active-down {
         color: #EF5350;
     }
+	/* 评论高亮闪烁 */
+	@keyframes highlightFlash {
+		0% { background-color: #fef3c7; border-color: #f59e0b; transform: scale(1.02); }
+		30% { background-color: #fde68a; border-color: #f59e0b; }
+		100% { background-color: transparent; border-color: transparent; transform: scale(1); }
+	}
+
+	.highlight-flash {
+		animation: highlightFlash 1.5s ease-out 3;
+		border: 2px solid #f59e0b;
+		border-radius: 12px;
+	}
 </style>
 {% endblock %}
 
@@ -287,21 +299,25 @@
     <!-- ===== 评论区 ===== -->
     <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
         <h3 class="text-lg font-bold text-gray-800 mb-4">
-            💬 评论（{{ comment_count }}）
-        </h3>
+			💬 评论（<span class="comment-count">{{ comment_count }}</span>）
+		</h3>
         
-        <!-- 评论表单 -->
-        {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'resources:add_comment' resource.id %}" class="mb-6">
-            {% csrf_token %}
-            <textarea name="content" rows="3" 
-                      placeholder="写下你的想法...（支持顶/踩，优质评论会获得油滴奖励）"
-                      class="input-field" required></textarea>
-            <button type="submit" class="btn-primary mt-2 px-6 py-2 text-sm">
-                📤 发布评论
-            </button>
-        </form>
-        {% else %}
+       <!-- 评论表单 -->
+		{% if user.is_authenticated %}
+		<div id="comment-form-wrapper">
+			<form id="comment-form" class="mb-6">
+				{% csrf_token %}
+				<input type="hidden" name="parent_id" id="parent_id" value="">
+				<textarea name="content" id="comment-content" rows="3" 
+						  placeholder="写下你的想法...（支持顶/踩，优质评论会获得油滴奖励）"
+						  class="input-field" required></textarea>
+				<button type="submit" id="comment-submit" class="btn-primary mt-2 px-6 py-2 text-sm">
+					📤 发布评论
+				</button>
+				<span id="comment-loading" class="text-sm text-gray-400 ml-3 hidden">⏳ 发布中...</span>
+			</form>
+		</div>
+		{% else %}
         <div class="text-center py-4 text-gray-400">
             <a href="{% url 'users:login' %}?next={{ request.path }}" class="text-green-600 hover:underline">登录</a>
             后发表评论
@@ -591,5 +607,125 @@ function resourceDetail() {
         }
     }
 }
+
+// ===== AJAX 评论提交 =====
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('comment-form');
+    if (!form) return;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const content = document.getElementById('comment-content');
+        const submitBtn = document.getElementById('comment-submit');
+        const loading = document.getElementById('comment-loading');
+        const parentId = document.getElementById('parent_id');
+        
+        if (!content.value.trim()) {
+            alert('请输入评论内容');
+            return;
+        }
+        
+        // 禁用按钮，显示加载状态
+        submitBtn.disabled = true;
+        loading.classList.remove('hidden');
+        
+        const formData = new FormData();
+        formData.append('content', content.value.trim());
+        if (parentId.value) {
+            formData.append('parent_id', parentId.value);
+        }
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch(window.location.pathname + 'comment/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+		if (data.success) {
+			// 1. 追加新评论
+			const commentHtml = createCommentHTML(data.comment);
+			const commentList = document.querySelector('.space-y-4');
+			if (commentList) {
+				commentList.insertAdjacentHTML('afterbegin', commentHtml);
+				
+				// 2. 高亮新评论（闪烁效果）
+				const newComment = commentList.querySelector('.comment-item:first-child');
+				if (newComment) {
+					newComment.classList.add('highlight-flash');
+					setTimeout(() => {
+						newComment.classList.remove('highlight-flash');
+					}, 3000);
+				}
+			}
+			
+			// 3. 清空输入框
+			content.value = '';
+			
+			// 4. 显示成功提示
+			const successMsg = document.createElement('div');
+			successMsg.className = 'text-green-600 text-sm font-medium mb-3 p-2 bg-green-50 rounded-lg border border-green-200';
+			successMsg.textContent = '✅ 评论发布成功！';
+			successMsg.id = 'comment-success-msg';
+			
+			// 移除旧的提示
+			const oldMsg = document.getElementById('comment-success-msg');
+			if (oldMsg) oldMsg.remove();
+			
+			// 插入到评论表单和列表之间
+			const formWrapper = document.getElementById('comment-form-wrapper');
+			if (formWrapper) {
+				formWrapper.insertAdjacentElement('afterend', successMsg);
+			}
+			
+			// 5. 评论数 +1
+			const countSpan = document.querySelector('.comment-count');
+			if (countSpan) {
+				countSpan.textContent = parseInt(countSpan.textContent) + 1;
+			}
+			
+		} else {
+			alert(data.error || '评论发布失败，请稍后重试');
+		}
+	})
+        .catch(error => {
+            console.error('评论发布错误:', error);
+            alert('网络错误，请稍后重试');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            loading.classList.add('hidden');
+        });
+    });
+});
+
+function createCommentHTML(comment) {
+    const time = new Date(comment.created_at).toLocaleString('zh-CN');
+    return `
+        <div class="comment-item p-4 bg-gray-50 rounded-xl" id="comment-${comment.id}">
+            <div class="flex items-start space-x-3">
+                <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-medium text-gray-800 text-sm">${comment.username}</span>
+                        <span class="text-xs text-gray-400">🐸 Lv.${comment.level}</span>
+                        <span class="text-xs text-gray-400">${time}</span>
+                    </div>
+                    <p class="text-gray-700 text-sm mt-1">${comment.content}</p>
+                    <div class="flex items-center space-x-4 mt-2 text-xs">
+                        <button onclick="voteComment(${comment.id}, 'up')" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
+                            👍 <span class="comment-up-${comment.id}">0</span>
+                        </button>
+                        <button onclick="voteComment(${comment.id}, 'down')" class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
+                            👎 <span class="comment-down-${comment.id}">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 </script>
+
 {% endblock %}

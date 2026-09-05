@@ -479,18 +479,16 @@ def rate_resource(request, resource_id):
 @login_required
 @require_POST
 def add_comment(request, resource_id):
-    """添加评论"""
+    """添加评论（AJAX）"""
     resource = get_object_or_404(Resource, id=resource_id)
     content = request.POST.get('content', '').strip()
     parent_id = request.POST.get('parent_id')
     
     if not content:
-        messages.error(request, '评论内容不能为空')
-        return redirect('resources:detail', resource_id=resource_id)
+        return JsonResponse({'success': False, 'error': '评论内容不能为空'})
     
     if len(content) > 1000:
-        messages.error(request, '评论内容不能超过1000字')
-        return redirect('resources:detail', resource_id=resource_id)
+        return JsonResponse({'success': False, 'error': '评论内容不能超过1000字'})
     
     parent = None
     if parent_id:
@@ -501,23 +499,31 @@ def add_comment(request, resource_id):
         resource=resource,
         parent=parent,
         content=content,
-        audit_status='visible'  # 简化：直接可见，后续可加AI审核
+        audit_status='visible'
     )
     
-    # 增加评论通知
+    # 发送通知
     if resource.uploader != request.user:
         from notifications.models import Notification
         Notification.objects.create(
             recipient=resource.uploader,
             sender=request.user,
             title=f'新评论：{resource.title}',
-            content=f'{request.user.first_name} 评论了你的资源：{content[:50]}...',
+            content=f'{request.user.first_name|default:request.user.username} 评论了你的资源：{content[:50]}...',
             message_type='comment',
             related_resource=resource
         )
     
-    messages.success(request, '评论发布成功！')
-    return redirect('resources:detail', resource_id=resource_id)
+    return JsonResponse({
+        'success': True,
+        'comment': {
+            'id': comment.id,
+            'username': request.user.first_name or request.user.username,
+            'level': request.user.level,
+            'content': comment.content,
+            'created_at': comment.created_at.isoformat(),
+        }
+    })
 
 
 @login_required
