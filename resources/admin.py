@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.urls import path  # ← 添加这行
+from django.shortcuts import redirect
+from django.contrib import messages
 from django.utils.html import format_html
 from .models import Resource, Collect, Download, Comment, CommentVote
-
+from .vector_search import VectorSearch
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):
@@ -59,6 +62,27 @@ class ResourceAdmin(admin.ModelAdmin):
         self.message_user(request, f'已标记 {count} 个资源为失效')
     mark_expired.short_description = '标记为失效'
 
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('rebuild-index/', self.admin_site.admin_view(self.rebuild_index), name='rebuild_index'),
+        ]
+        return custom_urls + urls
+    
+    def rebuild_index(self, request):
+        """重建向量索引"""
+        try:
+            count = VectorSearch.rebuild_index()
+            messages.success(request, f'✅ 向量索引重建成功！')
+        except Exception as e:
+            messages.error(request, f'❌ 重建失败: {e}')
+        return redirect('admin:resources_resource_changelist')
+
+    def changelist_view(self, request, extra_context=None):
+        """在列表页添加重建按钮"""
+        extra_context = extra_context or {}
+        extra_context['rebuild_index_url'] = 'rebuild-index/'
+        return super().changelist_view(request, extra_context=extra_context)
 
 @admin.register(Collect)
 class CollectAdmin(admin.ModelAdmin):

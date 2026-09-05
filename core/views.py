@@ -4,6 +4,7 @@ from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 from resources.models import Resource
 from users.models import User
+from resources.vector_search import VectorSearch
 
 
 def home_view(request):
@@ -79,10 +80,9 @@ def ranking_view(request):
 # 保留旧的 ranking_view 已替换
 
 def search_view(request):
-    """搜索资源"""
+    """搜索资源（关键词 + 语义）"""
     query = request.GET.get('q', '').strip()
     
-    # 从 URL 参数获取模式
     view_mode = request.GET.get('mode')
     if view_mode in ['list', 'card']:
         request.session['view_mode'] = view_mode
@@ -91,10 +91,13 @@ def search_view(request):
     
     results = []
     search_performed = False
+    result_count = 0
     
     if query:
         search_performed = True
-        results = Resource.objects.filter(
+        
+        # 🔍 先用关键词搜索
+        keyword_results = Resource.objects.filter(
             Q(status='published') &
             (
                 Q(title__icontains=query) |
@@ -104,17 +107,72 @@ def search_view(request):
                 Q(uploader__first_name__icontains=query)
             )
         ).select_related('uploader').order_by('-created_at')
-    
-    paginator = Paginator(results, 10) if results else Paginator([], 10)
-    page = request.GET.get('page', 1)
-    results_page = paginator.get_page(page)
+        
+        # 🧠 再用语义搜索（AI）
+        semantic_results = VectorSearch.search(query, limit=20)
+        
+        # 合并结果：先去重，再按相似度排序
+        seen_ids = set()
+        combined = []
+        
+        # 先添加语义搜索的结果（AI 排序）
+        for sr in semantic_results:
+            if sr['id'] not in seen_ids:
+                seen_ids.add(sr['id'])
+                combined.append({
+                    'resource': None,  # 稍后补充
+                    'is_semantic': True,
+                    'similarity': sr['similarity'],
+                    'data': sr
+                })
+        
+        # 再添加关键词结果
+        for kr in keyword_results:
+            if kr.id not in seen_ids:
+                seen_ids.add(kr.id)
+                combined.append({
+                    'resource': kr,
+                    'is_semantic': False,
+                    'similarity': 0,
+                    'data': None
+                })
+        
+        # 补充 resource 对象
+        resource_ids = [c['data']['id'] for c in combined if c['is_semantic']]
+        if resource_ids:
+            resource_map = {r.id: r for r in Resource.objects.filter(id__in=resource_ids)}
+            for c in combined:
+                if c['is_semantic'] and c['data']:
+                    c['resource'] = resource_map.get(c['data']['id'])
+        
+        # 过滤掉没有 resource 的语义结果
+        combined = [c for c in combined if c['resource'] is not None]
+        
+        # 按相似度降序（语义优先），再按创建时间
+        combined.sort(key=lambda x: (-x['similarity'] if x['is_semantic'] else 0, -x['resource'].created_at.timestamp()))
+        
+        # 提取最终的资源列表
+        final_resources = [c['resource'] for c in combined]
+        result_count = len(final_resources)
+        
+        # 分页
+        paginator = Paginator(final_resources, 10) if final_resources else Paginator([], 10)
+        page = request.GET.get('page', 1)
+        results_page = paginator.get_page(page)
+        
+        # 保存语义搜索标记（用于模板显示）
+        semantic_ids = {c['resource'].id for c in combined if c['is_semantic']}
+        for r in results_page:
+            r.is_semantic_match = r.id in semantic_ids
+    else:
+        results_page = []
     
     context = {
         'results': results_page,
         'query': query,
         'search_performed': search_performed,
         'view_mode': view_mode,
-        'result_count': results.count(),
+        'result_count': result_count,
     }
     
     return render(request, 'search_results.html', context)
