@@ -25,16 +25,16 @@
         <div class="flex items-center justify-between mb-4">
             <p class="text-sm text-gray-400">找到 <span class="font-medium text-gray-600">{{ result_count }}</span> 个结果</p>
             <!-- 视图切换 -->
-            <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-                <a href="?q={{ query }}&mode=list" 
-                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
-                    📋 列表
-                </a>
-                <a href="?q={{ query }}&mode=card" 
-                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
-                    🎴 卡片
-                </a>
-            </div>
+			<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+				<a href="?q={{ query }}&mode=list" 
+				   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+					📋 列表
+				</a>
+				<a href="?q={{ query }}&mode=card" 
+				   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+					🎴 卡片
+				</a>
+			</div>
         </div>
         
         <!-- 结果列表 -->

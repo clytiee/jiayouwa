@@ -81,14 +81,19 @@ def ranking_view(request):
 def search_view(request):
     """搜索资源"""
     query = request.GET.get('q', '').strip()
-    view_mode = request.session.get('view_mode', 'list')
+    
+    # 从 URL 参数获取模式
+    view_mode = request.GET.get('mode')
+    if view_mode in ['list', 'card']:
+        request.session['view_mode'] = view_mode
+    else:
+        view_mode = request.session.get('view_mode', 'list')
     
     results = []
     search_performed = False
     
     if query:
         search_performed = True
-        # 关键词搜索：标题、描述、标签、上传者
         results = Resource.objects.filter(
             Q(status='published') &
             (
@@ -100,7 +105,6 @@ def search_view(request):
             )
         ).select_related('uploader').order_by('-created_at')
     
-    # 分页
     paginator = Paginator(results, 10) if results else Paginator([], 10)
     page = request.GET.get('page', 1)
     results_page = paginator.get_page(page)
