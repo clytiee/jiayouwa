@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}搜索结果 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    
+    <!-- 搜索框 -->
+    <div class="mb-6">
+        <form action="/search/" method="GET" class="relative">
+            <input type="text" name="q" value="{{ query }}"
+                   placeholder="搜索资源、标签、用户..."
+                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition text-base">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 btn-primary text-sm py-1.5 px-4">
+                搜索
+            </button>
+        </form>
+    </div>
+    
+    <!-- 搜索结果 -->
+    {% if search_performed %}
+        {% if result_count > 0 %}
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-sm text-gray-400">找到 <span class="font-medium text-gray-600">{{ result_count }}</span> 个结果</p>
+            <!-- 视图切换 -->
+            <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                <a href="?q={{ query }}&mode=list" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    📋 列表
+                </a>
+                <a href="?q={{ query }}&mode=card" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    🎴 卡片
+                </a>
+            </div>
+        </div>
+        
+        <!-- 结果列表 -->
+        <div id="search-results">
+            {% if view_mode == 'list' %}
+            <!-- 列表模式 -->
+            <div class="space-y-3">
+                {% for resource in results %}
+                <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover px-5 py-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0 pr-4">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-medium text-gray-800 truncate">{{ resource.title }}</h3>
+                                <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
+                                    {% if resource.avg_rating > 0 %}
+                                    <span class="text-xs text-amber-500 font-medium">⭐ {{ resource.avg_rating|floatformat:1 }}</span>
+                                    {% endif %}
+                                    <span class="text-xs text-gray-400">❤️ {{ resource.collect_count }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                                {% if resource.tags %}
+                                {% for tag in resource.tags|slice:":3" %}
+                                <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">#{{ tag }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <span class="text-gray-400">👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+                                <span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
+                                <span class="text-gray-300">|</span>
+                                {% if resource.price == 0 %}
+                                <span class="text-green-600 font-medium">🆓 免费</span>
+                                {% else %}
+                                <span class="text-amber-600 font-medium">💰 {{ resource.price }}油滴</span>
+                                {% endif %}
+                                <span class="text-gray-400">📥 {{ resource.download_count }}</span>
+                                <span class="text-gray-400">👁️ {{ resource.view_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- 卡片模式 -->
+            <div class="masonry-grid">
+                {% for resource in results %}
+                <div class="masonry-item">
+                    <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover">
+                        <div class="relative bg-gray-100 overflow-hidden" style="aspect-ratio: 4/3;">
+                            {% if resource.cover_images and resource.cover_images|length > 0 %}
+                            <img src="{{ resource.cover_images.0 }}" alt="{{ resource.title }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-5xl bg-gray-50">📄</div>
+                            {% endif %}
+                            {% if resource.avg_rating > 0 %}
+                            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">⭐ {{ resource.avg_rating|floatformat:1 }}</div>
+                            {% endif %}
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">❤️ {{ resource.collect_count }}</div>
+                            <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                                {% if resource.price == 0 %}🆓 免费{% else %}💰 {{ resource.price }}油滴{% endif %}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="text-sm font-medium text-gray-800 line-clamp-2">{{ resource.title }}</h3>
+                            <div class="mt-1 flex items-center justify-between">
+                                <div class="flex items-center gap-1 text-[10px] text-gray-400">
+                                    <span>👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+                                    <span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
+                                    {% if resource.tags %}
+                                    {% for tag in resource.tags|slice:":2" %}
+                                    <span class="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] text-gray-400 flex-shrink-0">
+                                    <span>📥 {{ resource.download_count }}</span>
+                                    <span>👁️ {{ resource.view_count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- 分页 -->
+        {% if results.has_other_pages %}
+        <div class="flex justify-center space-x-2 mt-6">
+            {% if results.has_previous %}
+            <a href="?q={{ query }}&mode={{ view_mode }}&page={{ results.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+            {% endif %}
+            <span class="px-3 py-1 text-sm text-gray-600">第 {{ results.number }} / {{ results.paginator.num_pages }} 页</span>
+            {% if results.has_next %}
+            <a href="?q={{ query }}&mode={{ view_mode }}&page={{ results.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- 无结果 -->
+        <div class="bg-white rounded-2xl card-shadow p-12 text-center">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-xl font-medium text-gray-600">没有找到相关资源</h3>
+            <p class="text-gray-400 mt-2">试试其他关键词，或者浏览首页发现好资源</p>
+            <a href="/" class="btn-primary inline-block mt-4">🏠 返回首页</a>
+        </div>
+        {% endif %}
+        
+    {% else %}
+    <!-- 未搜索 -->
+    <div class="bg-white rounded-2xl card-shadow p-12 text-center">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="text-xl font-medium text-gray-600">输入关键词搜索</h3>
+        <p class="text-gray-400 mt-2">搜索资源标题、标签、上传者等</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

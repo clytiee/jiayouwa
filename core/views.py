@@ -77,3 +77,40 @@ def ranking_view(request):
 
 
 # 保留旧的 ranking_view 已替换
+
+def search_view(request):
+    """搜索资源"""
+    query = request.GET.get('q', '').strip()
+    view_mode = request.session.get('view_mode', 'list')
+    
+    results = []
+    search_performed = False
+    
+    if query:
+        search_performed = True
+        # 关键词搜索：标题、描述、标签、上传者
+        results = Resource.objects.filter(
+            Q(status='published') &
+            (
+                Q(title__icontains=query) |
+                Q(description__icontains=query) |
+                Q(tags__icontains=query) |
+                Q(uploader__username__icontains=query) |
+                Q(uploader__first_name__icontains=query)
+            )
+        ).select_related('uploader').order_by('-created_at')
+    
+    # 分页
+    paginator = Paginator(results, 10) if results else Paginator([], 10)
+    page = request.GET.get('page', 1)
+    results_page = paginator.get_page(page)
+    
+    context = {
+        'results': results_page,
+        'query': query,
+        'search_performed': search_performed,
+        'view_mode': view_mode,
+        'result_count': results.count(),
+    }
+    
+    return render(request, 'search_results.html', context)
