@@ -8,13 +8,18 @@ from users.models import User
 
 def home_view(request):
     """首页推荐流"""
+    # 从 URL 参数获取模式，如果没有则从 session 获取
+    view_mode = request.GET.get('mode')
+    if view_mode in ['list', 'card']:
+        request.session['view_mode'] = view_mode
+    else:
+        view_mode = request.session.get('view_mode', 'list')
+    
     resources = Resource.objects.filter(status='published').order_by('-created_at')
     
     paginator = Paginator(resources, 10)
     page = request.GET.get('page', 1)
     resources_page = paginator.get_page(page)
-    
-    view_mode = request.session.get('view_mode', 'list')
     
     context = {
         'resources': resources_page,

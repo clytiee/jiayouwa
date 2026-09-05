@@ -6,20 +6,22 @@
 {% block content %}
 <div class="max-w-4xl mx-auto">
     
-    <!-- 视图切换 -->
-<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1" 
-     x-data="{ mode: '{{ view_mode }}' }">
-    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-            :class="mode === 'list' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
-            @click="mode = 'list'; fetch('/toggle-mode/', {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}, body: 'mode=list'}).then(() => location.reload())">
-        📋 列表
-    </button>
-    <button class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-            :class="mode === 'card' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'"
-            @click="mode = 'card'; fetch('/toggle-mode/', {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}, body: 'mode=card'}).then(() => location.reload())">
-        🎴 卡片
-    </button>
-</div>
+	<!-- 视图切换 -->
+	<div class="flex items-center justify-between mb-4">
+		<div class="flex items-center space-x-2 text-sm text-gray-400">
+			<span>📚 发现好资源</span>
+		</div>
+		<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+			<a href="?mode=list" 
+			   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+				📋 列表
+			</a>
+			<a href="?mode=card" 
+			   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+				🎴 卡片
+			</a>
+		</div>
+	</div>
     
     <!-- 资源列表 -->
     <div id="resource-list">
