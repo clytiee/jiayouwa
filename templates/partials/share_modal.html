@@ -1,0 +1,202 @@
+<style>
+[x-cloak] { display: none !important; }
+</style>
+
+<div x-data="shareModal()" 
+     x-show="open" 
+	 x-cloak
+     x-transition.duration.200
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+     @click.away="close()">
+    
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+        
+        <!-- 头部 -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-800">📤 分享资源</h3>
+            <button @click="close()" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
+        </div>
+        
+        <!-- 内容 -->
+        <div class="p-6">
+            
+            <!-- 资源信息 -->
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                    <img x-show="coverImage" :src="coverImage" alt="" class="w-full h-full object-cover">
+                    <div x-show="!coverImage" class="w-full h-full flex items-center justify-center text-3xl">📄</div>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-medium text-gray-800 text-sm truncate" x-text="title"></div>
+                    <div class="text-xs text-gray-400">分享给朋友，一起学习 🐸</div>
+                </div>
+            </div>
+            
+            <!-- 分享链接 -->
+            <div class="mb-4">
+                <label class="text-sm font-medium text-gray-700">🔗 分享链接</label>
+                <div class="flex items-center space-x-2 mt-1">
+                    <input type="text" :value="shareUrl" readonly 
+                           class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 font-mono">
+                    <button @click="copyLink()" 
+                            class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition whitespace-nowrap">
+                        📋 复制
+                    </button>
+                </div>
+                <p x-show="copied" x-transition class="text-xs text-green-600 mt-1">✅ 已复制到剪贴板！</p>
+            </div>
+            
+            <!-- 分享渠道 -->
+            <div class="mb-4">
+                <label class="text-sm font-medium text-gray-700">📱 分享到</label>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <button @click="shareTo('wechat')" 
+                            class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition">
+                        💚 微信
+                    </button>
+                    <button @click="shareTo('xiaohongshu')" 
+                            class="px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm hover:bg-red-200 transition">
+                        📕 小红书
+                    </button>
+                    <button @click="shareTo('douyin')" 
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition">
+                        🎵 抖音
+                    </button>
+                    <button @click="shareTo('weibo')" 
+                            class="px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition">
+                        📱 微博
+                    </button>
+                    <button @click="shareTo('other')" 
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition">
+                        📋 复制文案
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 奖励说明 -->
+            <div class="bg-green-50 rounded-xl p-3 text-xs text-green-700">
+                💡 分享奖励：<br>
+                • 朋友点击链接 → 你 <strong>+1 油滴</strong><br>
+                • 朋友注册 → 你 <strong>+5 油滴</strong><br>
+                • 朋友下载资源 → 你 <strong>+1 油滴</strong>
+            </div>
+            
+            <!-- 生成分享图文按钮 -->
+            <button @click="generateImage()" 
+                    class="w-full mt-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition">
+                🎨 生成分享图文卡片
+            </button>
+            
+            <!-- 生成的图文预览 -->
+            <div x-show="imageGenerated" x-transition class="mt-4">
+                <div class="bg-gray-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl mb-2">🐸</div>
+                    <div class="font-medium text-gray-800" x-text="title"></div>
+                    <div class="text-xs text-gray-400 mt-1">加油哇 · 学习路上一起加油！</div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        📱 长按保存图片分享到朋友圈
+                    </div>
+                    <button @click="downloadImage()" 
+                            class="mt-2 px-4 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition">
+                        💾 保存图片
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function shareModal() {
+    return {
+        open: false,
+        resourceId: null,
+        title: '',
+        coverImage: '',
+        shareUrl: '',
+        shareId: '',
+        copied: false,
+        imageGenerated: false,
+        
+        init() {
+			document.addEventListener('open-share-modal', (event) => {
+				this.resourceId = event.detail.resourceId;
+				this.title = event.detail.title;
+				this.coverImage = event.detail.coverImage || '';
+				this.open = true;
+				this.createShare();
+			});
+		},
+        
+        async createShare() {
+            try {
+                const resp = await fetch('/s/create/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        resource_id: this.resourceId
+                    })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.shareUrl = data.share_url;
+                    this.shareId = data.share_id;
+                } else {
+                    alert('生成分享链接失败：' + data.error);
+                }
+            } catch(e) {
+                alert('网络错误，请重试');
+            }
+        },
+        
+        close() {
+            this.open = false;
+            this.imageGenerated = false;
+            this.copied = false;
+        },
+        
+        async copyLink() {
+            try {
+                await navigator.clipboard.writeText(this.shareUrl);
+                this.copied = true;
+                setTimeout(() => { this.copied = false; }, 2000);
+            } catch(e) {
+                // 降级方案
+                const input = document.querySelector('input[type="text"]');
+                if (input) {
+                    input.select();
+                    document.execCommand('copy');
+                    this.copied = true;
+                    setTimeout(() => { this.copied = false; }, 2000);
+                }
+            }
+        },
+        
+        shareTo(channel) {
+            const text = `🐸 我在加油哇发现了一个好资源：${this.title}\n学习路上，一起加油哇！\n${this.shareUrl}`;
+            
+            if (channel === 'copy' || channel === 'other') {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ 文案已复制，快去分享吧！');
+                });
+                return;
+            }
+            
+            // 各平台分享（实际需要根据平台API实现）
+            alert(`📱 分享到 ${channel}：\n\n${text}`);
+        },
+        
+        generateImage() {
+            // TODO: 实现图文生成功能
+            this.imageGenerated = true;
+        },
+        
+        downloadImage() {
+            alert('💾 图片下载功能开发中...');
+        }
+    }
+}
+</script>

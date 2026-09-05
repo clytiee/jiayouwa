@@ -210,12 +210,15 @@
                     <span x-text="collectCount"></span>
                 </button>
                 
-                <!-- 分享 -->
-                <button @click="shareResource()" 
-                        class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 transition">
-                    📤 分享
-                </button>
-                
+				<!-- 分享按钮 -->
+				<button @click="$dispatch('open-share-modal', {
+					resourceId: {{ resource.id }},
+					title: '{{ resource.title|escapejs }}',
+					coverImage: '{{ resource.cover_images.0|default:"" }}'
+				})" 
+				class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 transition">
+				📤 分享
+				</button>
                 <!-- 油滴价格 & 下载 -->
                 <div class="ml-auto flex items-center space-x-3">
                     {% if resource.price == 0 %}
@@ -576,6 +579,17 @@ function resourceDetail() {
                     }, 3000);
                 });
             }
+        }
+		
+        openShare() {
+            const event = new CustomEvent('openShareModal', {
+                detail: {
+                    resourceId: {{ resource.id }},
+                    title: '{{ resource.title|escapejs }}',
+                    coverImage: '{{ resource.cover_images.0|default:"" }}'
+                }
+            });
+            document.dispatchEvent(event);
         }
     }
 }

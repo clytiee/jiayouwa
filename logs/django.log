@@ -467,3 +467,473 @@ INFO 2026-09-04 19:37:21,768 log "GET /profile/ HTTP/1.1" 200 16419
 INFO 2026-09-04 19:38:41,276 log "GET /my-collections/ HTTP/1.1" 200 96654
 INFO 2026-09-04 19:38:46,645 log "GET /profile/ HTTP/1.1" 200 16419
 INFO 2026-09-04 19:39:01,362 log "GET /ranking/ HTTP/1.1" 200 17658
+INFO 2026-09-05 22:23:54,361 autoreload Watching for file changes with StatReloader
+INFO 2026-09-05 22:24:06,899 log "GET / HTTP/1.1" 200 326121
+INFO 2026-09-05 22:24:09,348 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+WARNING 2026-09-05 22:24:09,719 log Not Found: /favicon.ico
+WARNING 2026-09-05 22:24:09,721 log "GET /favicon.ico HTTP/1.1" 404 7007
+INFO 2026-09-05 22:24:12,361 log "GET /login/ HTTP/1.1" 200 11120
+INFO 2026-09-05 22:24:17,140 log "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-09-05 22:24:17,446 log "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4331
+INFO 2026-09-05 22:24:17,813 log "GET /static/admin/css/responsive.css HTTP/1.1" 200 15025
+INFO 2026-09-05 22:24:17,823 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2814
+INFO 2026-09-05 22:24:17,836 log "GET /static/admin/css/base.css HTTP/1.1" 200 24538
+INFO 2026-09-05 22:24:17,838 log "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2026-09-05 22:24:17,841 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 3583
+INFO 2026-09-05 22:24:17,864 log "GET /static/admin/js/theme.js HTTP/1.1" 200 1708
+INFO 2026-09-05 22:24:17,869 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3208
+INFO 2026-09-05 22:24:30,989 log "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-09-05 22:24:31,022 log "GET /admin/ HTTP/1.1" 200 11941
+INFO 2026-09-05 22:24:31,067 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,067 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,067 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,067 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,068 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,074 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:31,075 log "GET /static/admin/css/dashboard.css HTTP/1.1" 200 442
+INFO 2026-09-05 22:24:31,100 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 593
+INFO 2026-09-05 22:24:31,101 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 978
+INFO 2026-09-05 22:24:36,729 log "GET /admin/users/follow/ HTTP/1.1" 200 15633
+INFO 2026-09-05 22:24:36,769 log "GET /static/admin/css/changelists.css HTTP/1.1" 200 6216
+INFO 2026-09-05 22:24:36,779 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 349
+INFO 2026-09-05 22:24:36,793 log "GET /static/admin/js/actions.js HTTP/1.1" 200 8999
+INFO 2026-09-05 22:24:36,793 log "GET /static/admin/js/core.js HTTP/1.1" 200 6432
+INFO 2026-09-05 22:24:36,794 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 11452
+INFO 2026-09-05 22:24:36,797 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:36,801 log "GET /static/admin/js/urlify.js HTTP/1.1" 200 9985
+INFO 2026-09-05 22:24:36,807 log "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+INFO 2026-09-05 22:24:36,810 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1575
+INFO 2026-09-05 22:24:36,823 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-09-05 22:24:36,838 log "GET /static/admin/js/filters.js HTTP/1.1" 200 1099
+INFO 2026-09-05 22:24:36,867 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-09-05 22:24:36,901 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+INFO 2026-09-05 22:24:36,902 log "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+INFO 2026-09-05 22:24:41,656 log "GET /admin/users/user/ HTTP/1.1" 200 17004
+INFO 2026-09-05 22:24:41,706 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:41,713 log "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 558
+INFO 2026-09-05 22:24:41,713 log "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 645
+INFO 2026-09-05 22:24:44,047 log "GET /admin/auth/group/ HTTP/1.1" 200 12611
+INFO 2026-09-05 22:24:44,091 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:45,873 log "GET /admin/resources/download/ HTTP/1.1" 200 16964
+INFO 2026-09-05 22:24:45,920 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,921 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,922 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,922 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,922 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,928 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:45,928 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:45,952 log "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+INFO 2026-09-05 22:24:52,339 log "GET /admin/resources/collect/ HTTP/1.1" 200 16209
+INFO 2026-09-05 22:24:52,381 log "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,383 log "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,383 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,384 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,384 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,391 log "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,391 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,391 log "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,392 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,393 log "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:52,396 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:52,399 log "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:24:54,911 log "GET /admin/resources/comment/ HTTP/1.1" 200 17479
+INFO 2026-09-05 22:24:54,958 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:24:58,385 log "GET /admin/resources/commentvote/ HTTP/1.1" 200 13739
+INFO 2026-09-05 22:24:58,429 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:25:00,091 log "GET /admin/resources/resource/ HTTP/1.1" 200 19005
+INFO 2026-09-05 22:25:00,137 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:00,139 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:00,144 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:00,144 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:00,144 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:00,148 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:25:00,149 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:03,697 log "GET /admin/recommendations/browsehistory/ HTTP/1.1" 200 16699
+INFO 2026-09-05 22:25:03,744 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:25:11,757 log "GET /admin/recommendations/browsehistory/add/ HTTP/1.1" 200 17091
+INFO 2026-09-05 22:25:11,809 log "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,809 log "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,809 log "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,816 log "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,816 log "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,816 log "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,819 log "GET /admin/jsi18n/ HTTP/1.1" 200 8869
+INFO 2026-09-05 22:25:11,820 log "GET /static/admin/css/widgets.css HTTP/1.1" 200 12094
+INFO 2026-09-05 22:25:11,821 log "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,822 log "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,822 log "GET /static/admin/css/forms.css HTTP/1.1" 200 7951
+INFO 2026-09-05 22:25:11,823 log "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,835 log "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,836 log "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 726
+INFO 2026-09-05 22:25:11,841 log "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2026-09-05 22:25:11,855 log "GET /static/admin/js/change_form.js HTTP/1.1" 200 677
+INFO 2026-09-05 22:25:18,201 log "GET /admin/recommendations/browsehistory/ HTTP/1.1" 200 16699
+INFO 2026-09-05 22:25:26,042 log "GET /login/ HTTP/1.1" 302 0
+INFO 2026-09-05 22:25:26,064 log "GET / HTTP/1.1" 200 329945
+INFO 2026-09-05 22:25:26,388 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:25:30,592 log "GET /resource/2/ HTTP/1.1" 200 256825
+INFO 2026-09-05 22:25:36,109 log "GET / HTTP/1.1" 200 329945
+INFO 2026-09-05 22:25:36,361 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:25:37,554 log "GET /resource/1/ HTTP/1.1" 200 112690
+INFO 2026-09-05 22:25:41,711 log "GET /profile/ HTTP/1.1" 200 16398
+INFO 2026-09-05 22:25:48,837 log "GET /my-resources/ HTTP/1.1" 200 98339
+INFO 2026-09-05 22:25:52,504 log "GET /my-collections/ HTTP/1.1" 200 96640
+ERROR 2026-09-05 22:25:55,111 log Internal Server Error: /my-downloads/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 191, in my_downloads_view
+    return render(request, 'users/my_downloads.html', {'downloads': downloads_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_downloads.html
+ERROR 2026-09-05 22:25:55,113 log "GET /my-downloads/ HTTP/1.1" 500 89536
+INFO 2026-09-05 22:27:04,960 log "GET / HTTP/1.1" 200 329945
+INFO 2026-09-05 22:27:05,409 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:27:08,559 log "GET /my-downloads/ HTTP/1.1" 200 12133
+INFO 2026-09-05 22:27:18,812 log "GET /my-downloads/ HTTP/1.1" 200 12133
+ERROR 2026-09-05 22:27:29,211 log Internal Server Error: /my-history/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 211, in my_history_view
+    return render(request, 'users/my_history.html', {'history': history_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_history.html
+ERROR 2026-09-05 22:27:29,212 log "GET /my-history/ HTTP/1.1" 500 89435
+INFO 2026-09-05 22:28:26,024 log "GET /my-history/ HTTP/1.1" 200 327610
+ERROR 2026-09-05 22:28:31,860 log Internal Server Error: /my-shares/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 230, in my_shares_view
+    return render(request, 'users/my_shares.html', {'shares': shares_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_shares.html
+ERROR 2026-09-05 22:28:31,861 log "GET /my-shares/ HTTP/1.1" 500 89299
+ERROR 2026-09-05 22:28:39,770 log Internal Server Error: /my-earnings/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 264, in my_earnings_view
+    return render(request, 'users/my_earnings.html', {'transactions': transactions_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_earnings.html
+ERROR 2026-09-05 22:28:39,772 log "GET /my-earnings/ HTTP/1.1" 500 89601
+INFO 2026-09-05 22:29:29,786 log "GET /my-earnings/ HTTP/1.1" 200 16742
+INFO 2026-09-05 22:29:57,119 log "GET /ranking/ HTTP/1.1" 200 17637
+INFO 2026-09-05 22:30:08,016 log "GET / HTTP/1.1" 200 329945
+INFO 2026-09-05 22:30:08,277 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:30:09,371 log "GET /resource/2/ HTTP/1.1" 200 256825
+INFO 2026-09-05 22:33:43,288 autoreload C:\Users\dingy\jiayouwa\jiayouwa\core\urls.py changed, reloading.
+INFO 2026-09-05 22:33:44,172 autoreload Watching for file changes with StatReloader
+INFO 2026-09-05 22:48:10,121 log "GET /resource/2/ HTTP/1.1" 200 494471
+INFO 2026-09-05 22:48:26,057 autoreload Watching for file changes with StatReloader
+INFO 2026-09-05 22:48:28,841 log "GET /resource/2/ HTTP/1.1" 200 494471
+WARNING 2026-09-05 22:48:50,610 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:48:50,613 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:56:15,811 log "GET /resource/2/ HTTP/1.1" 200 723270
+WARNING 2026-09-05 22:56:15,865 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:56:15,866 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:56:18,374 log "POST /s/create/ HTTP/1.1" 200 229066
+WARNING 2026-09-05 22:58:36,040 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:58:36,041 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:59:13,819 log "GET /logout/ HTTP/1.1" 302 0
+INFO 2026-09-05 22:59:13,848 log "GET / HTTP/1.1" 200 334719
+WARNING 2026-09-05 22:59:13,925 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:59:13,926 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:59:14,731 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:59:16,359 log "GET /login/ HTTP/1.1" 200 19566
+WARNING 2026-09-05 22:59:16,414 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:59:16,415 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:59:27,292 log "POST /login/ HTTP/1.1" 200 19913
+WARNING 2026-09-05 22:59:27,328 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:59:27,329 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:59:35,823 log "POST /login/ HTTP/1.1" 302 0
+INFO 2026-09-05 22:59:35,841 log "GET / HTTP/1.1" 200 338575
+WARNING 2026-09-05 22:59:35,874 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 22:59:35,875 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 22:59:36,425 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 22:59:42,433 log "GET /resource/2/ HTTP/1.1" 200 722783
+INFO 2026-09-05 23:06:42,292 log "GET / HTTP/1.1" 200 338405
+INFO 2026-09-05 23:06:42,864 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:06:46,704 log "POST /toggle-mode/ HTTP/1.1" 200 16
+INFO 2026-09-05 23:06:46,730 log "GET / HTTP/1.1" 200 338405
+INFO 2026-09-05 23:06:47,007 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:06:48,188 log "POST /toggle-mode/ HTTP/1.1" 200 16
+INFO 2026-09-05 23:06:48,211 log "GET / HTTP/1.1" 200 338405
+INFO 2026-09-05 23:06:48,509 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:06:50,437 log "POST /toggle-mode/ HTTP/1.1" 200 16
+INFO 2026-09-05 23:06:50,464 log "GET / HTTP/1.1" 200 338405
+INFO 2026-09-05 23:06:50,777 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:06:58,547 log "GET /resource/2/ HTTP/1.1" 200 722783
+INFO 2026-09-05 23:10:16,528 log "GET / HTTP/1.1" 200 338473
+INFO 2026-09-05 23:10:16,794 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:10:17,700 log "GET / HTTP/1.1" 200 338473
+INFO 2026-09-05 23:10:17,955 log "GET /?page=2&mode=list HTTP/1.1" 200 315322
+INFO 2026-09-05 23:10:19,564 log "GET /resource/2/ HTTP/1.1" 200 722851
+INFO 2026-09-05 23:10:25,684 log "GET /resource/2/ HTTP/1.1" 200 722851
+INFO 2026-09-05 23:10:33,709 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:10:35,003 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:10:36,328 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:11:05,768 log "GET / HTTP/1.1" 200 338474
+INFO 2026-09-05 23:11:06,128 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:11:08,254 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:11:12,427 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:11:13,362 log "GET /resource/2/ HTTP/1.1" 200 722852
+INFO 2026-09-05 23:11:33,480 log "GET / HTTP/1.1" 200 338474
+INFO 2026-09-05 23:11:33,773 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:11:34,467 log "GET / HTTP/1.1" 200 338474
+INFO 2026-09-05 23:11:34,698 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:20:58,816 log "GET / HTTP/1.1" 200 336917
+INFO 2026-09-05 23:20:59,330 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:21:02,324 log "GET /resource/2/ HTTP/1.1" 200 721295
+INFO 2026-09-05 23:21:06,655 log "GET / HTTP/1.1" 200 336917
+INFO 2026-09-05 23:21:06,927 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:21:08,894 log "GET /resource/2/ HTTP/1.1" 200 721295
+INFO 2026-09-05 23:21:10,606 log "GET / HTTP/1.1" 200 336917
+INFO 2026-09-05 23:21:10,882 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:21:15,736 log "GET /my-resources/ HTTP/1.1" 200 251939
+INFO 2026-09-05 23:21:20,103 log "GET /profile/ HTTP/1.1" 200 23376
+INFO 2026-09-05 23:21:23,670 log "GET /my-resources/ HTTP/1.1" 200 251939
+INFO 2026-09-05 23:21:26,254 log "GET /profile/ HTTP/1.1" 200 23376
+INFO 2026-09-05 23:21:39,158 log "GET /my-resources/ HTTP/1.1" 200 251939
+INFO 2026-09-05 23:21:41,539 log "GET /profile/ HTTP/1.1" 200 23376
+INFO 2026-09-05 23:21:46,439 log "GET /my-resources/ HTTP/1.1" 200 251939
+INFO 2026-09-05 23:21:51,923 log "GET /my-collections/ HTTP/1.1" 200 103611
+INFO 2026-09-05 23:21:55,554 log "GET /my-downloads/ HTTP/1.1" 200 102906
+ERROR 2026-09-05 23:21:59,781 log Internal Server Error: /my-follows/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 201, in my_follows_view
+    return render(request, 'users/my_follows.html', {'follows': follows_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_follows.html
+ERROR 2026-09-05 23:21:59,784 log "GET /my-follows/ HTTP/1.1" 500 89458
+INFO 2026-09-05 23:22:05,801 log "GET /my-history/ HTTP/1.1" 200 334581
+ERROR 2026-09-05 23:22:08,158 log Internal Server Error: /my-shares/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 230, in my_shares_view
+    return render(request, 'users/my_shares.html', {'shares': shares_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_shares.html
+ERROR 2026-09-05 23:22:08,161 log "GET /my-shares/ HTTP/1.1" 500 89299
+INFO 2026-09-05 23:22:11,733 log "GET /my-earnings/ HTTP/1.1" 200 25752
+ERROR 2026-09-05 23:22:14,425 log Internal Server Error: /profile/edit/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 161, in profile_edit_view
+    return render(request, 'users/profile_edit.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/profile_edit.html
+ERROR 2026-09-05 23:22:14,427 log "GET /profile/edit/ HTTP/1.1" 500 88372
+ERROR 2026-09-05 23:22:17,410 log Internal Server Error: /my-follows/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 201, in my_follows_view
+    return render(request, 'users/my_follows.html', {'follows': follows_page})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/my_follows.html
+ERROR 2026-09-05 23:22:17,412 log "GET /my-follows/ HTTP/1.1" 500 89458
+INFO 2026-09-05 23:24:08,629 log "GET /my-follows/ HTTP/1.1" 200 20520
+INFO 2026-09-05 23:24:24,424 log "GET /profile/ HTTP/1.1" 200 23376
+INFO 2026-09-05 23:25:03,877 log "GET /my-shares/ HTTP/1.1" 200 20107
+INFO 2026-09-05 23:25:11,301 log "GET /profile/ HTTP/1.1" 200 23376
+INFO 2026-09-05 23:25:13,926 log "GET /my-earnings/ HTTP/1.1" 200 25752
+INFO 2026-09-05 23:25:20,006 log "GET /profile/ HTTP/1.1" 200 23376
+ERROR 2026-09-05 23:25:21,537 log Internal Server Error: /profile/edit/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 161, in profile_edit_view
+    return render(request, 'users/profile_edit.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/profile_edit.html
+ERROR 2026-09-05 23:25:21,539 log "GET /profile/edit/ HTTP/1.1" 500 88372
+ERROR 2026-09-05 23:31:27,201 log Internal Server Error: /profile/edit/
+Traceback (most recent call last):
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\jiayouwa\users\views.py", line 161, in profile_edit_view
+    return render(request, 'users/profile_edit.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\shortcuts.py", line 27, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dingy\jiayouwa\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/profile_edit.html
+ERROR 2026-09-05 23:31:27,205 log "GET /profile/edit/ HTTP/1.1" 500 88372
+INFO 2026-09-05 23:32:06,653 log "GET /profile/edit/ HTTP/1.1" 200 27436
+WARNING 2026-09-05 23:32:35,234 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:32:35,236 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:35:26,138 log "GET / HTTP/1.1" 200 336917
+WARNING 2026-09-05 23:35:26,202 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:35:26,203 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:35:26,804 log "GET /?page=2&mode=list HTTP/1.1" 200 315323
+INFO 2026-09-05 23:35:30,961 log "GET /profile/ HTTP/1.1" 200 23376
+WARNING 2026-09-05 23:35:31,017 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:35:31,017 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:35:37,780 log "GET /profile/edit/ HTTP/1.1" 200 27436
+WARNING 2026-09-05 23:35:37,831 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:35:37,832 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:35:55,704 log "POST /profile/edit/ HTTP/1.1" 200 27436
+WARNING 2026-09-05 23:35:55,754 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:35:55,755 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:36:06,396 log "POST /profile/edit/ HTTP/1.1" 200 27436
+WARNING 2026-09-05 23:36:10,538 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:36:10,539 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:36:18,457 log "POST /profile/edit/ HTTP/1.1" 200 27436
+WARNING 2026-09-05 23:36:18,486 log Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-05 23:36:18,487 log "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7283
+INFO 2026-09-05 23:38:50,272 autoreload C:\Users\dingy\jiayouwa\jiayouwa\users\views.py changed, reloading.
+INFO 2026-09-05 23:38:50,992 autoreload Watching for file changes with StatReloader

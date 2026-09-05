@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}我的关注 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    
+    <!-- 页面头部 -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">👤 我的关注</h1>
+            <p class="text-sm text-gray-400 mt-1">共 {{ follows.paginator.count }} 个关注</p>
+        </div>
+        <a href="{% url 'ranking' %}" class="text-sm text-green-600 hover:text-green-700">
+            🏆 发现更多用户 →
+        </a>
+    </div>
+    
+    <!-- 关注列表 -->
+    {% if follows %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for follow in follows %}
+        <div class="bg-white rounded-xl card-shadow p-4 flex items-center justify-between hover:shadow-lg transition frog-hover">
+            <div class="flex items-center space-x-3 min-w-0">
+                <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
+                <div class="min-w-0">
+                    <div class="font-medium text-gray-800 text-sm">
+                        {{ follow.following.first_name|default:follow.following.username }}
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs text-gray-400">
+                        <span>🐸 Lv.{{ follow.following.level }}</span>
+                        <span>·</span>
+                        <span>📦 {{ follow.following.resource_count|default:0 }} 资源</span>
+                        <span>·</span>
+                        <span>❤️ {{ follow.following.follower_set.count }} 粉丝</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="unfollow({{ follow.following.id }})" 
+                    class="text-sm px-4 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 transition flex-shrink-0">
+                ❌ 取消关注
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- 分页 -->
+    {% if follows.has_other_pages %}
+    <div class="flex justify-center space-x-2 mt-6">
+        {% if follows.has_previous %}
+        <a href="?page={{ follows.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+        {% endif %}
+        <span class="px-3 py-1 text-sm text-gray-600">第 {{ follows.number }} / {{ follows.paginator.num_pages }} 页</span>
+        {% if follows.has_next %}
+        <a href="?page={{ follows.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- 空状态 -->
+    <div class="bg-white rounded-2xl card-shadow p-12 text-center">
+        <div class="text-6xl mb-4">👤</div>
+        <h3 class="text-xl font-medium text-gray-600">还没有关注任何人</h3>
+        <p class="text-gray-400 mt-2">关注感兴趣的用户，他们的资源会优先出现在你的推荐流中</p>
+        <a href="{% url 'ranking' %}" class="btn-primary inline-block mt-4">
+            🏆 去发现优质用户
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function unfollow(userId) {
+    if (!confirm('确定要取消关注该用户吗？')) return;
+    
+    fetch(`/resource/user/${userId}/follow/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.following === false) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('操作失败，请稍后重试');
+    });
+}
+</script>
+{% endblock %}

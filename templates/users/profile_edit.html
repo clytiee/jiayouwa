@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}账号设置 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-6">
+    
+    <!-- 页面头部 -->
+    <div class="flex items-center space-x-3 mb-6">
+        <span class="text-3xl">⚙️</span>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">账号设置</h1>
+            <p class="text-sm text-gray-400 mt-1">管理你的个人资料和账号信息</p>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+        
+        <!-- ===== 头像 ===== -->
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="text-sm font-medium text-gray-700">👤 头像</h3>
+            <div class="flex items-center space-x-4 mt-3">
+                <div class="avatar-frog avatar-frog-lg">🐸</div>
+                <div>
+                    <p class="text-sm text-gray-600">当前使用默认头像 🐸</p>
+                    <p class="text-xs text-gray-400">自定义头像功能开发中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== 基本信息 ===== -->
+        <form method="POST" class="divide-y divide-gray-100">
+            {% csrf_token %}
+            
+            <div class="px-6 py-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">📋 基本信息</h3>
+                
+                <!-- 用户名（只读） -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">用户名</label>
+                    <input type="text" value="{{ user.username }}" disabled
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                    <p class="text-xs text-gray-400 mt-1">用户名不可修改</p>
+                </div>
+                
+                <!-- 昵称 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">昵称</label>
+                    <input type="text" name="first_name" value="{{ user.first_name|default:'' }}"
+                           placeholder="请输入昵称"
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition">
+                    <p class="text-xs text-gray-400 mt-1">2-12位中英文或数字，显示在网站上的名字</p>
+                </div>
+                
+                <!-- 邮箱（只读） -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">邮箱</label>
+                    <input type="email" value="{{ user.email }}" disabled
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                    <p class="text-xs text-gray-400 mt-1">邮箱用于登录和接收通知</p>
+                </div>
+            </div>
+            
+            <!-- ===== 修改密码 ===== -->
+            <div class="px-6 py-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">🔒 修改密码</h3>
+                
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">当前密码</label>
+                    <input type="password" name="old_password" placeholder="请输入当前密码"
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">新密码</label>
+                    <input type="password" name="new_password1" placeholder="至少8位，含字母和数字"
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">确认新密码</label>
+                    <input type="password" name="new_password2" placeholder="请再次输入新密码"
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition">
+                </div>
+                
+                <p class="text-xs text-gray-400 mt-1">💡 密码至少8位，需包含字母和数字</p>
+            </div>
+            
+            <!-- ===== 提交按钮 ===== -->
+            <div class="px-6 py-4 bg-gray-50 flex items-center justify-between">
+                <span class="text-xs text-gray-400">💾 修改后点击保存</span>
+                <button type="submit" class="btn-primary px-6 py-2 text-sm">
+                    💾 保存设置
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- ===== 其他操作 ===== -->
+    <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">⚠️ 其他操作</h3>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'users:my_history' %}" class="text-sm text-gray-500 hover:text-gray-700">
+                📖 浏览历史
+            </a>
+            <span class="text-gray-300">|</span>
+            <button onclick="confirmClearHistory()" class="text-sm text-red-400 hover:text-red-600">
+                🗑️ 清空浏览历史
+            </button>
+            <span class="text-gray-300">|</span>
+            <button onclick="confirmDeleteAccount()" class="text-sm text-red-500 hover:text-red-700">
+                🚨 注销账号
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 清空历史确认弹窗 -->
+<div id="clearHistoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+        <div class="text-center">
+            <div class="text-4xl mb-3">🗑️</div>
+            <h3 class="text-lg font-bold text-gray-800">清空浏览历史</h3>
+            <p class="text-sm text-gray-500 mt-2">确定要清空所有浏览历史吗？</p>
+            <p class="text-xs text-red-400 mt-1">此操作不可恢复</p>
+        </div>
+        <div class="flex space-x-3 mt-6">
+            <button onclick="closeClearHistory()" 
+                    class="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition">
+                取消
+            </button>
+            <form method="POST" action="{% url 'users:clear_history' %}" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                    确认清空
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 注销账号确认弹窗 -->
+<div id="deleteAccountModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+        <div class="text-center">
+            <div class="text-4xl mb-3">🚨</div>
+            <h3 class="text-lg font-bold text-gray-800">注销账号</h3>
+            <p class="text-sm text-gray-500 mt-2">确定要注销你的账号吗？</p>
+            <p class="text-xs text-red-400 mt-1">⚠️ 此操作不可恢复，所有数据将被永久删除</p>
+        </div>
+        <div class="flex space-x-3 mt-6">
+            <button onclick="closeDeleteAccount()" 
+                    class="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition">
+                取消
+            </button>
+            <button onclick="deleteAccount()" 
+                    class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                确认注销
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmClearHistory() {
+    document.getElementById('clearHistoryModal').classList.remove('hidden');
+}
+
+function closeClearHistory() {
+    document.getElementById('clearHistoryModal').classList.add('hidden');
+}
+
+function confirmDeleteAccount() {
+    document.getElementById('deleteAccountModal').classList.remove('hidden');
+}
+
+function closeDeleteAccount() {
+    document.getElementById('deleteAccountModal').classList.add('hidden');
+}
+
+function deleteAccount() {
+    // TODO: 实现账号注销功能
+    alert('🚨 账号注销功能开发中...');
+    closeDeleteAccount();
+}
+
+// 点击背景关闭弹窗
+document.getElementById('clearHistoryModal').addEventListener('click', function(e) {
+    if (e.target === this) closeClearHistory();
+});
+document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteAccount();
+});
+</script>
+{% endblock %}

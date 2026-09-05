@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}我的下载 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6">
+    
+    <!-- 页面头部 -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">📥 我的下载</h1>
+            <p class="text-sm text-gray-400 mt-1">共 {{ downloads.paginator.count }} 个下载记录</p>
+        </div>
+        <a href="/" class="text-sm text-green-600 hover:text-green-700">
+            🔍 发现更多资源 →
+        </a>
+    </div>
+    
+    <!-- 下载列表 -->
+    {% if downloads %}
+    <div class="space-y-4">
+        {% for download in downloads %}
+        {% with resource=download.resource %}
+        <div class="bg-white rounded-xl card-shadow overflow-hidden hover:shadow-lg transition frog-hover">
+            <div class="flex items-stretch">
+                
+                <!-- 缩略图 -->
+                <div class="w-24 md:w-32 flex-shrink-0 bg-gray-100 overflow-hidden">
+                    {% if resource.cover_images and resource.cover_images|length > 0 %}
+                    <img src="{{ resource.cover_images.0 }}" alt="{{ resource.title }}" 
+                         class="w-full h-full object-cover aspect-square">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-3xl aspect-square">
+                        📄
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- 信息 -->
+                <div class="flex-1 p-4 flex flex-col justify-between min-w-0">
+                    <div>
+                        <a href="{% url 'resources:detail' resource.id %}" class="hover:text-green-600">
+                            <h3 class="text-base font-medium text-gray-800 truncate">{{ resource.title }}</h3>
+                        </a>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                            <span class="text-gray-400">👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+                            <span class="text-gray-300">|</span>
+                            {% if download.is_free_trial %}
+                            <span class="text-blue-500">🎁 免费试用</span>
+                            {% elif download.oil_paid == 0 %}
+                            <span class="text-green-600">🆓 免费</span>
+                            {% else %}
+                            <span class="text-amber-600">💰 {{ download.oil_paid }}油滴</span>
+                            {% endif %}
+                            <span class="text-gray-400">📥 首次下载：{{ download.downloaded_at|date:"Y-m-d" }}</span>
+                        </div>
+                        {% if resource.tags %}
+                        <div class="flex flex-wrap gap-1 mt-1">
+                            {% for tag in resource.tags|slice:":3" %}
+                            <span class="text-xs text-gray-400">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- 重新下载按钮 -->
+                <div class="flex flex-col justify-center items-center px-4 border-l border-gray-100">
+                    <a href="{% url 'resources:detail' resource.id %}" 
+                       class="btn-primary text-sm py-1.5 px-4">
+                        📥 重新下载
+                    </a>
+                    <span class="text-xs text-gray-400 mt-1">
+                        {{ download.last_downloaded_at|date:"Y-m-d H:i" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    
+    <!-- 分页 -->
+    {% if downloads.has_other_pages %}
+    <div class="flex justify-center space-x-2 mt-6">
+        {% if downloads.has_previous %}
+        <a href="?page={{ downloads.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+        {% endif %}
+        <span class="px-3 py-1 text-sm text-gray-600">第 {{ downloads.number }} / {{ downloads.paginator.num_pages }} 页</span>
+        {% if downloads.has_next %}
+        <a href="?page={{ downloads.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- 空状态 -->
+    <div class="bg-white rounded-2xl card-shadow p-12 text-center">
+        <div class="text-6xl mb-4">📭</div>
+        <h3 class="text-xl font-medium text-gray-600">还没有下载记录</h3>
+        <p class="text-gray-400 mt-2">去发现好资源，下载后这里就会有记录了！</p>
+        <a href="/" class="btn-primary inline-block mt-4">
+            🔍 去发现好资源
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

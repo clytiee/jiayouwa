@@ -19,7 +19,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #66BB6A, #388E3C);
+            background: linear-gradient(135deg, #f9f4a3, #6ccc44);
             font-size: 22px;
             flex-shrink: 0;
         }
@@ -158,63 +158,57 @@
                     
                     {% if user.is_authenticated %}
                         <!-- 消息通知 -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="relative p-2 rounded-full hover:bg-gray-100 transition">
-                                <span class="text-xl">🔔</span>
-                                {% if unread_count > 0 %}
-                                <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                                    {{ unread_count }}
-                                </span>
-                                {% endif %}
-                            </button>
-                            <!-- 下拉通知 -->
-                            <div x-show="open" @click.away="open = false" 
-                                 x-transition:enter.duration.200ms.opacity
-                                 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                                <div class="p-3 border-b border-gray-100 font-medium text-gray-700">📬 消息中心</div>
-                                <div class="max-h-64 overflow-y-auto">
-                                    {% for notice in recent_notifications %}
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition">
-                                        <div class="text-sm text-gray-800">{{ notice.title }}</div>
-                                        <div class="text-xs text-gray-400">{{ notice.created_at|date:"Y-m-d H:i" }}</div>
-                                    </a>
-                                    {% empty %}
-                                    <div class="px-4 py-6 text-center text-gray-400 text-sm">暂无消息</div>
-                                    {% endfor %}
-                                </div>
-                                <a href="/notifications/" class="block text-center text-sm text-green-600 py-2 hover:bg-gray-50 transition">查看全部消息 →</a>
-                            </div>
-                        </div>
+                        <div x-data="{ open: false }" class="relative">
+							<button @click="open = !open" 
+									@click.away="open = false"
+									class="relative p-2 rounded-full hover:bg-gray-100 transition">
+								<span class="text-xl">🔔</span>
+								{% if unread_count > 0 %}
+								<span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+									{{ unread_count }}
+								</span>
+								{% endif %}
+							</button>
+							<div x-show="open" x-cloak
+								 x-transition:enter.duration.200ms.opacity
+								 x-transition:leave.duration.150ms.opacity
+								 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+								<div class="p-3 border-b border-gray-100 font-medium text-gray-700">📬 消息中心</div>
+								<div class="max-h-64 overflow-y-auto">
+									<!-- 消息列表 -->
+									<div class="px-4 py-3 text-center text-gray-400 text-sm">暂无消息</div>
+								</div>
+								<a href="#" class="block text-center text-sm text-green-600 py-2 hover:bg-gray-50 transition">查看全部消息 →</a>
+							</div>
+						</div>
 
                         <!-- 用户菜单 -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition">
-                                <span class="avatar-frog">🐸</span>
-                                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ user.first_name|default:user.username }}</span>
-                            </button>
-                            <div x-show="open" @click.away="open = false"
-                                 x-transition:enter.duration.200ms.opacity
-                                 class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                                <div class="px-4 py-3 border-b border-gray-100">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="avatar-frog avatar-frog-sm">🐸</span>
-                                        <div>
-                                            <div class="font-medium text-gray-800">{{ user.first_name|default:user.username }}</div>
-                                            <div class="text-xs text-gray-400">🐸 Lv.{{ user.level }} {{ user.level_title }} · 💰 {{ user.oil_balance }}油滴</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">👤 我的主页</a>
-                                <a href="{% url 'users:my_resources' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📦 我的资源</a>
-                                <a href="{% url 'users:my_collections' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">❤️ 我的收藏</a>
-                                <a href="{% url 'users:my_downloads' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📥 我的下载</a>
-                                <a href="{% url 'users:my_history' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📖 浏览历史</a>
-                                <a href="{% url 'users:my_shares' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">🔗 分享历史</a>
-                                <a href="{% url 'users:my_earnings' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">💰 收益统计</a>
-                                <div class="border-t border-gray-100"></div>
-                                <a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-500">🚪 退出登录</a>
-                            </div>
-                        </div>
+                        <div x-data="{ open: false }" class="relative">
+							<button @click="open = !open"
+									@click.away="open = false"
+									class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition">
+								<span class="avatar-frog">🐸</span>
+								<span class="text-sm font-medium text-gray-700 hidden sm:block">{{ user.first_name|default:user.username }}</span>
+							</button>
+							<div x-show="open" x-cloak
+								 x-transition:enter.duration.200ms.opacity
+								 x-transition:leave.duration.150ms.opacity
+								 class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+								<!-- 菜单内容 -->
+								<div class="px-4 py-3 border-b border-gray-100">
+									<div class="flex items-center space-x-3">
+										<span class="avatar-frog avatar-frog-sm">🐸</span>
+										<div>
+											<div class="font-medium text-gray-800">{{ user.first_name|default:user.username }}</div>
+											<div class="text-xs text-gray-400">🐸 Lv.{{ user.level }} · 💰 {{ user.oil_balance }}油滴</div>
+										</div>
+									</div>
+								</div>
+								<a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">👤 我的主页</a>
+								<a href="{% url 'users:my_resources' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📦 我的资源</a>
+								<a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-500">🚪 退出登录</a>
+							</div>
+						</div>
                     {% else %}
                         <a href="{% url 'users:login' %}" class="text-gray-600 hover:text-green-600 text-sm font-medium">登录</a>
                         <a href="{% url 'users:register' %}" class="btn-primary text-sm py-2 px-4">免费注册</a>
@@ -237,6 +231,9 @@
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {% block content %}{% endblock %}
     </main>
+
+	<!-- 分享弹窗 -->
+	{% include 'partials/share_modal.html' %}
 
     <!-- ========== 底部 ========== -->
     <footer class="bg-white border-t border-gray-100 mt-12">

@@ -155,9 +155,41 @@ def profile_view(request):
 @login_required
 def profile_edit_view(request):
     """编辑个人资料"""
+    user = request.user
+    
     if request.method == 'POST':
-        # TODO: 实现资料编辑
-        pass
+        # 修改昵称
+        first_name = request.POST.get('first_name', '').strip()
+        if first_name:
+            user.first_name = first_name
+            user.save()
+            messages.success(request, '✅ 昵称已更新！')
+        else:
+            messages.error(request, '❌ 昵称不能为空')
+        
+        # 修改密码
+        old_password = request.POST.get('old_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+        
+        if old_password and new_password1 and new_password2:
+            if not user.check_password(old_password):
+                messages.error(request, '❌ 当前密码错误')
+            elif new_password1 != new_password2:
+                messages.error(request, '❌ 两次输入的新密码不一致')
+            elif len(new_password1) < 8:
+                messages.error(request, '❌ 密码至少8位')
+            else:
+                user.set_password(new_password1)
+                user.save()
+                # 修改密码后重新登录
+                from django.contrib.auth import login
+                login(request, user)
+                messages.success(request, '✅ 密码已更新，请重新登录')
+                return redirect('users:profile_edit')
+        
+        return redirect('users:profile_edit')
+    
     return render(request, 'users/profile_edit.html')
 
 

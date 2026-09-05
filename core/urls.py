@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
     path('resource/', include('resources.urls')),
+    path('s/', include('shares.urls')),  # 分享短链接
 ]
 
 if settings.DEBUG:
