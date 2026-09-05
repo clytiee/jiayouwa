@@ -183,24 +183,24 @@
             <div class="mt-6 flex flex-wrap items-center gap-3">
                 
                 <!-- 评分（👍/👎） -->
-                <div class="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
-                    <button @click="rate('up')" 
-                            class="vote-btn text-gray-400 hover:text-green-500 text-lg px-1"
-                            :class="userRating === 'up' ? 'active-up' : ''">
-                        👍
-                    </button>
-                    <span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
-                          x-text="upCount"></span>
-                    <span class="text-gray-300">|</span>
-                    <span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
-                          x-text="downCount"></span>
-                    <button @click="rate('down')" 
-                            class="vote-btn text-gray-400 hover:text-red-500 text-lg px-1"
-                            :class="userRating === 'down' ? 'active-down' : ''">
-                        👎
-                    </button>
-                    <span class="text-xs text-gray-400 ml-1" x-show="avgRating !== 0" x-text="'⭐ ' + avgRating.toFixed(1)"></span>
-                </div>
+				<div class="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+					<button @click="rate('up')" 
+							class="vote-btn text-gray-400 hover:text-green-500 text-lg px-1"
+							:class="userRating === 'up' ? 'active-up' : ''">
+						👍
+					</button>
+					<span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
+						  x-text="upCount"></span>
+					<span class="text-gray-300">|</span>
+					<span class="text-sm font-medium text-gray-600 min-w-[24px] text-center" 
+						  x-text="downCount"></span>
+					<button @click="rate('down')" 
+							class="vote-btn text-gray-400 hover:text-red-500 text-lg px-1"
+							:class="userRating === 'down' ? 'active-down' : ''">
+						👎
+					</button>
+					<span class="text-xs text-gray-400 ml-1" x-show="avgRating !== 0" x-text="'⭐ ' + avgRating.toFixed(1)"></span>
+				</div>
                 
                 <!-- 收藏 -->
                 <button @click="toggleCollect()" 
@@ -459,30 +459,28 @@ function resourceDetail() {
         
         // 评分
         async rate(type) {
-            if (this.userRating === type) {
-                // 取消评分（简化处理）
-                return;
-            }
-            try {
-                const resp = await fetch("{% url 'resources:rate_resource' resource.id %}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `vote_type=${type}`
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    this.upCount = data.up_count;
-                    this.downCount = data.down_count;
-                    this.avgRating = data.avg_rating;
-                    this.userRating = type;
-                }
-            } catch(e) {
-                console.error(e);
-            }
-        },
+			if (this.userRating === type) return;
+			try {
+				const resp = await fetch(`/resource/{{ resource.id }}/rate/`, {
+					method: 'POST',
+					headers: {
+						'X-CSRFToken': '{{ csrf_token }}',
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body: `vote_type=${type}`
+				});
+				const data = await resp.json();
+				if (data.success) {
+					// 直接使用后端返回的最终值，不要在前端做任何加法
+					this.upCount = data.up_count;
+					this.downCount = data.down_count;
+					this.avgRating = data.avg_rating;
+					this.userRating = type;
+				}
+			} catch(e) {
+				console.error('评分错误:', e);
+			}
+		},
         
         // 下载（登录用户）
         async download() {
@@ -579,7 +577,7 @@ function resourceDetail() {
                     }, 3000);
                 });
             }
-        }
+        },
 		
         openShare() {
             const event = new CustomEvent('openShareModal', {

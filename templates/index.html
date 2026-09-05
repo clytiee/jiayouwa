@@ -6,22 +6,24 @@
 {% block content %}
 <div class="max-w-4xl mx-auto">
     
-	<!-- 视图切换 -->
-	<div class="flex items-center justify-between mb-4">
-		<div class="flex items-center space-x-2 text-sm text-gray-400">
-			<span>📚 发现好资源</span>
-		</div>
-		<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-			<a href="?mode=list" 
-			   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
-				📋 列表
-			</a>
-			<a href="?mode=card" 
-			   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}">
-				🎴 卡片
-			</a>
-		</div>
-	</div>
+    <!-- 视图切换 -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2 text-sm text-gray-400">
+            <span>📚 发现好资源</span>
+        </div>
+        <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+            <a href="?mode=list" 
+               class="view-mode-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'list' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}"
+               data-mode="list">
+                📋 列表
+            </a>
+            <a href="?mode=card" 
+               class="view-mode-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if view_mode == 'card' %}bg-white shadow text-gray-800{% else %}text-gray-500 hover:text-gray-700{% endif %}"
+               data-mode="card">
+                🎴 卡片
+            </a>
+        </div>
+    </div>
     
     <!-- 资源列表 -->
     <div id="resource-list">
@@ -33,67 +35,112 @@
 
 {% block extra_js %}
 <script>
-    // 无限滚动：当用户滚动到底部时加载更多
     let page = 1;
     let loading = false;
     let hasMore = true;
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const list = document.getElementById('resource-list');
-        if (!list) return;
-        
-        const observer = new IntersectionObserver(function(entries) {
-            if (entries[0].isIntersecting && !loading && hasMore) {
-                loadMore();
-            }
-        }, { rootMargin: '200px' });
-        
-        // 观察列表底部
-        const sentinel = document.createElement('div');
-        sentinel.id = 'scroll-sentinel';
-        sentinel.className = 'h-4';
-        list.appendChild(sentinel);
-        observer.observe(sentinel);
-    });
-    
+    let observer = null;
+
+    function getCurrentMode() {
+        const activeBtn = document.querySelector('.view-mode-btn.bg-white');
+        return activeBtn ? activeBtn.dataset.mode : 'list';
+    }
+
     function loadMore() {
+        if (loading || !hasMore) {
+            return;
+        }
         loading = true;
         page += 1;
-        
-        fetch(`/?page=${page}&mode={{ view_mode }}`, {
-            headers: {
-                'HX-Request': 'true'
-            }
+
+        const mode = getCurrentMode();
+
+        fetch(`/?page=${page}&mode=${mode}`, {
+            headers: { 'HX-Request': 'true' }
         })
         .then(response => response.text())
         .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const newContent = doc.getElementById('resource-list');
+            const newContent = doc.querySelector('#resource-list');
+
             if (newContent) {
                 const list = document.getElementById('resource-list');
-                const sentinel = document.getElementById('scroll-sentinel');
-                // 移除旧哨兵
-                if (sentinel) sentinel.remove();
-                // 移除新内容中的哨兵
+                const hasNextSentinel = newContent.querySelector('#scroll-sentinel');
+                if (!hasNextSentinel) {
+                    hasMore = false;
+                }
+                const oldSentinel = document.getElementById('scroll-sentinel');
+                if (oldSentinel) oldSentinel.remove();
                 const newSentinel = newContent.querySelector('#scroll-sentinel');
                 if (newSentinel) newSentinel.remove();
-                // 追加新内容
                 list.insertAdjacentHTML('beforeend', newContent.innerHTML);
-                // 重新添加哨兵
-                const newSentinel2 = document.createElement('div');
-                newSentinel2.id = 'scroll-sentinel';
-                newSentinel2.className = 'h-4';
-                list.appendChild(newSentinel2);
-                observer.observe(newSentinel2);
+                
+                // 检查是否已经存在"已经到底了"
+                const existingEnd = list.querySelector('.text-center.text-gray-400.text-sm.py-4');
+                
+                if (hasNextSentinel) {
+                    // 如果已经存在"已经到底了"，移除它
+                    if (existingEnd) existingEnd.remove();
+                    const sentinel = document.createElement('div');
+                    sentinel.id = 'scroll-sentinel';
+                    sentinel.className = 'h-4';
+                    list.appendChild(sentinel);
+                    if (observer) {
+                        observer.disconnect();
+                    }
+                    observer = new IntersectionObserver(function(entries) {
+                        if (entries[0].isIntersecting && !loading && hasMore) {
+                            loadMore();
+                        }
+                    }, { rootMargin: '200px' });
+                    observer.observe(sentinel);
+                } else {
+                    // 没有更多数据，如果"已经到底了"不存在则添加
+                    if (!existingEnd) {
+                        const endMsg = document.createElement('div');
+                        endMsg.className = 'text-center text-gray-400 text-sm py-4';
+                        endMsg.textContent = '— 已经到底了 🐸 —';
+                        list.appendChild(endMsg);
+                    }
+                }
             } else {
                 hasMore = false;
+                const list = document.getElementById('resource-list');
+                const existingEnd = list.querySelector('.text-center.text-gray-400.text-sm.py-4');
+                if (!existingEnd) {
+                    const endMsg = document.createElement('div');
+                    endMsg.className = 'text-center text-gray-400 text-sm py-4';
+                    endMsg.textContent = '— 已经到底了 🐸 —';
+                    list.appendChild(endMsg);
+                }
             }
             loading = false;
         })
         .catch(() => {
             loading = false;
+            hasMore = false;
         });
     }
+
+    function setupObserver() {
+        const sentinel = document.getElementById('scroll-sentinel');
+        if (!sentinel) return;
+        if (observer) {
+            observer.disconnect();
+        }
+        observer = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting && !loading && hasMore) {
+                loadMore();
+            }
+        }, { rootMargin: '200px' });
+        observer.observe(sentinel);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        page = 1;
+        hasMore = true;
+        loading = false;
+        setupObserver();
+    });
 </script>
 {% endblock %}

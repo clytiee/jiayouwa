@@ -439,40 +439,38 @@ def toggle_follow(request, user_id):
 @login_required
 @require_POST
 def rate_resource(request, resource_id):
-    """资源评分（👍 / 👎）"""
     resource = get_object_or_404(Resource, id=resource_id)
     vote_type = request.POST.get('vote_type', 'up')
     
     if vote_type not in ['up', 'down']:
         return JsonResponse({'error': '无效的评分类型'}, status=400)
     
-    # 检查是否已评分（简化：用session记录）
-    # 实际应用可用单独模型记录用户评分
-    session_key = f'rated_{resource_id}'
+    session_key = f'rated_{resource_id}_{request.user.id}'
     if request.session.get(session_key):
         return JsonResponse({'error': '您已经评过分了'}, status=400)
     
-    # 更新评分
+    # 更新计数
     if vote_type == 'up':
-        Resource.objects.filter(id=resource_id).update(upvote_count=models.F('upvote_count') + 1)
+        resource.upvote_count += 1
     else:
-        Resource.objects.filter(id=resource_id).update(downvote_count=models.F('downvote_count') + 1)
+        resource.downvote_count += 1
     
-    # 更新平均评分
-    resource.refresh_from_db()
+    # 计算评分（范围 -5 到 5）
     total_votes = resource.upvote_count + resource.downvote_count
     if total_votes > 0:
-        avg = (resource.upvote_count - resource.downvote_count) / total_votes
-        Resource.objects.filter(id=resource_id).update(avg_rating=avg)
+        # 公式：(赞 - 踩) / 总数 × 5
+        resource.avg_rating = (resource.upvote_count - resource.downvote_count) / total_votes * 5
+    else:
+        resource.avg_rating = 0
     
-    # 标记已评分
+    resource.save()
     request.session[session_key] = vote_type
     
     return JsonResponse({
         'success': True,
-        'up_count': resource.upvote_count + (1 if vote_type == 'up' else 0),
-        'down_count': resource.downvote_count + (1 if vote_type == 'down' else 0),
-        'avg_rating': avg if total_votes > 0 else 0
+        'up_count': resource.upvote_count,
+        'down_count': resource.downvote_count,
+        'avg_rating': resource.avg_rating
     })
 
 

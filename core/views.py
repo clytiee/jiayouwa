@@ -7,8 +7,6 @@ from users.models import User
 
 
 def home_view(request):
-    """首页推荐流"""
-    # 从 URL 参数获取模式，如果没有则从 session 获取
     view_mode = request.GET.get('mode')
     if view_mode in ['list', 'card']:
         request.session['view_mode'] = view_mode
@@ -17,18 +15,18 @@ def home_view(request):
     
     resources = Resource.objects.filter(status='published').order_by('-created_at')
     
-    paginator = Paginator(resources, 10)
+    paginator = Paginator(resources, 9)
     page = request.GET.get('page', 1)
     resources_page = paginator.get_page(page)
     
     context = {
-        'resources': resources_page,
+        'resources': resources_page,  # ← 确保这里是 resources_page，不是 resources
         'view_mode': view_mode,
     }
     
     if request.headers.get('HX-Request') == 'true':
         return render(request, 'partials/resource_list.html', context)
-    
+    print(f"page: {page}, 本页数量: {len(resources_page)}, 总资源数: {resources.count()}")
     return render(request, 'index.html', context)
 
 

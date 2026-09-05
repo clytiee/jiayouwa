@@ -1,129 +1,119 @@
 {% load static %}
 
-{% if view_mode == 'list' %}
-<!-- ===== 列表模式 ===== -->
-<div class="space-y-4">
-    {% for resource in resources %}
-    <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover">
-        <div class="flex items-stretch h-28 md:h-32">
-            <div class="w-28 md:w-36 flex-shrink-0 bg-gray-100 overflow-hidden relative">
-                {% if resource.cover_images and resource.cover_images|length > 0 %}
-                <img src="{{ resource.cover_images.0 }}" alt="{{ resource.title }}" class="w-full h-full object-cover">
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center text-3xl bg-gray-50">📄</div>
-                {% endif %}
-                {% if resource.avg_rating > 0 %}
-                <div class="absolute top-1 left-1 bg-black/60 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full">⭐ {{ resource.avg_rating|floatformat:1 }}</div>
-                {% endif %}
-                <div class="absolute top-1 right-1 bg-black/60 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full">❤️ {{ resource.collect_count }}</div>
-            </div>
-            <div class="flex-1 p-3 flex flex-col justify-between min-w-0">
-                <div>
-                    <h3 class="text-sm font-medium text-gray-800 truncate">{{ resource.title }}</h3>
-                    <div class="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
+<div id="resource-list">
+    {% if view_mode == 'list' %}
+    <!-- ===== 列表模式：纯文本，紧凑 ===== -->
+    <div class="space-y-3">
+        {% for resource in resources %}
+        <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover px-5 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 min-w-0 pr-4">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-medium text-gray-800 truncate">{{ resource.title }}</h3>
+                        <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
+                            {% if resource.avg_rating > 0 %}
+                            <span class="text-xs text-amber-500 font-medium">⭐ {{ resource.avg_rating|floatformat:1 }}</span>
+                            {% endif %}
+                            <span class="text-xs text-gray-400">❤️ {{ resource.collect_count }}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
                         {% if resource.tags %}
                         {% for tag in resource.tags|slice:":3" %}
-                        <span class="bg-gray-100 px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
+                        <span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">#{{ tag }}</span>
                         {% endfor %}
                         {% endif %}
-                        <span class="ml-1">👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+                        <span class="text-gray-400">👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
                         <span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between mt-1 text-xs text-gray-400">
-                    <div class="flex items-center space-x-3">
+                        <span class="text-gray-300">|</span>
                         {% if resource.price == 0 %}
                         <span class="text-green-600 font-medium">🆓 免费</span>
                         {% else %}
                         <span class="text-amber-600 font-medium">💰 {{ resource.price }}油滴</span>
                         {% endif %}
-                        <span>📥 {{ resource.download_count }}</span>
-                        <span>👁️ {{ resource.view_count }}</span>
+                        <span class="text-gray-400">📥 {{ resource.download_count }}</span>
+                        <span class="text-gray-400">👁️ {{ resource.view_count }}</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </a>
-    {% empty %}
-    <div class="bg-white rounded-xl card-shadow p-12 text-center">
-        <div class="text-6xl mb-4">🐸</div>
-        <h3 class="text-xl font-medium text-gray-600">还没有资源</h3>
-        <p class="text-gray-400 mt-2">成为第一个分享学习资源的人吧！</p>
-        <a href="{% url 'resources:upload' %}" class="btn-primary inline-block mt-4">📤 发布资源</a>
-    </div>
-    {% endfor %}
-</div>
-
-{% else %}
-<!-- ===== 卡片模式：瀑布流 ===== -->
-<div class="masonry-grid">
-    {% for resource in resources %}
-    <div class="masonry-item">
-        <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover">
-            <!-- 图片区域：固定宽高比 4:3 -->
-            <div class="relative bg-gray-100 overflow-hidden" style="aspect-ratio: 4/3;">
-                {% if resource.cover_images and resource.cover_images|length > 0 %}
-                <img src="{{ resource.cover_images.0 }}" alt="{{ resource.title }}" 
-                     class="w-full h-full object-cover">
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
-                    📄
-                </div>
-                {% endif %}
-                
-                <!-- 评分 -->
-                {% if resource.avg_rating > 0 %}
-                <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                    ⭐ {{ resource.avg_rating|floatformat:1 }}
-                </div>
-                {% endif %}
-                
-                <!-- 收藏 -->
-                <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                    ❤️ {{ resource.collect_count }}
-                </div>
-                
-                <!-- 价格 -->
-                <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                    {% if resource.price == 0 %}🆓 免费{% else %}💰 {{ resource.price }}油滴{% endif %}
-                </div>
-            </div>
-            
-            <!-- 标题 -->
-            <div class="p-3">
-                <h3 class="text-sm font-medium text-gray-800 line-clamp-2">{{ resource.title }}</h3>
-                <div class="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
-                    <span>👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
-                    <span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
-                </div>
-                {% if resource.tags %}
-                <div class="mt-1 flex flex-wrap gap-1">
-                    {% for tag in resource.tags|slice:":2" %}
-                    <span class="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                <div class="mt-2 flex items-center justify-between text-xs text-gray-400">
-                    <span>📥 {{ resource.download_count }}</span>
-                    <span>👁️ {{ resource.view_count }}</span>
-                </div>
-            </div>
         </a>
+        {% empty %}
+        <div class="bg-white rounded-xl card-shadow p-12 text-center">
+            <div class="text-6xl mb-4">🐸</div>
+            <h3 class="text-xl font-medium text-gray-600">还没有资源</h3>
+            <p class="text-gray-400 mt-2">成为第一个分享学习资源的人吧！</p>
+            <a href="{% url 'resources:upload' %}" class="btn-primary inline-block mt-4">📤 发布资源</a>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="col-span-2 md:col-span-3 bg-white rounded-xl card-shadow p-12 text-center">
-        <div class="text-6xl mb-4">🐸</div>
-        <h3 class="text-xl font-medium text-gray-600">还没有资源</h3>
-        <p class="text-gray-400 mt-2">成为第一个分享学习资源的人吧！</p>
-        <a href="{% url 'resources:upload' %}" class="btn-primary inline-block mt-4">📤 发布资源</a>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
 
-<!-- 加载更多 -->
-{% if resources.has_next %}
-<div id="scroll-sentinel" class="h-4"></div>
-{% else %}
-<div class="text-center text-gray-400 text-sm py-4">— 已经到底了 🐸 —</div>
-{% endif %}
+    {% else %}
+	<!-- ===== 卡片模式：瀑布流 ===== -->
+	<div class="masonry-grid">
+		{% for resource in resources %}
+		<div class="masonry-item">
+			<a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover">
+				<!-- 图片区域 -->
+				<div class="relative bg-gray-100 overflow-hidden" style="aspect-ratio: 4/3;">
+					{% if resource.cover_images and resource.cover_images|length > 0 %}
+					<img src="{{ resource.cover_images.0 }}" alt="{{ resource.title }}" class="w-full h-full object-cover">
+					{% else %}
+					<div class="w-full h-full flex items-center justify-center text-5xl bg-gray-50">📄</div>
+					{% endif %}
+					
+					<!-- 评分 -->
+					{% if resource.avg_rating > 0 %}
+					<div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">⭐ {{ resource.avg_rating|floatformat:1 }}</div>
+					{% endif %}
+					
+					<!-- 收藏 -->
+					<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">❤️ {{ resource.collect_count }}</div>
+					
+					<!-- 价格 -->
+					<div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+						{% if resource.price == 0 %}🆓 免费{% else %}💰 {{ resource.price }}油滴{% endif %}
+					</div>
+				</div>
+				
+				<!-- 标题 -->
+				<div class="p-3">
+					<h3 class="text-sm font-medium text-gray-800 line-clamp-2">{{ resource.title }}</h3>
+					
+					<!-- 发布人和标签同行 -->
+					<div class="mt-1 flex items-center justify-between">
+						<div class="flex items-center gap-1 text-[10px] text-gray-400">
+							<span>👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+							<span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
+							{% if resource.tags %}
+							{% for tag in resource.tags|slice:":2" %}
+							<span class="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
+							{% endfor %}
+							{% endif %}
+						</div>
+						<!-- 下载数和浏览量移到右侧 -->
+						<div class="flex items-center gap-2 text-[10px] text-gray-400 flex-shrink-0">
+							<span>📥 {{ resource.download_count }}</span>
+							<span>👁️ {{ resource.view_count }}</span>
+						</div>
+					</div>
+				</div>
+			</a>
+		</div>
+		{% empty %}
+		<div class="col-span-2 md:col-span-3 bg-white rounded-xl card-shadow p-12 text-center">
+			<div class="text-6xl mb-4">🐸</div>
+			<h3 class="text-xl font-medium text-gray-600">还没有资源</h3>
+			<p class="text-gray-400 mt-2">成为第一个分享学习资源的人吧！</p>
+			<a href="{% url 'resources:upload' %}" class="btn-primary inline-block mt-4">📤 发布资源</a>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+
+    <!-- 加载更多 -->
+    {% if resources.has_next %}
+    <div id="scroll-sentinel" class="h-4"></div>
+    {% else %}
+    <div class="text-center text-gray-400 text-sm py-4">— 已经到底了 🐸 —</div>
+    {% endif %}
+</div>
