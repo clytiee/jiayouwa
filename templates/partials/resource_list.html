@@ -63,14 +63,18 @@
 					
 					<!-- 评分 -->
 					{% if resource.avg_rating > 0 %}
-					<div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">⭐ {{ resource.avg_rating|floatformat:1 }}</div>
+					<div class="absolute top-2 left-2 bg-white/50 backdrop-blur-sm text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
+						⭐ {{ resource.avg_rating|floatformat:1 }}
+					</div>
 					{% endif %}
 					
 					<!-- 收藏 -->
-					<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">❤️ {{ resource.collect_count }}</div>
+					<div class="absolute top-2 right-2 bg-white/50 backdrop-blur-sm text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
+						❤️ {{ resource.collect_count }}
+					</div>
 					
 					<!-- 价格 -->
-					<div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+					<div class="absolute bottom-2 right-2 bg-white/50 backdrop-blur-sm text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
 						{% if resource.price == 0 %}🆓 免费{% else %}💰 {{ resource.price }}油滴{% endif %}
 					</div>
 				</div>
