@@ -342,10 +342,16 @@ def my_earnings_view(request):
         amount__lt=0
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
+    # ✅ 按类型分组，并获取显示名称
     income_by_type = OilTransaction.objects.filter(
         user=request.user,
         amount__gt=0
     ).values('type').annotate(total=Sum('amount')).order_by('-total')
+    
+    # 获取交易类型的显示名称
+    type_display_map = dict(OilTransaction.TYPE_CHOICES)
+    for item in income_by_type:
+        item['type_display'] = type_display_map.get(item['type'], item['type'])
     
     paginator = Paginator(transactions, 30)
     page = request.GET.get('page', 1)
@@ -358,4 +364,5 @@ def my_earnings_view(request):
         'balance': request.user.oil_balance,
         'income_by_type': income_by_type,
     }
-    return render(request, 'users/my_earnings.html', {'transactions': transactions_page})
+    return render(request, 'users/my_earnings.html', context)
+    
