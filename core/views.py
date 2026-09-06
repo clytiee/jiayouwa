@@ -41,26 +41,26 @@ def toggle_view_mode(request):
 
 
 def ranking_view(request):
-    """油滴排行榜"""
-    # 获取所有用户，按油滴余额排序，取前50
-    top_users = User.objects.filter(
+    """综合排行榜（支持多维度）"""
+    
+    rank_type = request.GET.get('type', 'oil')
+    
+    # 1. 油滴排行榜（保持不变）
+    oil_top_users = User.objects.filter(
         is_active=True,
         is_banned=False
     ).exclude(
         oil_balance=0
     ).order_by('-oil_balance')[:50]
     
-    # 为每个用户补充资源数
-    for user in top_users:
+    for user in oil_top_users:
         user.resource_count = Resource.objects.filter(
             uploader=user,
             status='published'
         ).count()
     
-    # 当前用户的排名
     user_rank = None
     if request.user.is_authenticated:
-        # 获取当前用户的油滴排名
         higher_count = User.objects.filter(
             is_active=True,
             is_banned=False,
@@ -68,16 +68,49 @@ def ranking_view(request):
         ).count()
         user_rank = higher_count + 1
     
+    # ===== 资源排行榜（根据类型选择） =====
+    resources_list = []
+    
+    if rank_type == 'download':
+        resources_list = Resource.objects.filter(
+            status='published'
+        ).order_by('-download_count')[:30]
+    
+    elif rank_type == 'free_download':
+        resources_list = Resource.objects.filter(
+            status='published',
+            price=0
+        ).order_by('-download_count')[:30]
+    
+    elif rank_type == 'collect':
+        resources_list = Resource.objects.filter(
+            status='published'
+        ).order_by('-collect_count')[:30]
+    
+    elif rank_type == 'comment':
+        resources_list = Resource.objects.filter(
+            status='published'
+        ).annotate(
+            comment_count=Count('comment')
+        ).filter(
+            comment_count__gt=0
+        ).order_by('-comment_count')[:30]
+    
+    # 补充上传者名称
+    for r in resources_list:
+        r.uploader_name = r.uploader.first_name or r.uploader.username
+        if rank_type == 'comment':
+            r.comment_count = getattr(r, 'comment_count', 0)
+    
     context = {
-        'top_users': top_users,
+        'rank_type': rank_type,
+        'resources_list': resources_list,  # ← 统一变量名
+        'oil_top_users': oil_top_users,
         'user_rank': user_rank,
         'total_users': User.objects.filter(is_active=True, is_banned=False).count(),
     }
     
     return render(request, 'ranking.html', context)
-
-
-# 保留旧的 ranking_view 已替换
 
 def search_view(request):
     """搜索资源（关键词 + 语义）"""
