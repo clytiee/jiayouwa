@@ -105,6 +105,22 @@ def login_view(request):
             password = form.cleaned_data.get('password')
             remember = form.cleaned_data.get('remember_me', False)
             
+            # 先检查用户是否存在且是否被禁用
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            
+            try:
+                user = User.objects.get(Q(username=username) | Q(email=username))
+                if not user.is_active:
+                    messages.error(request, '❌ 账号已被禁用，请联系管理员')
+                    return render(request, 'users/login.html', {'form': form})
+                if user.is_banned:
+                    messages.error(request, '❌ 账号已被封禁，请联系管理员')
+                    return render(request, 'users/login.html', {'form': form})
+            except User.DoesNotExist:
+                pass
+            
+            # 再验证密码
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -117,8 +133,10 @@ def login_view(request):
                 messages.success(request, f'欢迎回来，{user.username}！🐸')
                 next_url = request.GET.get('next', 'index')
                 return redirect(next_url)
+            else:
+                messages.error(request, '❌ 用户名或密码错误')
         else:
-            messages.error(request, '用户名或密码错误')
+            messages.error(request, '❌ 用户名或密码错误')
     else:
         form = LoginForm()
     
