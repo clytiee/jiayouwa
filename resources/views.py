@@ -494,8 +494,16 @@ def toggle_collect(request, resource_id):
         return JsonResponse({'collected': False, 'count': resource.collect_count - 1})
     else:
         Resource.objects.filter(id=resource_id).update(collect_count=models.F('collect_count') + 1)
-        # 收藏奖励
-        OilService.add_oil(request.user, 1, 'collect_reward', f'收藏了资源《{resource.title}》')
+        
+        # ✅ 只有收藏的不是自己发布的资源，才给油滴奖励
+        if resource.uploader != request.user:
+            OilService.add_oil(
+                request.user, 
+                1, 
+                'collect_reward', 
+                f'收藏了资源《{resource.title}》'
+            )
+        
         return JsonResponse({'collected': True, 'count': resource.collect_count + 1})
 
 
