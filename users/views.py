@@ -330,25 +330,41 @@ def my_shares_view(request):
 @login_required
 def my_earnings_view(request):
     """收益统计"""
-    transactions = OilTransaction.objects.filter(user=request.user).order_by('-created_at')
+    user = request.user  # ← 添加这行
+    transactions = OilTransaction.objects.filter(user=user).order_by('-created_at')
     
+    # 汇总统计
     total_income = OilTransaction.objects.filter(
-        user=request.user,
+        user=user,
         amount__gt=0
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
     total_expense = OilTransaction.objects.filter(
-        user=request.user,
+        user=user,
         amount__lt=0
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
-    # ✅ 按类型分组，并获取显示名称
+    # 上次登录以来的油滴增加数
+    last_login = user.last_login
+    oil_since_last_login = 0
+    if last_login:
+        oil_since_last_login = OilTransaction.objects.filter(
+            user=user,
+            amount__gt=0,
+            created_at__gt=last_login
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+    else:
+        oil_since_last_login = OilTransaction.objects.filter(
+            user=user,
+            amount__gt=0
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # 按类型分组
     income_by_type = OilTransaction.objects.filter(
-        user=request.user,
+        user=user,
         amount__gt=0
     ).values('type').annotate(total=Sum('amount')).order_by('-total')
     
-    # 获取交易类型的显示名称
     type_display_map = dict(OilTransaction.TYPE_CHOICES)
     for item in income_by_type:
         item['type_display'] = type_display_map.get(item['type'], item['type'])
@@ -361,8 +377,10 @@ def my_earnings_view(request):
         'transactions': transactions_page,
         'total_income': total_income,
         'total_expense': abs(total_expense),
-        'balance': request.user.oil_balance,
+        'balance': user.oil_balance,
         'income_by_type': income_by_type,
+        'oil_since_last_login': oil_since_last_login,
+        'last_login': last_login,
     }
     return render(request, 'users/my_earnings.html', context)
     

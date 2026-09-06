@@ -242,7 +242,7 @@
 						</div>
 
                         <!-- 用户菜单 -->
-                        <div x-data="{ open: false }" class="relative">
+						<div x-data="{ open: false }" class="relative">
 							<button @click="open = !open"
 									@click.away="open = false"
 									class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition">
@@ -252,8 +252,8 @@
 							<div x-show="open" x-cloak
 								 x-transition:enter.duration.200ms.opacity
 								 x-transition:leave.duration.150ms.opacity
-								 class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-								<!-- 菜单内容 -->
+								 class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+								<!-- 用户信息 -->
 								<div class="px-4 py-3 border-b border-gray-100">
 									<div class="flex items-center space-x-3">
 										<span class="avatar-frog avatar-frog-sm">🐸</span>
@@ -263,8 +263,34 @@
 										</div>
 									</div>
 								</div>
+								
 								<a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">👤 我的主页</a>
-								<a href="{% url 'users:my_resources' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📦 我的资源</a>
+
+								<!-- ✅ 收益统计（独立一行，旁边显示油滴增加数） -->
+								<a href="{% url 'users:my_earnings' %}" class="text-sm text-gray-700">
+									<div class="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
+									💰 收益统计
+									{% if oil_since_last_login > 0 %}
+									<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full cursor-help" 
+										  title="上次登录以来新增的油滴">+{{ oil_since_last_login }}</span>
+									{% elif oil_since_last_login == 0 %}
+									<span class="text-xs text-gray-400 cursor-help" 
+										  title="上次登录以来暂无新增油滴">暂无新增</span>
+									{% endif %}
+									</div>
+								</a>
+								
+								<a href="{% url 'users:my_resources' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📦 我的资源</a>								
+								<a href="{% url 'users:my_collections' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">❤️ 我的收藏</a>
+								<a href="{% url 'users:my_downloads' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📥 我的下载</a>
+								<!--
+								<a href="{% url 'users:my_follows' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">👤 我的关注</a>
+								<a href="{% url 'users:my_history' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">📖 浏览历史</a>
+								<a href="{% url 'users:my_shares' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">🔗 分享历史</a>
+								-->
+								<a href="{% url 'users:profile_edit' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">⚙️ 账号设置</a>
+								
+								<div class="border-t border-gray-100"></div>
 								<a href="{% url 'users:logout' %}" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-500">🚪 退出登录</a>
 							</div>
 						</div>
