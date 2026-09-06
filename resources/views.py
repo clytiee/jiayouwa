@@ -45,45 +45,48 @@ def resource_upload(request):
                     resource.cover_images = processed_images
                     resource.save()
             
-            # 🆕 预设标签匹配（本地，零成本）
+            # ✅ 预设标签匹配（本地，零成本，即时生效）
             preset_tags = TagService.get_preset_tags(resource.title, resource.description)
             
-            # 如果预设标签不够3个，再调用AI补充
-            if len(preset_tags) < 3:
-                ai_result = AIService.generate_resource_tags(resource.title, resource.description)
-                final_tags = TagService.merge_with_ai_tags(preset_tags, ai_result)
-            else:
-                final_tags = preset_tags[:5]
-            
-            # 保存标签
-            if final_tags:
-                resource.tags = final_tags
-                resource.ai_tags_generated = True
+            # 如果有预设标签，先保存（用户马上能看到）
+            if preset_tags:
+                resource.tags = preset_tags[:5]
+                resource.ai_tags_generated = False  # 标记AI还未生成
                 resource.save()
-                
-            # 🆕 异步调用 AI 生成标签（不阻塞响应）
-            # 使用 Django 的线程或后台任务
+                logger.info(f'[预设标签] 资源 {resource.id} 匹配到: {preset_tags[:5]}')
+            
+            # 🆕 异步调用 AI 补充标签（不阻塞响应）
             import threading
+            
             def generate_ai_tags():
                 try:
+                    logger.info(f'[AI标签] 资源 {resource.id} 开始生成...')
                     ai_result = AIService.generate_resource_tags(
                         resource.title, 
                         resource.description
                     )
-                    if ai_result:
-                        resource.tags = ai_result.get('tags', [])
+                    logger.info(f'[AI标签] 资源 {resource.id} AI返回: {ai_result}')
+                    
+                    if ai_result and ai_result.get('tags'):
+                        # 合并预设标签和AI标签
+                        existing_tags = resource.tags or []
+                        new_tags = ai_result.get('tags', [])
+                        # 合并去重
+                        merged = list(set(existing_tags + new_tags))[:5]
+                        resource.tags = merged
                         resource.grade = ai_result.get('grade', '')
                         resource.resource_type = ai_result.get('resource_type', '')
                         resource.ai_tags_generated = True
                         resource.save()
-                        logger.info(f'AI 标签生成成功: 资源 {resource.id}')
+                        logger.info(f'[AI标签] 资源 {resource.id} 最终标签: {merged}')
                 except Exception as e:
-                    logger.error(f'AI 标签生成失败: {e}')
+                    logger.error(f'[AI标签] 资源 {resource.id} 失败: {e}')
             
             thread = threading.Thread(target=generate_ai_tags)
             thread.start()
+            logger.info(f'[AI标签] 资源 {resource.id} 线程已启动')
             
-            messages.success(request, f'🎉 资源《{resource.title}》发布成功！AI 正在自动生成标签，请稍后刷新查看。')
+            messages.success(request, f'🎉 资源《{resource.title}》发布成功！AI 正在自动生成补充标签，请稍后刷新查看。')
             return redirect('resources:detail', resource_id=resource.id)
         else:
             messages.error(request, '发布失败，请检查表单中的错误。')
