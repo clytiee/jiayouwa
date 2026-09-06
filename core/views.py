@@ -43,7 +43,7 @@ def toggle_view_mode(request):
 def ranking_view(request):
     """综合排行榜（支持多维度）"""
     
-    rank_type = request.GET.get('type', 'oil')
+    rank_type = request.GET.get('type', 'download')
     
     # 1. 油滴排行榜（保持不变）
     oil_top_users = User.objects.filter(
