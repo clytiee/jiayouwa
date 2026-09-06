@@ -385,7 +385,7 @@
         <!-- 评论列表 -->
         <div class="space-y-4">
             {% for comment in comments %}
-            <div class="comment-item p-4 bg-gray-50 rounded-xl">
+            <div class="comment-item p-4 bg-gray-50 rounded-xl" id="comment-{{ comment.id }}">
                 <div class="flex items-start space-x-3">
                     <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
                     <div class="flex-1 min-w-0">

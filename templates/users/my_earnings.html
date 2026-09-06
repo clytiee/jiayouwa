@@ -77,9 +77,16 @@
                             {{ tx.get_type_display|default:tx.type }}
                         </div>
                         <div class="text-xs text-gray-400 truncate">
-                            {{ tx.description|default:"" }}
-                            {% if tx.related_resource %}
-                            · 《{{ tx.related_resource.title }}》
+                            {% if tx.type == 'comment_up_reward' and tx.related_comment %}
+								<!-- ✅ 评论被顶：显示评论预览，点击跳转 -->
+								<a href="{% url 'resources:detail' tx.related_comment.resource.id %}#comment-{{ tx.related_comment.id }}" 
+								   class="text-green-600 hover:underline">
+									{{ tx.description }}：“{{ tx.related_comment.content|slice:":15" }}{% if tx.related_comment.content|length > 15 %}...{% endif %}”
+								</a>
+                            {% elif tx.related_resource %}
+								{{ tx.description|default:"" }}
+							{% else %}
+								{{ tx.description|default:"" }}
                             {% endif %}
                         </div>
                     </div>

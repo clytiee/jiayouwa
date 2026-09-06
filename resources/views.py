@@ -633,7 +633,6 @@ def vote_comment(request, comment_id):
     if vote_type not in ['up', 'down']:
         return JsonResponse({'error': '无效的投票类型'}, status=400)
     
-    # ✅ 用 session 记录已奖励的评论
     rewarded_key = f'comment_rewarded_{comment_id}_{request.user.id}'
     already_rewarded = request.session.get(rewarded_key, False)
     
@@ -641,7 +640,6 @@ def vote_comment(request, comment_id):
     
     if existing:
         if existing.vote_type == vote_type:
-            # 取消投票
             existing.delete()
             if vote_type == 'up':
                 comment.upvote_count -= 1
@@ -654,7 +652,6 @@ def vote_comment(request, comment_id):
                 'down_count': comment.downvote_count
             })
         else:
-            # 切换投票
             old_type = existing.vote_type
             existing.vote_type = vote_type
             existing.save()
@@ -662,11 +659,12 @@ def vote_comment(request, comment_id):
             if vote_type == 'up':
                 comment.upvote_count += 1
                 comment.downvote_count -= 1
-                # ✅ 只有从踩变顶，且之前没有奖励过，才给奖励
                 if old_type == 'down' and not already_rewarded and comment.user != request.user:
+                    # ✅ 传递 comment 对象
                     OilService.add_oil(
                         comment.user, 1, 'comment_up_reward', 
-                        f'你的评论被 {request.user.first_name or request.user.username} 顶了'
+                        f'你的评论被 {request.user.first_name or request.user.username} 顶了',
+                        related_comment=comment  # ✅ 新增
                     )
                     request.session[rewarded_key] = True
             else:
@@ -679,7 +677,6 @@ def vote_comment(request, comment_id):
                 'down_count': comment.downvote_count
             })
     else:
-        # 新增投票
         CommentVote.objects.create(
             user=request.user,
             comment=comment,
@@ -687,11 +684,12 @@ def vote_comment(request, comment_id):
         )
         if vote_type == 'up':
             comment.upvote_count += 1
-            # ✅ 首次顶，且评论者不是自己，且没有奖励过
             if not already_rewarded and comment.user != request.user:
+                # ✅ 传递 comment 对象
                 OilService.add_oil(
                     comment.user, 1, 'comment_up_reward', 
-                    f'你的评论被 {request.user.first_name or request.user.username} 顶了'
+                    f'你的评论被 {request.user.first_name or request.user.username} 顶了',
+                    related_comment=comment  # ✅ 新增
                 )
                 request.session[rewarded_key] = True
         else:

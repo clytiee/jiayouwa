@@ -12,7 +12,7 @@ class OilService:
     """油滴服务"""
     
     @staticmethod
-    def add_oil(user, amount, trans_type, description='', related_resource=None, related_user=None):
+    def add_oil(user, amount, trans_type, description='', related_resource=None, related_user=None, related_comment=None):
         """增加油滴"""
         if amount <= 0:
             return False
@@ -28,11 +28,12 @@ class OilService:
                 type=trans_type,
                 description=description,
                 related_resource=related_resource,
-                related_user=related_user
+                related_user=related_user,
+                related_comment=related_comment,  # ✅ 新增
             )
         
         # 同时增加经验值
-        exp_amount = ExpService._get_exp_for_action(trans_type)  # ← 调用 ExpService 的方法
+        exp_amount = OilService._get_exp_for_action(trans_type)
         if exp_amount > 0:
             ExpService.add_exp(user, exp_amount, trans_type)
         
@@ -142,34 +143,6 @@ class OilService:
             related_resource=resource
         )
 
-    @staticmethod
-    def add_oil(user, amount, trans_type, description='', related_resource=None, related_user=None):
-        """增加油滴"""
-        if amount <= 0:
-            return False
-        
-        with transaction.atomic():
-            user.oil_balance += amount
-            user.save()
-            
-            OilTransaction.objects.create(
-                user=user,
-                amount=amount,
-                balance_after=user.oil_balance,
-                type=trans_type,
-                description=description,
-                related_resource=related_resource,
-                related_user=related_user
-            )
-        
-        # 🆕 同时增加经验值
-        exp_amount = ExpService._get_exp_for_action(trans_type)
-        if exp_amount > 0:
-            ExpService.add_exp(user, exp_amount, trans_type)
-        
-        logger.info(f"用户 {user.username} 获得 {amount} 油滴，原因: {trans_type}")
-        return True
-    
     @staticmethod
     def _get_exp_for_action(action_type):
         """根据行为类型获取经验值"""

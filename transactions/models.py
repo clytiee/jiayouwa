@@ -28,6 +28,8 @@ class OilTransaction(models.Model):
                                          on_delete=models.SET_NULL, verbose_name='关联资源')
     related_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
                                      on_delete=models.SET_NULL, related_name='related_transactions', verbose_name='关联用户')
+    related_comment = models.ForeignKey('resources.Comment', null=True, blank=True,  # ✅ 新增 
+                                        on_delete=models.SET_NULL, verbose_name='关联评论')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='交易时间')
     
     class Meta:
