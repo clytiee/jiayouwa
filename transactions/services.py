@@ -105,7 +105,21 @@ class OilService:
     
     @staticmethod
     def share_download_bonus(user, share, downloader):
-        """分享下载奖励"""
+        """分享下载奖励（每个分享链接限前10次）"""
+        # 统计该分享链接已经奖励的下载次数
+        from transactions.models import OilTransaction
+        from django.db.models import Q
+        
+        reward_count = OilTransaction.objects.filter(
+            Q(type='share_download') &
+            Q(description__icontains=share.share_id) &
+            Q(user=user)
+        ).count()
+        
+        # 如果已达到10次，不再奖励
+        if reward_count >= 10:
+            return False
+        
         return OilService.add_oil(
             user, 1, 'share_download', f'分享下载奖励 ({share.share_id})',
             related_resource=share.resource,
