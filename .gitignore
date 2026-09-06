@@ -7,3 +7,6 @@ media/
 staticfiles/ 
 logs/ 
 .DS_Store 
+resource_embeddings.json
+create_test_data_with_codes.sh
+create_data.py
