@@ -2,6 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 from .models import OilTransaction
 from users.models import User
+from users.services import ExpService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,11 @@ class OilService:
                 related_resource=related_resource,
                 related_user=related_user
             )
+        
+        # 同时增加经验值
+        exp_amount = ExpService._get_exp_for_action(trans_type)  # ← 调用 ExpService 的方法
+        if exp_amount > 0:
+            ExpService.add_exp(user, exp_amount, trans_type)
         
         logger.info(f"用户 {user.username} 获得 {amount} 油滴，原因: {trans_type}")
         return True

@@ -39,7 +39,18 @@ class Resource(models.Model):
     
     # 媒体
     cover_images = models.JSONField(default=list, blank=True, verbose_name='预览图列表')
-    download_url = models.URLField(max_length=500, verbose_name='下载链接')
+    download_url = models.URLField(
+        max_length=500, 
+        verbose_name='下载链接',
+        blank=True,
+        null=True
+    )
+    extract_code = models.CharField(
+        max_length=50, 
+        blank=True, 
+        default='',
+        verbose_name='提取码'
+    )
     
     # 油滴
     price = models.IntegerField(default=0, verbose_name='油滴价格')

@@ -97,3 +97,19 @@ class ExpService:
             content=f'恭喜你从「{old_title}」升级到「{new_title}」！继续加油，学习路上一起进步！🐸',
             message_type='system'
         )
+        
+    @staticmethod
+    def _get_exp_for_action(action_type):
+        """根据行为类型获取经验值"""
+        exp_map = {
+            'register_bonus': 5,
+            'daily_login': 2,
+            'share_click': 1,
+            'share_register': 3,
+            'share_download': 2,
+            'upload_earning': 10,
+            'upvote_reward': 1,
+            'collect_reward': 1,
+            'comment_up_reward': 1,
+        }
+        return exp_map.get(action_type, 0)

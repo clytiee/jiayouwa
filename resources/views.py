@@ -245,23 +245,22 @@ def resource_detail(request, resource_id):
             defaults={'viewed_at': timezone.now()}
         )
     
-    # ===== 权限判断 =====
+    # ===== 下载权限判断 =====
     is_uploader = user.is_authenticated and user.id == resource.uploader.id
     has_purchased = False
-    can_download_free_trial = False
-    
     if user.is_authenticated:
-        # 是否已购买（有下载记录）
         has_purchased = Download.objects.filter(user=user, resource=resource).exists()
-        # 是否已用过免费下载
-        has_used_free_trial = user.has_used_free_trial
+    
+    # 是否已付费（上传者自动视为已付费）
+    can_see_extract = is_uploader or has_purchased or resource.price == 0
     
     # 游客免费下载判断
+    can_download_free_trial = False
     if not user.is_authenticated:
-        # 检查session中是否已用过免费下载
         can_download_free_trial = not request.session.get('has_used_free_trial', False)
     else:
-        can_download_free_trial = not has_purchased and not user.has_used_free_trial
+        if not has_purchased and not user.has_used_free_trial and not is_uploader:
+            can_download_free_trial = True
     
     # ===== 收藏状态 =====
     is_collected = False
@@ -315,6 +314,7 @@ def resource_detail(request, resource_id):
         'resource': resource,
         'is_uploader': is_uploader,
         'has_purchased': has_purchased,
+        'can_see_extract': can_see_extract,
         'can_download_free_trial': can_download_free_trial,
         'is_collected': is_collected,
         'is_following': is_following,
@@ -331,43 +331,33 @@ def resource_detail(request, resource_id):
 @login_required
 @require_POST
 def resource_download(request, resource_id):
-    """处理资源下载"""
+    """处理资源下载 - 返回完整下载信息"""
     resource = get_object_or_404(Resource, id=resource_id, status='published')
     user = request.user
     
-    # 上传者本人直接返回链接
+    # 上传者本人直接返回完整信息
     if user.id == resource.uploader.id:
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'is_free': True
+            'extract_code': resource.extract_code,
+            'is_free': True,
+            'can_see_extract': True,
         })
     
     # 检查是否已购买
-    if Download.objects.filter(user=user, resource=resource).exists():
+    has_purchased = Download.objects.filter(user=user, resource=resource).exists()
+    if has_purchased:
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'is_free': False
+            'extract_code': resource.extract_code,
+            'is_free': False,
+            'can_see_extract': True,
         })
     
-    # 检查游客免费下载
-    if user.has_used_free_trial:
-        return JsonResponse({
-            'success': False,
-            'error': '您已经使用过免费下载机会，请支付油滴下载'
-        })
-    
-    # 检查油滴是否足够
-    if user.oil_balance < resource.price:
-        return JsonResponse({
-            'success': False,
-            'error': f'油滴不足！需要 {resource.price} 油滴，当前仅有 {user.oil_balance} 油滴'
-        })
-    
-    # 如果是免费资源（price=0），直接下载
+    # 如果资源免费，直接返回
     if resource.price == 0:
-        # 记录下载
         Download.objects.create(
             user=user,
             resource=resource,
@@ -377,7 +367,16 @@ def resource_download(request, resource_id):
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'is_free': True
+            'extract_code': resource.extract_code,
+            'is_free': True,
+            'can_see_extract': True,
+        })
+    
+    # 检查油滴是否足够
+    if user.oil_balance < resource.price:
+        return JsonResponse({
+            'success': False,
+            'error': f'油滴不足！需要 {resource.price} 油滴，当前仅有 {user.oil_balance} 油滴'
         })
     
     # 扣除油滴
@@ -402,8 +401,10 @@ def resource_download(request, resource_id):
     return JsonResponse({
         'success': True,
         'download_url': resource.download_url,
+        'extract_code': resource.extract_code,
         'is_free': False,
-        'oil_paid': resource.price
+        'oil_paid': resource.price,
+        'can_see_extract': True,
     })
 
 

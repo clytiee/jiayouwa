@@ -148,21 +148,43 @@
             {% endif %}
         </div>
 
-        <!-- 下载链接 -->
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                下载链接 <span class="text-red-500">*</span>
-            </label>
-            <input type="url" name="download_url" id="id_download_url"
-                   value="{{ form.download_url.value|default:'' }}"
-                   placeholder="https://pan.baidu.com/s/xxxxx 或 https://example.com/file.pdf"
-                   class="input-field {% if form.download_url.errors %}error{% endif %}"
-                   required>
-            <p class="text-xs text-gray-400 mt-1">支持百度网盘、阿里云盘、网站链接等</p>
-            {% if form.download_url.errors %}
-            <p class="text-red-500 text-xs mt-1">{{ form.download_url.errors.0 }}</p>
-            {% endif %}
-        </div>
+		<!-- 下载链接 + 识别按钮 -->
+		<div class="mb-4">
+			<label class="block text-sm font-medium text-gray-700 mb-1.5">
+				下载链接 <span class="text-red-500">*</span>
+			</label>
+			<div class="flex items-center space-x-2">
+				<input type="url" name="download_url" id="id_download_url"
+					   value="{{ form.download_url.value|default:'' }}"
+					   placeholder="粘贴网盘分享链接或整段文本，点击识别"
+					   class="input-field flex-1 {% if form.download_url.errors %}error{% endif %}"
+					   required>
+				<button type="button" id="extract-btn" 
+						class="btn-primary whitespace-nowrap px-4 py-2 text-sm">
+					🔍 识别
+				</button>
+			</div>
+			<p class="text-xs text-gray-400 mt-1">支持百度、阿里、夸克网盘分享链接的自动识别提取</p>
+			{% if form.download_url.errors %}
+			<p class="text-red-500 text-xs mt-1">{{ form.download_url.errors.0 }}</p>
+			{% endif %}
+		</div>
+
+		<!-- 提取码 -->
+		<div class="mb-4">
+			<label class="block text-sm font-medium text-gray-700 mb-1.5">
+				🔑 提取码
+			</label>
+			<input type="text" name="extract_code" id="id_extract_code"
+				   value="{{ form.extract_code.value|default:'' }}"
+				   placeholder="自动识别或手动填写（如：abcd）"
+				   class="input-field {% if form.extract_code.errors %}error{% endif %}"
+				   maxlength="20">
+			<p class="text-xs text-gray-400 mt-1" id="extract_status">💡 粘贴内容后点击“识别”按钮自动提取</p>
+			{% if form.extract_code.errors %}
+			<p class="text-red-500 text-xs mt-1">{{ form.extract_code.errors.0 }}</p>
+			{% endif %}
+		</div>
 
         <!-- 价格 -->
         <div class="mb-6">
@@ -344,5 +366,212 @@ dropZone.addEventListener('drop', async function(e) {
 dropZone.addEventListener('click', function() {
     document.getElementById('imageInput').click();
 });
+// ===== 自动识别提取码 =====
+document.getElementById('id_download_url').addEventListener('input', function() {
+    const url = this.value;
+    const extractInput = document.getElementById('id_extract_code');
+    const statusEl = document.getElementById('extract_status');
+    
+    // 如果提取码字段已有内容且不是自动填充的，不覆盖
+    if (extractInput.dataset.manual === 'true') return;
+    
+    // 尝试从链接中提取提取码
+    const extracted = extractCodeFromText(url);
+    if (extracted) {
+        extractInput.value = extracted;
+        statusEl.textContent = '✅ 已自动识别提取码: ' + extracted;
+        statusEl.className = 'text-xs text-green-600 mt-1';
+        extractInput.dataset.auto = 'true';
+    } else {
+        // 如果用户手动清空了自动识别的码，不重置状态
+        if (extractInput.dataset.auto === 'true' && !extractInput.value) {
+            extractInput.dataset.auto = 'false';
+            statusEl.textContent = '💡 粘贴下载链接后自动识别，也可手动填写';
+            statusEl.className = 'text-xs text-gray-400 mt-1';
+        }
+    }
+});
+
+// 用户手动编辑提取码时，标记为手动
+document.getElementById('id_extract_code').addEventListener('input', function() {
+    if (this.value) {
+        this.dataset.manual = 'true';
+        const statusEl = document.getElementById('extract_status');
+        statusEl.textContent = '✏️ 已手动填写提取码';
+        statusEl.className = 'text-xs text-blue-600 mt-1';
+    } else {
+        this.dataset.manual = 'false';
+        this.dataset.auto = 'false';
+        const statusEl = document.getElementById('extract_status');
+        statusEl.textContent = '💡 粘贴下载链接后自动识别，也可手动填写';
+        statusEl.className = 'text-xs text-gray-400 mt-1';
+    }
+});
+
+function extractCodeFromText(text) {
+    if (!text) return null;
+    
+    // 格式1: URL参数中的 pwd=xxx
+    let match = text.match(/[?&]pwd=([a-zA-Z0-9]{4,6})/);
+    if (match) return match[1].toUpperCase();
+    
+    // 格式2: 提取码: xxxx 或 提取码：xxxx
+    match = text.match(/提取码[：:]\s*([a-zA-Z0-9]{4,6})/);
+    if (match) return match[1].toUpperCase();
+    
+    // 格式3: 链接中的 pwd=xxx
+    match = text.match(/pwd=([a-zA-Z0-9]{4,6})/);
+    if (match) return match[1].toUpperCase();
+    
+    // 格式4: 单独的4-6位字母数字
+    match = text.match(/\b([a-zA-Z0-9]{4,6})\b/);
+    if (match) {
+        const code = match[1];
+        const exclude = ['http', 'https', 'www', 'com', 'cn', 'net', 'org'];
+        if (!exclude.includes(code.toLowerCase()) && !/^\d+$/.test(code)) {
+            return code.toUpperCase();
+        }
+    }
+    
+    return null;
+}
+
+// ===== 自动识别链接和提取码（支持百度网盘、阿里云盘、夸克） =====
+document.getElementById('extract-btn').addEventListener('click', function() {
+    const input = document.getElementById('id_download_url');
+    const extractInput = document.getElementById('id_extract_code');
+    const statusEl = document.getElementById('extract_status');
+    const text = input.value.trim();
+    
+    if (!text) {
+        statusEl.textContent = '⚠️ 请先粘贴内容';
+        statusEl.className = 'text-xs text-red-500 mt-1';
+        return;
+    }
+    
+    const result = extractLinkAndCode(text);
+    
+    if (result.link) {
+        input.value = result.link;
+        statusEl.textContent = '✅ 已识别下载链接';
+        statusEl.className = 'text-xs text-green-600 mt-1';
+        
+        if (result.code) {
+            extractInput.value = result.code.toUpperCase();
+            extractInput.dataset.auto = 'true';
+            statusEl.textContent = '✅ 已识别下载链接和提取码: ' + result.code.toUpperCase();
+            statusEl.className = 'text-xs text-green-600 mt-1';
+        }
+    } else {
+        statusEl.textContent = '⚠️ 未能识别出下载链接，请检查内容';
+        statusEl.className = 'text-xs text-red-500 mt-1';
+    }
+});
+
+function extractLinkAndCode(text) {
+    let link = null;
+    let code = null;
+    let platform = null;
+    
+    // ===== 1. 提取百度网盘链接 =====
+    // https://pan.baidu.com/s/xxxxx
+    let match = text.match(/(https?:\/\/pan\.baidu\.com\/s\/[a-zA-Z0-9_-]+)/);
+    if (!match) {
+        match = text.match(/(pan\.baidu\.com\/s\/[a-zA-Z0-9_-]+)/);
+        if (match) {
+            link = 'https://' + match[1];
+            platform = 'baidu';
+        }
+    } else {
+        link = match[1];
+        platform = 'baidu';
+    }
+    
+    // ===== 2. 提取阿里云盘链接 =====
+    if (!link) {
+        // https://www.alipan.com/s/xxxxx 或 https://aliyundrive.com/s/xxxxx
+        match = text.match(/(https?:\/\/(?:www\.)?alipan\.com\/s\/[a-zA-Z0-9_-]+)/);
+        if (!match) {
+            match = text.match(/(https?:\/\/aliyundrive\.com\/s\/[a-zA-Z0-9_-]+)/);
+        }
+        if (!match) {
+            match = text.match(/(alipan\.com\/s\/[a-zA-Z0-9_-]+)/);
+            if (match) {
+                link = 'https://' + match[1];
+                platform = 'alipan';
+            }
+        } else {
+            link = match[1];
+            platform = 'alipan';
+        }
+    }
+    
+    // ===== 3. 提取夸克网盘链接 =====
+    if (!link) {
+        // https://pan.quark.cn/s/xxxxx
+        match = text.match(/(https?:\/\/pan\.quark\.cn\/s\/[a-zA-Z0-9_-]+)/);
+        if (!match) {
+            match = text.match(/(pan\.quark\.cn\/s\/[a-zA-Z0-9_-]+)/);
+            if (match) {
+                link = 'https://' + match[1];
+                platform = 'quark';
+            }
+        } else {
+            link = match[1];
+            platform = 'quark';
+        }
+    }
+    
+    // ===== 4. 从链接中提取 pwd / code 参数 =====
+    if (link) {
+        // 百度网盘: pwd=xxx
+        let pwdMatch = link.match(/[?&]pwd=([a-zA-Z0-9]{4,6})/);
+        if (pwdMatch) {
+            code = pwdMatch[1];
+        }
+        // 阿里云盘: ?code=xxx 或 &code=xxx
+        if (!code) {
+            let codeMatch = link.match(/[?&]code=([a-zA-Z0-9]{4,8})/);
+            if (codeMatch) {
+                code = codeMatch[1];
+            }
+        }
+        // 夸克: ?code=xxx 或 &code=xxx
+        if (!code) {
+            let codeMatch = link.match(/[?&]code=([a-zA-Z0-9]{4,8})/);
+            if (codeMatch) {
+                code = codeMatch[1];
+            }
+        }
+    }
+    
+    // ===== 5. 如果链接中没有提取码，从文本中提取 =====
+    if (!code) {
+        // 格式: 提取码: xxxx 或 提取码：xxxx
+        let codeMatch = text.match(/提取码[：:]\s*([a-zA-Z0-9]{4,8})/);
+        if (codeMatch) {
+            code = codeMatch[1];
+        }
+    }
+    
+    // ===== 6. 如果还是没有，尝试从文本中找独立的4-6位字母数字 =====
+    if (!code) {
+        let standaloneMatch = text.match(/\b([a-zA-Z0-9]{4,6})\b/);
+        if (standaloneMatch) {
+            const candidate = standaloneMatch[1];
+            const exclude = ['http', 'https', 'www', 'com', 'cn', 'net', 'org', 'html', 'php', 'asp', 'jsp'];
+            if (!exclude.includes(candidate.toLowerCase()) && !/^\d+$/.test(candidate)) {
+                code = candidate;
+            }
+        }
+    }
+    
+    // ===== 7. 如果找到了链接但没有协议，补全协议 =====
+    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+        link = 'https://' + link;
+    }
+    
+    return { link: link, code: code, platform: platform };
+}
 </script>
 {% endblock %}

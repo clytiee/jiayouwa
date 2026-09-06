@@ -274,19 +274,43 @@
             </div>
             
             <!-- 下载链接显示区 -->
-            <div x-show="showDownload" x-transition.duration.300 
-                 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                <p class="text-sm text-green-700 font-medium mb-2">✅ 下载链接：</p>
-                <div class="flex items-center space-x-2">
-                    <input type="text" :value="downloadUrl" readonly 
-                           class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-mono">
-                    <button @click="copyDownloadUrl()" 
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
-                        📋 复制
-                    </button>
-                </div>
-                <p class="text-xs text-gray-500 mt-2" x-show="downloadMessage" x-text="downloadMessage"></p>
-            </div>
+			<div x-show="showDownload" x-transition.duration.300 
+				 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+				
+				<!-- 下载链接 -->
+				<div class="mb-2">
+					<p class="text-sm text-green-700 font-medium">🔗 下载链接：</p>
+					<div class="flex items-center space-x-2 mt-1">
+						<input type="text" :value="downloadUrl" readonly 
+							   class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-mono">
+						<button @click="copyText(downloadUrl)" 
+								class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
+							📋 复制
+						</button>
+					</div>
+				</div>
+				
+				<!-- 提取码（付费资源需购买后显示） -->
+				<div x-show="showExtractCode" x-transition>
+					<p class="text-sm text-green-700 font-medium">🔑 提取码：</p>
+					<div class="flex items-center space-x-2 mt-1">
+						<input type="text" :value="extractCode" readonly 
+							   class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-mono">
+						<button @click="copyText(extractCode)" 
+								class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
+							📋 复制
+						</button>
+					</div>
+				</div>
+				
+				<!-- 如果付费且未购买，显示购买提示 -->
+				<div x-show="!showExtractCode && resourcePrice > 0 && !isUploader && !hasPurchased" 
+					 class="mt-2 text-sm text-amber-600">
+					💡 支付 {{ resourcePrice }} 油滴后显示提取码
+				</div>
+				
+				<p class="text-xs text-gray-500 mt-2" x-show="downloadMessage" x-text="downloadMessage"></p>
+			</div>
             
             <!-- 错误信息 -->
             <div x-show="errorMessage" x-transition.duration.300 
@@ -422,13 +446,19 @@ function resourceDetail() {
         avgRating: {{ resource.avg_rating|floatformat:2 }},
         userRating: null,
         
-        // 下载
-        downloading: false,
-        showDownload: false,
-        downloadUrl: '',
-        downloadMessage: '',
-        errorMessage: '',
-        freeTrialUsed: {{ can_download_free_trial|yesno:"false,true" }},
+        // 下载相关
+		downloading: false,
+		showDownload: false,
+		downloadUrl: '',
+		extractCode: '',              // 提取码
+		showExtractCode: false,       // 是否显示提取码
+		downloadMessage: '',
+		errorMessage: '',
+		freeTrialUsed: {{ can_download_free_trial|yesno:"false,true" }},
+		resourcePrice: {{ resource.price }},
+		isUploader: {{ is_uploader|yesno:"true,false" }},
+		hasPurchased: {{ has_purchased|yesno:"true,false" }},
+		canSeeExtract: {{ can_see_extract|yesno:"true,false" }},
         
         init() {
             // 检查session中是否有评分记录
@@ -500,27 +530,44 @@ function resourceDetail() {
         
         // 下载（登录用户）
         async download() {
-            this.errorMessage = '';
-            this.downloading = true;
-            try {
-                const resp = await fetch("{% url 'resources:download' resource.id %}", {
-                    method: 'POST',
-                    headers: {'X-CSRFToken': '{{ csrf_token }}'}
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    this.downloadUrl = data.download_url;
-                    this.showDownload = true;
-                    this.downloadMessage = data.is_free ? '🎉 免费下载成功！' : `✅ 已支付 ${data.oil_paid || ''} 油滴`;
-                } else {
-                    this.errorMessage = data.error || '下载失败，请稍后重试';
-                }
-            } catch(e) {
-                this.errorMessage = '网络错误，请稍后重试';
-            }
-            this.downloading = false;
-        },
-        
+			this.errorMessage = '';
+			this.downloading = true;
+			try {
+				const resp = await fetch("{% url 'resources:download' resource.id %}", {
+					method: 'POST',
+					headers: {'X-CSRFToken': '{{ csrf_token }}'}
+				});
+				const data = await resp.json();
+				if (data.success) {
+					this.downloadUrl = data.download_url;
+					// 如果返回了提取码且用户有权限查看
+					if (data.extract_code && data.can_see_extract) {
+						this.extractCode = data.extract_code;
+						this.showExtractCode = true;
+					} else if (data.extract_code && !data.can_see_extract) {
+						this.showExtractCode = false;
+					} else {
+						this.showExtractCode = false;
+					}
+					this.showDownload = true;
+					this.downloadMessage = data.is_free ? '🎉 免费下载成功！' : `✅ 已支付 ${data.oil_paid || ''} 油滴`;
+				} else {
+					this.errorMessage = data.error || '下载失败';
+				}
+			} catch(e) {
+				this.errorMessage = '网络错误';
+			}
+			this.downloading = false;
+		},
+
+		// 复制文本
+		copyText(text) {
+			navigator.clipboard.writeText(text).then(() => {
+				this.downloadMessage = '✅ 已复制到剪贴板！';
+				setTimeout(() => { this.downloadMessage = ''; }, 3000);
+			});
+		},
+		
         // 游客免费下载
         async freeDownload() {
             if (this.freeTrialUsed) return;
