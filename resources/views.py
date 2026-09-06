@@ -250,6 +250,15 @@ def resource_detail(request, resource_id):
     has_purchased = False
     if user.is_authenticated:
         has_purchased = Download.objects.filter(user=user, resource=resource).exists()
+
+    # ===== 是否有提取码 =====
+    has_extract_code = bool(resource.extract_code and resource.extract_code.strip())
+    
+    # ===== 下载权限判断 =====
+    is_uploader = user.is_authenticated and user.id == resource.uploader.id
+    has_purchased = False
+    if user.is_authenticated:
+        has_purchased = Download.objects.filter(user=user, resource=resource).exists()
     
     # 是否已付费（上传者自动视为已付费）
     can_see_extract = is_uploader or has_purchased or resource.price == 0
@@ -321,6 +330,7 @@ def resource_detail(request, resource_id):
         'comments': comments_page,
         'related_resources': related_resources,
         'comment_count': comments.count(),
+        'has_extract_code': has_extract_code,
     }
     
     return render(request, 'resources/resource_detail.html', context)
@@ -432,6 +442,38 @@ def free_download(request, resource_id):
         'message': '🎉 首次免费下载成功！注册登录后可下载更多资源'
     })
 
+@login_required
+@require_POST
+def report_invalid(request, resource_id):
+    """报告资源链接失效"""
+    resource = get_object_or_404(Resource, id=resource_id)
+    
+    # 记录报告（可以创建 Report 模型，简单起见先发通知）
+    from notifications.models import Notification
+    
+    Notification.objects.create(
+        recipient=resource.uploader,
+        sender=request.user,
+        title=f'⚠️ 资源链接失效报告',
+        content=f'用户 {request.user.first_name|default:request.user.username} 报告资源《{resource.title}》的下载链接可能已失效，请核查。',
+        message_type='system',
+        related_resource=resource
+    )
+    
+    # 同时给管理员发通知（如果有管理员账号）
+    from users.models import User
+    admin = User.objects.filter(is_superuser=True).first()
+    if admin:
+        Notification.objects.create(
+            recipient=admin,
+            sender=request.user,
+            title=f'⚠️ 资源链接失效报告',
+            content=f'用户 {request.user.first_name|default:request.user.username} 报告资源《{resource.title}》链接失效，请核查。',
+            message_type='system',
+            related_resource=resource
+        )
+    
+    return JsonResponse({'success': True})
 
 # ========== 收藏切换 ==========
 
