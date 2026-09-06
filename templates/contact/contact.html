@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}联系我们 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+    
+    <div class="text-center mb-8">
+        <div class="text-5xl mb-3">📧</div>
+        <h1 class="text-2xl font-bold text-gray-800">联系我们</h1>
+        <p class="text-sm text-gray-400 mt-1">有任何问题或建议？欢迎随时联系我们 🐸</p>
+    </div>
+    
+    <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">📋 消息类型</label>
+                <select name="type" class="input-field">
+                    <option value="question">问题咨询</option>
+                    <option value="bug">BUG反馈</option>
+                    <option value="suggestion">功能建议</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    标题 <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="title" placeholder="请简要描述你的问题"
+                       class="input-field" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    详细内容 <span class="text-red-500">*</span>
+                </label>
+                <textarea name="content" rows="5" placeholder="请详细描述你的问题或建议..."
+                          class="input-field" required></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    📱 联系方式（选填）
+                </label>
+                <input type="text" name="contact" placeholder="邮箱或微信号，方便我们联系你"
+                       class="input-field">
+                <p class="text-xs text-gray-400 mt-1">如果不方便留，也可以不留</p>
+            </div>
+            
+            <button type="submit" class="btn-primary w-full py-3 text-center text-base">
+                📤 提交消息
+            </button>
+        </form>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'contact:history' %}" class="text-sm text-green-600 hover:text-green-700">
+                查看我的消息记录 →
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

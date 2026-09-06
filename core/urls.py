@@ -14,6 +14,7 @@ urlpatterns = [
     path('resource/', include('resources.urls')),
     path('s/', include('shares.urls')),
     path('notifications/', include('notifications.urls')),
+    path('contact/', include('contact.urls')),
 ]
 
 if settings.DEBUG:

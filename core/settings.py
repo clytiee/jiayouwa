@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'transactions.apps.TransactionsConfig',
     'notifications.apps.NotificationsConfig',
     'shares.apps.SharesConfig',
+    'contact.apps.ContactConfig',
 ]
 
 # 中间件
