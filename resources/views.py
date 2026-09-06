@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 
 # resources/views.py 中的 resource_upload 函数
+from .tag_service import TagService
+
 @login_required
 def resource_upload(request):
     """资源发布页面"""
@@ -43,6 +45,22 @@ def resource_upload(request):
                     resource.cover_images = processed_images
                     resource.save()
             
+            # 🆕 预设标签匹配（本地，零成本）
+            preset_tags = TagService.get_preset_tags(resource.title, resource.description)
+            
+            # 如果预设标签不够3个，再调用AI补充
+            if len(preset_tags) < 3:
+                ai_result = AIService.generate_resource_tags(resource.title, resource.description)
+                final_tags = TagService.merge_with_ai_tags(preset_tags, ai_result)
+            else:
+                final_tags = preset_tags[:5]
+            
+            # 保存标签
+            if final_tags:
+                resource.tags = final_tags
+                resource.ai_tags_generated = True
+                resource.save()
+                
             # 🆕 异步调用 AI 生成标签（不阻塞响应）
             # 使用 Django 的线程或后台任务
             import threading
