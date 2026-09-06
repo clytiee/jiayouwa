@@ -47,31 +47,17 @@
             </div>
             
             <!-- 分享渠道 -->
-            <div class="mb-4">
-                <label class="text-sm font-medium text-gray-700">📱 分享到</label>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <button @click="shareTo('wechat')" 
-                            class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition">
-                        💚 微信
-                    </button>
-                    <button @click="shareTo('xiaohongshu')" 
-                            class="px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm hover:bg-red-200 transition">
-                        📕 小红书
-                    </button>
-                    <button @click="shareTo('douyin')" 
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition">
-                        🎵 抖音
-                    </button>
-                    <button @click="shareTo('weibo')" 
-                            class="px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition">
-                        📱 微博
-                    </button>
-                    <button @click="shareTo('other')" 
-                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition">
-                        📋 复制文案
-                    </button>
-                </div>
-            </div>
+			<div class="mb-4">				
+				<!-- ✅ 分享文案预览 -->
+				<label class="text-sm font-medium text-gray-700">📝 文案预览</label>
+				<button @click="shareTo('other')" 
+						class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition">
+					📋 复制文案
+				</button>
+				<div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+					<p class="text-sm text-gray-700 break-all" x-text="shareText"></p>
+				</div>
+			</div>
             
             <!-- 奖励说明 -->
 			<div class="bg-green-50 rounded-xl p-3 text-xs text-green-700">
@@ -82,10 +68,12 @@
 			</div>
             
             <!-- 生成分享图文按钮 -->
-            <button @click="generateImage()" 
+            <!--
+			<button @click="generateImage()" 
                     class="w-full mt-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition">
                 🎨 生成分享图文卡片
             </button>
+			-->
             
             <!-- 生成的图文预览 -->
             <div x-show="imageGenerated" x-transition class="mt-4">
@@ -144,12 +132,24 @@ function shareModal() {
                 if (data.success) {
                     this.shareUrl = data.share_url;
                     this.shareId = data.share_id;
+                    // ✅ 生成分享文案
+                    this.shareText = `🐸 我在加油哇发现了一个好资源：${this.title}\n学习路上，一起加油哇！\n${this.shareUrl}`;
                 } else {
                     alert('生成分享链接失败：' + data.error);
                 }
             } catch(e) {
                 alert('网络错误，请重试');
             }
+        },
+        
+        shareTo(channel) {
+            if (channel === 'other') {
+                navigator.clipboard.writeText(this.shareText).then(() => {
+                    alert('✅ 文案已复制，快去分享吧！');
+                });
+                return;
+            }
+            alert(`📱 分享到 ${channel}：\n\n${this.shareText}`);
         },
         
         close() {
