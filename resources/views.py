@@ -601,11 +601,12 @@ def add_comment(request, resource_id):
     # 发送通知
     if resource.uploader != request.user:
         from notifications.models import Notification
+        username = request.user.first_name or request.user.username  # ← 修复这里
         Notification.objects.create(
             recipient=resource.uploader,
             sender=request.user,
             title=f'新评论：{resource.title}',
-            content=f'{request.user.first_name|default:request.user.username} 评论了你的资源：{content[:50]}...',
+            content=f'{username} 评论了你的资源：{content[:50]}...',
             message_type='comment',
             related_resource=resource
         )
