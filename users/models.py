@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from django.utils import timezone
 
 class User(AbstractUser):
     """
@@ -36,6 +36,16 @@ class User(AbstractUser):
     daily_login_date = models.DateField(null=True, blank=True, help_text="最近一次登录日期（用于每日奖励去重）")
     
     is_banned = models.BooleanField(default=False, help_text="是否被封禁")
+
+    daily_free_downloads = models.IntegerField(
+        default=0, 
+        verbose_name="今日已用免费下载次数"
+    )
+    last_free_date = models.DateField(
+        null=True, 
+        blank=True, 
+        verbose_name="上次免费下载日期"
+    )
     
     class Meta:
         db_table = 'users_user'
@@ -57,6 +67,18 @@ class User(AbstractUser):
         """格式化显示油滴数"""
         return f"{self.oil_balance}"
 
+    @property
+    def free_downloads_left(self):
+        """今日剩余免费下载次数"""
+        today = timezone.now().date()
+        if self.last_free_date != today:
+            return 1  # 新的一天，重置为1次
+        return max(0, 1 - self.daily_free_downloads)
+    
+    @property
+    def has_free_download_today(self):
+        """今日是否已使用免费下载"""
+        return self.free_downloads_left == 0
 
 class Follow(models.Model):
     """关注关系表"""

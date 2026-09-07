@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q  # ← 添加 Q
 from django.core.paginator import Paginator
 import logging
 
@@ -51,6 +51,9 @@ def register_view(request):
             )
             
             messages.success(request, '注册成功！请查收邮件激活你的账号。')
+            
+            # ❌ 移除自动登录，让用户去邮箱激活
+            # 不要在这里 login
             return redirect('users:login')
     else:
         form = RegisterForm()
@@ -85,7 +88,11 @@ def activate_view(request, uidb64, token):
                 pass
         
         user.save()
+        
+        # 指定认证后端
+        user.backend = 'users.backends.EmailOrUsernameModelBackend'
         login(request, user)
+        
         messages.success(request, '账号激活成功！欢迎加入加油哇！🐸')
         return redirect('index')
     else:
@@ -106,13 +113,10 @@ def login_view(request):
             remember = form.cleaned_data.get('remember_me', False)
             
             # 先检查用户是否存在且是否被禁用
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            
             try:
                 user = User.objects.get(Q(username=username) | Q(email=username))
                 if not user.is_active:
-                    messages.error(request, '❌ 账号已被禁用，请联系管理员')
+                    messages.error(request, '❌ 账号尚未激活，请查收激活邮件')
                     return render(request, 'users/login.html', {'form': form})
                 if user.is_banned:
                     messages.error(request, '❌ 账号已被封禁，请联系管理员')
@@ -123,6 +127,11 @@ def login_view(request):
             # 再验证密码
             user = authenticate(request, username=username, password=password)
             if user is not None:
+                # 确保用户已激活
+                if not user.is_active:
+                    messages.error(request, '❌ 账号尚未激活，请查收激活邮件')
+                    return render(request, 'users/login.html', {'form': form})
+                
                 login(request, user)
                 
                 OilService.daily_login_bonus(user)
@@ -227,10 +236,8 @@ def profile_view(request):
         'recent_activities': recent_activities,
         'exp_current': exp_current,
         'exp_next': exp_next,
-        'exp_current': exp_current,
-        'exp_next': exp_next,
         'exp_progress': exp_progress,
-        'exp_needed': exp_needed,  # ← 直接计算好差值
+        'exp_needed': exp_needed,
     }
     return render(request, 'users/profile.html', context)
 
@@ -266,9 +273,9 @@ def profile_edit_view(request):
                 user.set_password(new_password1)
                 user.save()
                 # 修改密码后重新登录
-                from django.contrib.auth import login
+                user.backend = 'users.backends.EmailOrUsernameModelBackend'
                 login(request, user)
-                messages.success(request, '✅ 密码已更新，请重新登录')
+                messages.success(request, '✅ 密码已更新')
                 return redirect('users:profile_edit')
         
         return redirect('users:profile_edit')
@@ -348,7 +355,7 @@ def my_shares_view(request):
 @login_required
 def my_earnings_view(request):
     """收益统计"""
-    user = request.user  # ← 添加这行
+    user = request.user
     transactions = OilTransaction.objects.filter(user=user).order_by('-created_at')
     
     # 汇总统计
@@ -401,4 +408,3 @@ def my_earnings_view(request):
         'last_login': last_login,
     }
     return render(request, 'users/my_earnings.html', context)
-    

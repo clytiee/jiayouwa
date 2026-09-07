@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.db import models
 from django.utils import timezone
+from django.utils import timezone
+from datetime import date
 import json
 import base64
 import logging
@@ -341,32 +343,68 @@ def resource_detail(request, resource_id):
 @login_required
 @require_POST
 def resource_download(request, resource_id):
-    """处理资源下载 - 返回完整下载信息"""
+    """处理资源下载（含每日免费额度）"""
     resource = get_object_or_404(Resource, id=resource_id, status='published')
     user = request.user
     
-    # 上传者本人直接返回完整信息
+    # 1. 上传者本人 → 直接返回链接
     if user.id == resource.uploader.id:
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'extract_code': resource.extract_code,
             'is_free': True,
-            'can_see_extract': True,
+            'message': '本人资源，免费下载'
         })
     
-    # 检查是否已购买
-    has_purchased = Download.objects.filter(user=user, resource=resource).exists()
-    if has_purchased:
+    # 2. 已购买过 → 直接返回链接
+    if Download.objects.filter(user=user, resource=resource).exists():
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'extract_code': resource.extract_code,
             'is_free': False,
-            'can_see_extract': True,
+            'message': '已购买，重新下载'
         })
     
-    # 如果资源免费，直接返回
+    # ===== 3. 检查每日免费额度 =====
+    today = timezone.now().date()
+    
+    # 如果上次免费日期不是今天，重置计数
+    if user.last_free_date != today:
+        user.daily_free_downloads = 0
+        user.last_free_date = today
+    
+    # 如果今日免费次数 < 1，可以免费下载
+    if user.daily_free_downloads < 1:
+        # 使用免费额度
+        user.daily_free_downloads += 1
+        user.save()
+        
+        # 记录下载（标记为免费试用）
+        Download.objects.create(
+            user=user,
+            resource=resource,
+            oil_paid=0,
+            is_free_trial=True
+        )
+        
+        # 给上传者加油滴（平台补贴）
+        OilService.add_oil(
+            resource.uploader, 
+            1, 
+            'upload_earning', 
+            f'用户通过免费额度下载了《{resource.title}》'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'download_url': resource.download_url,
+            'is_free': True,
+            'message': '✅ 今日免费下载已使用，剩余 0 次'
+        })
+    
+    # ===== 4. 免费额度已用完，用油滴支付 =====
+    
+    # 如果是免费资源（price=0），直接下载
     if resource.price == 0:
         Download.objects.create(
             user=user,
@@ -377,16 +415,15 @@ def resource_download(request, resource_id):
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
-            'extract_code': resource.extract_code,
             'is_free': True,
-            'can_see_extract': True,
+            'message': '🆓 免费资源'
         })
     
     # 检查油滴是否足够
     if user.oil_balance < resource.price:
         return JsonResponse({
             'success': False,
-            'error': f'油滴不足！需要 {resource.price} 油滴，当前仅有 {user.oil_balance} 油滴'
+            'error': f'💧 油滴不足！需要 {resource.price} 油滴，当前 {user.oil_balance} 油滴。今日免费额度已用完，请明天再来或赚取更多油滴。'
         })
     
     # 扣除油滴
@@ -411,10 +448,9 @@ def resource_download(request, resource_id):
     return JsonResponse({
         'success': True,
         'download_url': resource.download_url,
-        'extract_code': resource.extract_code,
         'is_free': False,
         'oil_paid': resource.price,
-        'can_see_extract': True,
+        'message': f'✅ 已支付 {resource.price} 油滴，下载成功'
     })
 
 
