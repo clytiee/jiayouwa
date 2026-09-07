@@ -11,3 +11,5 @@ logs/
 resource_embeddings.json
 create_test_data_with_codes.sh
 create_data.py
+db.sqlite3
+*.sqlite3
