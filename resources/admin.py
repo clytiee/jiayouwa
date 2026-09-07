@@ -11,7 +11,7 @@ class ResourceAdmin(admin.ModelAdmin):
     list_display = ['id', 'title_preview', 'uploader', 'grade', 'price', 'status', 'view_count', 'created_at']
     list_filter = ['status', 'grade', 'resource_type', 'created_at']
     search_fields = ['title', 'description', 'uploader__username', 'uploader__email']
-    readonly_fields = ['view_count', 'download_count', 'collect_count', 'upvote_count', 'downvote_count', 'avg_rating']
+    readonly_fields = ['view_count', 'download_count', 'collect_count', 'upvote_count', 'downvote_count', 'avg_rating', 'created_at', 'updated_at']
     ordering = ['-created_at']
     
     fieldsets = (
