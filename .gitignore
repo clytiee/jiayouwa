@@ -16,3 +16,4 @@ create_data.py
 *.db
 db.sqlite3
 *.sqlite3-journal
+*/migrations/

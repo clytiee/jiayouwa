@@ -7,17 +7,33 @@
 <div class="max-w-4xl mx-auto py-6">
     
     <!-- 搜索框 -->
-    <div class="mb-6">
-        <form action="/search/" method="GET" class="relative">
-            <input type="text" name="q" value="{{ query }}"
-                   placeholder="搜索资源、标签、用户..."
-                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition text-base">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
-            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 btn-primary text-sm py-1.5 px-4">
-                搜索
-            </button>
-        </form>
-    </div>
+	<div class="mb-6">
+		<form action="/search/" method="GET" class="relative">
+			<input type="text" name="q" value="{{ query }}"
+				   placeholder="搜索资源、标签、用户..."
+				   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100 transition text-base">
+			<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+			<button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 btn-primary text-sm py-1.5 px-4">
+				搜索
+			</button>
+		</form>
+		
+		<!-- 🆕 匹配模式切换 -->
+		<div class="flex items-center gap-4 mt-3 text-sm">
+			<span class="text-gray-400">匹配方式：</span>
+			<a href="?q={{ query }}&match=exact&mode={{ view_mode }}" 
+			   class="px-3 py-1 rounded-full transition {% if match_type == 'exact' %}bg-green-100 text-green-700 font-medium{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+				🎯 精确匹配
+			</a>
+			<a href="?q={{ query }}&match=fuzzy&mode={{ view_mode }}" 
+			   class="px-3 py-1 rounded-full transition {% if match_type == 'fuzzy' %}bg-green-100 text-green-700 font-medium{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+				🔍 模糊匹配
+			</a>
+			<span class="text-xs text-gray-400 ml-2">
+				{% if match_type == 'fuzzy' %}AI推荐（功能完善中……）{% else %}支持多个关键词，顺序无关{% endif %}
+			</span>
+		</div>
+	</div>
     
     <!-- 搜索结果 -->
     {% if search_performed %}
@@ -126,11 +142,11 @@
         {% if results.has_other_pages %}
         <div class="flex justify-center space-x-2 mt-6">
             {% if results.has_previous %}
-            <a href="?q={{ query }}&mode={{ view_mode }}&page={{ results.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
+            <a href="?q={{ query }}&match={{ match_type }}&mode={{ view_mode }}&page={{ results.previous_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">‹</a>
             {% endif %}
             <span class="px-3 py-1 text-sm text-gray-600">第 {{ results.number }} / {{ results.paginator.num_pages }} 页</span>
             {% if results.has_next %}
-            <a href="?q={{ query }}&mode={{ view_mode }}&page={{ results.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
+            <a href="?q={{ query }}&match={{ match_type }}&mode={{ view_mode }}&page={{ results.next_page_number }}" class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-50">›</a>
             {% endif %}
         </div>
         {% endif %}

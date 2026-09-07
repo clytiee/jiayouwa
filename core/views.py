@@ -113,8 +113,9 @@ def ranking_view(request):
     return render(request, 'ranking.html', context)
 
 def search_view(request):
-    """搜索资源（关键词 + 语义）"""
+    """搜索资源（支持精确/模糊匹配）"""
     query = request.GET.get('q', '').strip()
+    match_type = request.GET.get('match', 'exact')
     
     view_mode = request.GET.get('mode')
     if view_mode in ['list', 'card']:
@@ -125,78 +126,85 @@ def search_view(request):
     results = []
     search_performed = False
     result_count = 0
+    final_resources = []
     
     if query:
         search_performed = True
         
-        # 🔍 先用关键词搜索
-        keyword_results = Resource.objects.filter(
-            Q(status='published') &
-            (
-                Q(title__icontains=query) |
-                Q(description__icontains=query) |
-                Q(tags__icontains=query) |
-                Q(uploader__username__icontains=query) |
-                Q(uploader__first_name__icontains=query)
-            )
-        ).select_related('uploader').order_by('-created_at')
-        
-        # 🧠 再用语义搜索（AI）
-        semantic_results = VectorSearch.search(query, limit=20)
-        
-        # 合并结果：先去重，再按相似度排序
-        seen_ids = set()
-        combined = []
-        
-        # 先添加语义搜索的结果（AI 排序）
-        for sr in semantic_results:
-            if sr['id'] not in seen_ids:
-                seen_ids.add(sr['id'])
-                combined.append({
-                    'resource': None,  # 稍后补充
-                    'is_semantic': True,
-                    'similarity': sr['similarity'],
-                    'data': sr
-                })
-        
-        # 再添加关键词结果
-        for kr in keyword_results:
-            if kr.id not in seen_ids:
-                seen_ids.add(kr.id)
-                combined.append({
-                    'resource': kr,
-                    'is_semantic': False,
-                    'similarity': 0,
-                    'data': None
-                })
-        
-        # 补充 resource 对象
-        resource_ids = [c['data']['id'] for c in combined if c['is_semantic']]
-        if resource_ids:
-            resource_map = {r.id: r for r in Resource.objects.filter(id__in=resource_ids)}
-            for c in combined:
-                if c['is_semantic'] and c['data']:
-                    c['resource'] = resource_map.get(c['data']['id'])
-        
-        # 过滤掉没有 resource 的语义结果
-        combined = [c for c in combined if c['resource'] is not None]
-        
-        # 按相似度降序（语义优先），再按创建时间
-        combined.sort(key=lambda x: (-x['similarity'] if x['is_semantic'] else 0, -x['resource'].created_at.timestamp()))
-        
-        # 提取最终的资源列表
-        final_resources = [c['resource'] for c in combined]
-        result_count = len(final_resources)
-        
-        # 分页
-        paginator = Paginator(final_resources, 10) if final_resources else Paginator([], 10)
-        page = request.GET.get('page', 1)
-        results_page = paginator.get_page(page)
-        
-        # 保存语义搜索标记（用于模板显示）
-        semantic_ids = {c['resource'].id for c in combined if c['is_semantic']}
-        for r in results_page:
-            r.is_semantic_match = r.id in semantic_ids
+        if match_type == 'exact':
+            # 🎯 精确匹配：标题包含所有关键词（无关顺序）
+            keywords = query.split()
+            q_filter = Q(status='published')
+            for kw in keywords:
+                q_filter &= Q(title__icontains=kw)
+            
+            keyword_results = Resource.objects.filter(
+                q_filter
+            ).select_related('uploader').order_by('-created_at')
+            
+            final_resources = list(keyword_results)
+            result_count = len(final_resources)
+            results_page = Paginator(final_resources, 10).get_page(request.GET.get('page', 1))
+            
+        else:
+            # 🔍 模糊匹配：原有逻辑
+            keyword_results = Resource.objects.filter(
+                Q(status='published') &
+                (
+                    Q(title__icontains=query) |
+                    Q(description__icontains=query) |
+                    Q(tags__icontains=query) |
+                    Q(uploader__username__icontains=query) |
+                    Q(uploader__first_name__icontains=query)
+                )
+            ).select_related('uploader').order_by('-created_at')
+            
+            # 语义搜索
+            semantic_results = VectorSearch.search(query, limit=20)
+            
+            seen_ids = set()
+            combined = []
+            
+            for sr in semantic_results:
+                resource_id = sr['id']
+                if resource_id not in seen_ids:
+                    seen_ids.add(resource_id)
+                    try:
+                        resource = Resource.objects.get(id=resource_id, status='published')
+                        combined.append({
+                            'resource': resource,
+                            'is_semantic': True,
+                            'similarity': sr.get('similarity', 0),
+                        })
+                    except Resource.DoesNotExist:
+                        pass
+            
+            for kr in keyword_results:
+                if kr.id not in seen_ids:
+                    seen_ids.add(kr.id)
+                    combined.append({
+                        'resource': kr,
+                        'is_semantic': False,
+                        'similarity': 0,
+                    })
+            
+            combined.sort(key=lambda x: (-x['similarity'] if x['is_semantic'] else -1, -x['resource'].created_at.timestamp()))
+            
+            final_resources = [item['resource'] for item in combined]
+            result_count = len(final_resources)
+            
+            for item in combined:
+                if item['is_semantic']:
+                    item['resource'].is_semantic_match = True
+            
+            results_page = Paginator(final_resources, 10).get_page(request.GET.get('page', 1))
+            
+            for r in results_page:
+                for item in combined:
+                    if item['resource'].id == r.id:
+                        r.is_semantic_match = item['is_semantic']
+                        break
+    
     else:
         results_page = []
     
@@ -206,6 +214,7 @@ def search_view(request):
         'search_performed': search_performed,
         'view_mode': view_mode,
         'result_count': result_count,
+        'match_type': match_type,
     }
     
     return render(request, 'search_results.html', context)
