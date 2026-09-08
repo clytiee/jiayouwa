@@ -28,12 +28,15 @@
 				<!-- ✅ 右侧：邀请码（靠右） -->
 				<div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 text-white text-center min-w-[140px] flex-shrink-0">
 					<div class="text-xs text-white/70">🎁 邀请码</div>
-					<div class="text-xl font-mono font-bold tracking-wider" id="inviteCodeDisplay">
+					<div class="text-xl font-mono font-bold tracking-wider cursor-pointer hover:text-yellow-200 transition" 
+						 id="inviteCodeDisplay"
+						 onclick="copyInviteCodeOnly()"
+						 title="点击复制邀请码">
 						{{ user.get_invite_code }}
 					</div>
 					<button onclick="copyInviteCode()" 
 							class="mt-1 text-xs bg-white/30 hover:bg-white/40 text-white px-3 py-0.5 rounded-full transition">
-						📋 复制
+						📋 复制文案
 					</button>
 				</div>
             </div>
@@ -175,6 +178,28 @@
 
 {% block extra_js %}
 <script>
+// 点击邀请码：只复制邀请码本身
+function copyInviteCodeOnly() {
+    const code = '{{ user.get_invite_code }}';
+    if (!code || code === '暂无') {
+        showToast('❌ 暂无邀请码', 'error');
+        return;
+    }
+    
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('✅ 已复制邀请码：' + code, 'success');
+    }).catch(() => {
+        // 降级方案
+        const input = document.createElement('input');
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('✅ 已复制邀请码：' + code, 'success');
+    });
+}
+
 function copyInviteCode() {
     const code = '{{ user.get_invite_code }}';
     const siteUrl = window.location.origin;
@@ -189,64 +214,13 @@ function copyInviteCode() {
     // 方法1：使用 Clipboard API（需要 HTTPS 或 localhost）
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(message).then(() => {
-            showCopyToast('✅ 邀请码已复制！快去分享给朋友吧 🎉');
+            showToast('✅ 邀请码文案已复制！快去分享给朋友吧 🎉');
         }).catch(() => {
-            fallbackCopy(message);
+            showToast(message);
         });
     } else {
-        fallbackCopy(message);
+        showToast(message);
     }
-}
-
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.left = '-9999px';
-    textarea.style.top = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.select();
-    textarea.setSelectionRange(0, text.length);
-    
-    try {
-        const success = document.execCommand('copy');
-        if (success) {
-            showCopyToast('✅ 邀请码已复制！快去分享给朋友吧 🎉');
-        } else {
-            showCopyToast('❌ 复制失败，请手动复制邀请码');
-        }
-    } catch (e) {
-        showCopyToast('❌ 复制失败，请手动复制邀请码');
-    }
-    document.body.removeChild(textarea);
-}
-
-function showCopyToast(message) {
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1a1a2e;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 14px;
-        z-index: 9999;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        max-width: 90%;
-        text-align: center;
-    `;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 500);
-    }, 3000);
 }
 </script>
 {% endblock %}

@@ -383,5 +383,39 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
+
+	<!-- ========== 全局浮层提示 ========== -->
+	<div id="global-toast" 
+		 class="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gray-800 text-white text-sm rounded-xl shadow-lg transition-all duration-300 pointer-events-none"
+		 style="transform: translate(-50%, -10px); opacity: 0;">
+	</div>
+
+	<!-- 全局 Toast 函数 -->
+	<script>
+	function showToast(message, type = 'success') {
+		const toast = document.getElementById('global-toast');
+		if (!toast) return;
+		
+		// 根据类型设置颜色
+		const colors = {
+			success: 'bg-gray-800 text-white',
+			error: 'bg-red-600 text-white',
+			warning: 'bg-amber-600 text-white',
+			info: 'bg-blue-600 text-white',
+		};
+		
+		toast.textContent = message;
+		toast.className = `fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 ${colors[type] || colors.success} text-sm rounded-xl shadow-lg transition-all duration-300 pointer-events-none`;
+		toast.style.transform = 'translate(-50%, 0px)';
+		toast.style.opacity = '1';
+		
+		// 清除之前的定时器
+		clearTimeout(toast._timer);
+		toast._timer = setTimeout(() => {
+			toast.style.opacity = '0';
+			toast.style.transform = 'translate(-50%, -10px)';
+		}, 2000);
+	}
+	</script>
 </body>
 </html>
