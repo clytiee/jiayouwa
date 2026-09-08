@@ -573,5 +573,14 @@ function extractLinkAndCode(text) {
     
     return { link: link, code: code, platform: platform };
 }
+
+{% if is_edit and existing_images %}
+// 编辑模式：加载已有图片
+const existingImages = {{ existing_images|safe }};
+existingImages.forEach(img => {
+    images.push(img);
+});
+updatePreview();
+{% endif %}
 </script>
 {% endblock %}

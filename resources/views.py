@@ -151,16 +151,29 @@ def resource_edit(request, resource_id):
     if request.method == 'POST':
         form = ResourceUploadForm(request.POST, instance=resource)
         if form.is_valid():
-            resource = form.save()
+            resource = form.save(commit=False)
+            
+            # 🆕 处理预览图更新
+            images_data = request.POST.get('images_data', '')
+            if images_data:
+                processed_images = _process_images(images_data)
+                if processed_images:
+                    resource.cover_images = processed_images
+            
+            resource.save()
             messages.success(request, f'✅ 资源《{resource.title}》更新成功！')
             return redirect('resources:detail', resource_id=resource.id)
     else:
+        # 编辑时，把现有图片传给模板
         form = ResourceUploadForm(instance=resource)
+        # 把 cover_images 转为 JSON 字符串，供前端显示
+        existing_images = json.dumps(resource.cover_images or [])
     
     context = {
         'form': form,
         'resource': resource,
         'is_edit': True,
+        'existing_images': existing_images,  # ← 传给模板
     }
     return render(request, 'resources/resource_upload.html', context)
 

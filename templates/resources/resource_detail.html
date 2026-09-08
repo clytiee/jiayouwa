@@ -79,7 +79,7 @@
 {% endblock %}
 
 {% block content %}
-<div x-data="resourceDetail()" x-init="init()" class="max-w-4xl mx-auto py-4">
+<div x-data="resourceDetail()" x-init="startAutoplay()" class="max-w-4xl mx-auto py-4">
     
     <!-- ===== 顶部导航 ===== -->
     <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-4">
@@ -131,6 +131,16 @@
                 <div class="absolute top-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
                     <span x-text="currentIndex + 1"></span> / {{ resource.cover_images|length }}
                 </div>
+				<!-- 在图片计数器旁边 -->
+				<div class="absolute top-4 right-4 flex items-center space-x-2">
+					<button @click="toggleAutoplay()" 
+							class="bg-black/60 text-white text-xs px-3 py-1 rounded-full hover:bg-black/80 transition">
+						<span x-text="isPlaying ? '⏸️ 暂停' : '▶️ 播放'"></span>
+					</button>
+					<div class="bg-black/60 text-white text-xs px-3 py-1 rounded-full">
+						<span x-text="currentIndex + 1"></span> / {{ resource.cover_images|length }}
+					</div>
+				</div>
                 {% endif %}
             </div>
             {% else %}
@@ -221,6 +231,18 @@
                     <span x-text="isCollected ? '❤️' : '🤍'"></span>
                     <span x-text="collectCount"></span>
                 </button>
+
+				<!-- 🆕 编辑按钮（仅上传者可见） -->
+				{% if is_uploader %}
+				<a href="{% url 'resources:edit' resource.id %}" 
+				   class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition text-blue-600 text-sm">
+					✏️ 编辑
+				</a>
+				<button onclick="confirmDelete({{ resource.id }})" 
+						class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-red-200 hover:border-red-400 hover:bg-red-50 transition text-red-500 text-sm">
+					🗑️ 删除
+				</button>
+				{% endif %}
                 
 				<!-- 分享按钮 -->
 				<button @click="$dispatch('open-share-modal', {
@@ -466,6 +488,10 @@ function resourceDetail() {
     return {
         // 轮播
         currentIndex: 0,
+		autoplayInterval: null,
+		isPlaying: true,
+		playCount: 0,           // 已播放轮数
+		maxPlayCount: 3,        // 最大播放轮数
         
         // 收藏
         isCollected: {{ is_collected|yesno:"true,false" }},
@@ -494,20 +520,58 @@ function resourceDetail() {
 		hasPurchased: {{ has_purchased|yesno:"true,false" }},
 		canSeeExtract: {{ can_see_extract|yesno:"true,false" }},
         
-        init() {
-            // 检查session中是否有评分记录
-            // 简化处理
-        },
+		prev() {
+			this.stopAutoplay();
+			if (this.currentIndex > 0) this.currentIndex--;
+			this.startAutoplay();
+		},
+
+		next() {
+			const total = {{ resource.cover_images|length|default:1 }};
+			if (this.currentIndex < total - 1) {
+				this.currentIndex++;
+			} else {
+				// 到达最后一张，轮数+1
+				this.playCount++;
+				if (this.playCount >= this.maxPlayCount) {
+					// 达到最大轮数，停止播放
+					this.stopAutoplay();
+					this.isPlaying = false;
+					return;
+				}
+				this.currentIndex = 0;
+			}
+		},
         
-        prev() {
-            if (this.currentIndex > 0) this.currentIndex--;
-        },
-        
-        next() {
-            const total = {{ resource.cover_images|length|default:1 }};
-            if (this.currentIndex < total - 1) this.currentIndex++;
-        },
-        
+		startAutoplay() {
+			if (this.autoplayInterval) {
+				clearInterval(this.autoplayInterval);
+			}
+			const total = {{ resource.cover_images|length|default:1 }};
+			if (total <= 1) return;
+			this.playCount = 0;  // 重置播放计数
+			this.autoplayInterval = setInterval(() => {
+				this.next();
+			}, 3000);  // 每3秒切换一张
+		},
+
+		stopAutoplay() {
+			if (this.autoplayInterval) {
+				clearInterval(this.autoplayInterval);
+				this.autoplayInterval = null;
+			}
+		},
+
+		toggleAutoplay() {
+			if (this.isPlaying) {
+				this.stopAutoplay();
+				this.isPlaying = false;
+			} else {
+				this.startAutoplay();
+				this.isPlaying = true;
+			}
+		},
+
         // 收藏
         async toggleCollect() {
             try {
