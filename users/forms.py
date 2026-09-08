@@ -59,11 +59,11 @@ class RegisterForm(UserCreationForm):
     )
 
     def clean_invite_code(self):
-        """验证邀请码"""
-        code = self.cleaned_data.get('invite_code', '').strip()
+        code = self.cleaned_data.get('invite_code')
         if code:
             user = User.get_user_by_invite_code(code)
             if not user:
+                raise forms.ValidationError('邀请码无效，请检查后重新输入')
         return code
 
     class Meta:
