@@ -2,11 +2,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# 加载环境变量
-load_dotenv()
-
 # 项目路径
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 加载环境变量
+load_dotenv(BASE_DIR / '.env')
 
 # 安全密钥（生产环境务必从环境变量读取）
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-please-change-in-production')
