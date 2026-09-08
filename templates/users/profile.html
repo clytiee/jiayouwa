@@ -9,7 +9,7 @@
     <!-- ===== 用户信息卡片 ===== -->
     <div class="bg-white rounded-2xl card-shadow overflow-hidden">
         <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-8">
-            <div class="flex items-center space-x-5">
+            <div class="flex items-center justify-between">
                 <!-- 头像 -->
                 <div class="avatar-frog avatar-frog-lg border-4 border-white shadow-lg">
                     🐸
@@ -24,6 +24,18 @@
                         <span>📅 加入于 {{ user.date_joined|date:"Y-m-d" }}</span>
                     </div>
                 </div>
+
+				<!-- ✅ 右侧：邀请码（靠右） -->
+				<div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 text-white text-center min-w-[140px] flex-shrink-0">
+					<div class="text-xs text-white/70">🎁 邀请码</div>
+					<div class="text-xl font-mono font-bold tracking-wider" id="inviteCodeDisplay">
+						{{ user.get_invite_code }}
+					</div>
+					<button onclick="copyInviteCode()" 
+							class="mt-1 text-xs bg-white/30 hover:bg-white/40 text-white px-3 py-0.5 rounded-full transition">
+						📋 复制
+					</button>
+				</div>
             </div>
         </div>
 
@@ -159,4 +171,82 @@
 	</div>
     
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyInviteCode() {
+    const code = '{{ user.get_invite_code }}';
+    const siteUrl = window.location.origin;
+    const message = `🐸 我在加油哇发现了一个超棒的学习资源分享社区！
+
+🎁 使用我的邀请码注册，双方各得 5 油滴奖励！
+📝 邀请码：${code}
+🌐 立即注册：${siteUrl}/register/
+
+学习路上，一起加油哇！🐸`;
+    
+    // 方法1：使用 Clipboard API（需要 HTTPS 或 localhost）
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(message).then(() => {
+            showCopyToast('✅ 邀请码已复制！快去分享给朋友吧 🎉');
+        }).catch(() => {
+            fallbackCopy(message);
+        });
+    } else {
+        fallbackCopy(message);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+    
+    try {
+        const success = document.execCommand('copy');
+        if (success) {
+            showCopyToast('✅ 邀请码已复制！快去分享给朋友吧 🎉');
+        } else {
+            showCopyToast('❌ 复制失败，请手动复制邀请码');
+        }
+    } catch (e) {
+        showCopyToast('❌ 复制失败，请手动复制邀请码');
+    }
+    document.body.removeChild(textarea);
+}
+
+function showCopyToast(message) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a2e;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 14px;
+        z-index: 9999;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        max-width: 90%;
+        text-align: center;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 500);
+    }, 3000);
+}
+</script>
 {% endblock %}

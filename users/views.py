@@ -34,6 +34,23 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
+
+            # 处理邀请码
+            invite_code = form.cleaned_data.get('invite_code', '').strip()
+            if invite_code:
+                inviter = User.get_user_by_invite_code(invite_code)
+                if inviter:
+                    user.invited_by = inviter
+                    user.save()
+                    # 给邀请人 +5 油滴奖励
+                    from transactions.services import OilService
+                    OilService.add_oil(
+                        inviter, 
+                        5, 
+                        'share_register', 
+                        f'邀请注册奖励：{user.username}',
+                        related_user=user
+                    )
             
             # 生成激活邮件
             token = default_token_generator.make_token(user)

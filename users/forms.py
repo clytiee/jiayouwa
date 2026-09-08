@@ -49,6 +49,24 @@ class RegisterForm(UserCreationForm):
         widget=forms.TextInput(attrs={'placeholder': '选填，如果有邀请码请填写', 'class': 'w-full px-4 py-2 border rounded-lg'})
     )
     
+    invite_code = forms.CharField(
+        label='邀请码',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': '选填，如果有邀请码请填写',
+            'class': 'w-full px-4 py-2 border rounded-lg focus:border-green-400 focus:outline-none'
+        })
+    )
+
+    def clean_invite_code(self):
+        """验证邀请码"""
+        code = self.cleaned_data.get('invite_code', '').strip()
+        if code:
+            user = User.get_user_by_invite_code(code)
+            if not user:
+                raise forms.ValidationError('邀请码无效，请重新输入')
+        return code
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']

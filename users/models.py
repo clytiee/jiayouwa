@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+from hashids import Hashids
 
 class User(AbstractUser):
     """
@@ -79,6 +81,29 @@ class User(AbstractUser):
     def has_free_download_today(self):
         """今日是否已使用免费下载"""
         return self.free_downloads_left == 0
+
+    def get_invite_code(self):
+        """生成当前用户的邀请码"""
+        hashids = Hashids(
+            salt=settings.HASHIDS_SALT,
+            min_length=settings.HASHIDS_MIN_LENGTH
+        )
+        return hashids.encode(self.id)
+    
+    @classmethod
+    def get_user_by_invite_code(cls, code):
+        """根据邀请码查找用户"""
+        try:
+            hashids = Hashids(
+                salt=settings.HASHIDS_SALT,
+                min_length=settings.HASHIDS_MIN_LENGTH
+            )
+            decoded = hashids.decode(code)
+            if decoded:
+                return cls.objects.get(id=decoded[0])
+        except (ValueError, User.DoesNotExist):
+            pass
+        return None
 
 class Follow(models.Model):
     """关注关系表"""
