@@ -17,6 +17,7 @@ class OilTransaction(models.Model):
         ('collect_reward', '收藏奖励'),
         ('comment_up_reward', '评论被顶'),
         ('admin_adjust', '管理员调整'),
+        ('invite_reward', '邀请奖励'),
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='用户')

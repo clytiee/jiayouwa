@@ -64,7 +64,6 @@ class RegisterForm(UserCreationForm):
         if code:
             user = User.get_user_by_invite_code(code)
             if not user:
-                raise forms.ValidationError('邀请码无效，请重新输入')
         return code
 
     class Meta:
@@ -81,8 +80,13 @@ class RegisterForm(UserCreationForm):
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
+        # 检查是否存在已激活或未激活的用户
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('该邮箱已被注册')
+            user = User.objects.get(email=email)
+            if user.is_active:
+                raise forms.ValidationError('该邮箱已被注册，请直接登录')
+            else:
+                raise forms.ValidationError('该邮箱已注册但尚未激活，请查收激活邮件或重新注册')
         return email
     
     def clean_nickname(self):

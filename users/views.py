@@ -9,6 +9,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Count, Sum, Q  # ← 添加 Q
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from django.utils.html import format_html
 import logging
 
 from .forms import RegisterForm, LoginForm
@@ -31,26 +33,77 @@ def register_view(request):
     
     if request.method == 'POST':
         form = RegisterForm(request.POST)
+        
+        # 🆕 检查是否已存在未激活的用户
+        email = request.POST.get('email', '').strip()
+        existing_user = User.objects.filter(email=email, is_active=False).first()
+        
+        if existing_user:
+            # 重新发送激活邮件
+            token = default_token_generator.make_token(existing_user)
+            uid = urlsafe_base64_encode(force_bytes(existing_user.pk))
+            activation_link = request.build_absolute_uri(
+                f'/activate/{uid}/{token}/'
+            )
+            
+            try:
+                html_content = format_html(
+                    """
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 12px;">
+                        <div style="text-align: center; padding: 20px 0;">
+                            <span style="font-size: 48px;">🐸</span>
+                            <h1 style="color: #2E7D32; margin: 10px 0;">加油哇</h1>
+                            <p style="color: #666;">学习路上，一起加油哇！</p>
+                        </div>
+                        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <h2 style="color: #333; margin-top: 0;">重新激活你的账号</h2>
+                            <p style="color: #555; line-height: 1.8;">点击下方按钮重新激活你的账号：</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{}" 
+                                   style="display: inline-block; background: linear-gradient(135deg, #66BB6A, #388E3C); color: white; padding: 14px 40px; border-radius: 9999px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                                    ✅ 激活账号
+                                </a>
+                            </div>
+                            <p style="color: #999; font-size: 13px; word-break: break-all;">
+                                或复制以下链接到浏览器打开：<br>
+                                <a href="{}" style="color: #4CAF50;">{}</a>
+                            </p>
+                            <p style="color: #999; font-size: 13px; margin-top: 20px;">
+                                如果这不是你操作的，请忽略此邮件。
+                            </p>
+                        </div>
+                        <div style="text-align: center; padding: 20px 0; color: #aaa; font-size: 12px;">
+                            © 2026 加油哇 · 学习路上，一起加油哇！
+                        </div>
+                    </div>
+                    """,
+                    activation_link, activation_link, activation_link
+                )
+                
+                send_mail(
+                    subject='重新发送：激活你的加油哇账号',
+                    message=f'请点击以下链接激活你的账号：\n\n{activation_link}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[existing_user.email],
+                    html_message=html_content,
+                    fail_silently=False,
+                )
+                messages.success(request, f'📧 该邮箱已注册但尚未激活，新的激活邮件已发送到 {email}，请查收')
+                return redirect('users:login')
+            except Exception as e:
+                logger.error(f'重新发送激活邮件失败: {e}')
+                messages.error(request, '❌ 激活邮件发送失败，请稍后重试')
+                return render(request, 'users/register.html', {'form': form})
+        
+        # 正常注册流程
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
-
-            # 处理邀请码
-            invite_code = form.cleaned_data.get('invite_code', '').strip()
+            
+            # 保存邀请码到 session
+            invite_code = form.cleaned_data.get('invite_code')
             if invite_code:
-                inviter = User.get_user_by_invite_code(invite_code)
-                if inviter:
-                    user.invited_by = inviter
-                    user.save()
-                    # 给邀请人 +5 油滴奖励
-                    from transactions.services import OilService
-                    OilService.add_oil(
-                        inviter, 
-                        5, 
-                        'share_register', 
-                        f'邀请注册奖励：{user.username}',
-                        related_user=user
-                    )
+                request.session['invite_code'] = invite_code
             
             # 生成激活邮件
             token = default_token_generator.make_token(user)
@@ -59,19 +112,58 @@ def register_view(request):
                 f'/activate/{uid}/{token}/'
             )
             
-            send_mail(
-                subject='激活你的加油哇账号',
-                message=f'欢迎加入加油哇！请点击以下链接激活你的账号：\n\n{activation_link}\n\n学习路上，一起加油哇！🐸',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-            
-            messages.success(request, '注册成功！请查收邮件激活你的账号。')
-            
-            # ❌ 移除自动登录，让用户去邮箱激活
-            # 不要在这里 login
-            return redirect('users:login')
+            try:
+                html_content = format_html(
+                    """
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 12px;">
+                        <div style="text-align: center; padding: 20px 0;">
+                            <span style="font-size: 48px;">🐸</span>
+                            <h1 style="color: #2E7D32; margin: 10px 0;">加油哇</h1>
+                            <p style="color: #666;">学习路上，一起加油哇！</p>
+                        </div>
+                        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <h2 style="color: #333; margin-top: 0;">重新激活你的账号</h2>
+                            <p style="color: #555; line-height: 1.8;">点击下方按钮重新激活你的账号：</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{}" 
+                                   style="display: inline-block; background: linear-gradient(135deg, #66BB6A, #388E3C); color: white; padding: 14px 40px; border-radius: 9999px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                                    ✅ 激活账号
+                                </a>
+                            </div>
+                            <p style="color: #999; font-size: 13px; word-break: break-all;">
+                                或复制以下链接到浏览器打开：<br>
+                                <a href="{}" style="color: #4CAF50;">{}</a>
+                            </p>
+                            <p style="color: #999; font-size: 13px; margin-top: 20px;">
+                                如果这不是你操作的，请忽略此邮件。
+                            </p>
+                        </div>
+                        <div style="text-align: center; padding: 20px 0; color: #aaa; font-size: 12px;">
+                            © 2026 加油哇 · 学习路上，一起加油哇！
+                        </div>
+                    </div>
+                    """,
+                    activation_link, activation_link, activation_link
+                )
+                send_mail(
+                    subject='激活你的加油哇账号',
+                    message=f'请点击以下链接激活你的账号：\n\n{activation_link}',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html_content,
+                    fail_silently=False,
+                )
+                messages.success(request, '🎉 注册成功！请查收邮件激活你的账号。')
+                return redirect('users:login')
+            except Exception as e:
+                user.delete()
+                logger.error(f'邮件发送失败: {e}')
+                messages.error(request, '❌ 验证邮件发送失败，请稍后重试。')
+                return render(request, 'users/register.html', {'form': form})
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = RegisterForm()
     
@@ -92,21 +184,43 @@ def activate_view(request, uidb64, token):
         # 赠送注册油滴
         OilService.register_bonus(user)
         
-        # 处理邀请码
-        invite_code = request.GET.get('invite')
+        # 🆕 处理邀请码（从 session 获取）
+        invite_code = request.session.get('invite_code')
+        logger.info(f'[激活] 用户: {user.username}, session邀请码: {invite_code}')
+        
         if invite_code:
             try:
-                share = Share.objects.get(share_id=invite_code)
-                if share.sharer != user:
-                    share.register_count += 1
-                    share.save()
-                    OilService.share_register_bonus(share.sharer, share, user)
-            except Share.DoesNotExist:
-                pass
+                # 遍历所有用户，查找匹配的邀请码
+                inviter = None
+                for u in User.objects.all():
+                    if u.get_invite_code() == invite_code:
+                        inviter = u
+                        break
+                
+                if inviter and inviter != user:
+                    user.invited_by = inviter
+                    user.save()
+                    OilService.add_oil(
+                        inviter, 5, 'invite_reward', 
+                        f'邀请 {user.username} 注册'
+                    )
+                    OilService.add_oil(
+                        user, 5, 'register_bonus', 
+                        f'通过邀请码 {invite_code} 注册'
+                    )
+                    logger.info(f'[激活] 邀请成功: {inviter.username} -> {user.username}')
+                    messages.success(request, f'🎉 邀请成功！你和 {inviter.username} 各获得 5 油滴！')
+                else:
+                    logger.warning(f'[激活] 邀请码 {invite_code} 未找到匹配用户')
+            except Exception as e:
+                logger.error(f'[激活] 邀请奖励发放失败: {e}')
+        
+        # 清除 session 中的邀请码
+        if 'invite_code' in request.session:
+            del request.session['invite_code']
         
         user.save()
         
-        # 指定认证后端
         user.backend = 'users.backends.EmailOrUsernameModelBackend'
         login(request, user)
         
@@ -115,6 +229,7 @@ def activate_view(request, uidb64, token):
     else:
         messages.error(request, '激活链接无效或已过期')
         return redirect('users:login')
+
 
 
 def login_view(request):
