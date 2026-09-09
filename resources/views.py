@@ -39,6 +39,12 @@ def resource_upload(request):
             resource.uploader = request.user
             resource.save()
             
+            # 🆕 如果没有提取码，强制价格为 0
+            if not resource.extract_code:
+                resource.price = 0
+
+            resource.save()
+
             # 处理预览图
             images_data = request.POST.get('images_data', '')
             if images_data:
@@ -152,8 +158,12 @@ def resource_edit(request, resource_id):
         form = ResourceUploadForm(request.POST, instance=resource)
         if form.is_valid():
             resource = form.save(commit=False)
+
+            # 如果没有提取码，强制价格为 0
+            if not resource.extract_code:
+                resource.price = 0
             
-            # 🆕 处理预览图更新
+            # 处理预览图更新
             images_data = request.POST.get('images_data', '')
             if images_data:
                 processed_images = _process_images(images_data)
@@ -163,17 +173,26 @@ def resource_edit(request, resource_id):
             resource.save()
             messages.success(request, f'✅ 资源《{resource.title}》更新成功！')
             return redirect('resources:detail', resource_id=resource.id)
+        else:
+            # ❌ 表单验证失败：需要重新渲染编辑页面，必须传递 existing_images
+            existing_images = json.dumps(resource.cover_images or [])
+            context = {
+                'form': form,
+                'resource': resource,
+                'is_edit': True,
+                'existing_images': existing_images,
+            }
+            return render(request, 'resources/resource_upload.html', context)
     else:
-        # 编辑时，把现有图片传给模板
+        # GET 请求：正常显示编辑页面
         form = ResourceUploadForm(instance=resource)
-        # 把 cover_images 转为 JSON 字符串，供前端显示
         existing_images = json.dumps(resource.cover_images or [])
     
     context = {
         'form': form,
         'resource': resource,
         'is_edit': True,
-        'existing_images': existing_images,  # ← 传给模板
+        'existing_images': existing_images,
     }
     return render(request, 'resources/resource_upload.html', context)
 

@@ -43,7 +43,10 @@ class ResourceUploadForm(forms.ModelForm):
         self.fields['price'].help_text = f'建议价格：1-5油滴（系统限制 0-{settings.DEFAULT_SETTINGS.get("oil_price_max", 10)}）'
         self.fields['extract_code'].label = '提取码'
         self.fields['extract_code'].help_text = '粘贴链接后自动识别，也可手动填写'
-    
+         # 🆕 价格字段不必填（由视图层控制）
+        self.fields['price'].required = False
+        self.fields['extract_code'].required = False   
+
     def clean_download_url(self):
         """验证下载链接格式，并自动提取提取码"""
         url = self.cleaned_data.get('download_url')
@@ -105,11 +108,25 @@ class ResourceUploadForm(forms.ModelForm):
         min_price = settings.DEFAULT_SETTINGS.get('oil_price_min', 0)
         max_price = settings.DEFAULT_SETTINGS.get('oil_price_max', 10)
         if price is None:
-            price = 0
+            return 0
         if price < min_price or price > max_price:
             raise forms.ValidationError(f'价格必须在 {min_price} 到 {max_price} 油滴之间')
         return price
     
+    def clean(self):
+        """全局校验：收费资源必须有提取码"""
+        cleaned_data = super().clean()
+        price = cleaned_data.get('price', 0)
+        extract_code = cleaned_data.get('extract_code', '').strip()
+        
+        # 🔒 如果价格 > 0，必须填写提取码字段
+        if price > 0 and not extract_code:
+            raise forms.ValidationError({
+                'extract_code': '收费资源必须填写提取码，确保用户能正常下载'
+            })
+        
+        return cleaned_data
+
     def clean_download_url(self):
         url = self.cleaned_data.get('download_url')
         if url and not url.startswith(('http://', 'https://')):

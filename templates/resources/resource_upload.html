@@ -198,9 +198,9 @@
                        class="input-field w-32 {% if form.price.errors %}error{% endif %}"
                        required>
                 <span class="text-gray-500">油滴</span>
-                <span class="text-xs text-gray-400">（范围 {{ min_price }} - {{ max_price }} 油滴）</span>
+                <span class="text-xs text-gray-400">（范围 {{ min_price }} - {{ max_price }} 油滴；无提取码的资源不能设置油滴）</span>
             </div>
-            <p class="text-xs text-gray-400 mt-1">建议价格：1-5油滴，免费资源可设为0</p>
+            <p class="text-xs text-gray-400 mt-1" id="price_hint">建议价格：1-5油滴，免费资源可设为0</p>
             {% if form.price.errors %}
             <p class="text-red-500 text-xs mt-1">{{ form.price.errors.0 }}</p>
             {% endif %}
@@ -435,6 +435,49 @@ function extractCodeFromText(text) {
     
     return null;
 }
+
+// ===== 提取码联动价格（无提取码则强制免费） =====
+function updatePriceByExtractCode() {
+    const extractInput = document.getElementById('id_extract_code');
+    const priceInput = document.getElementById('id_price');
+    const priceHint = document.getElementById('price_hint');
+    const code = extractInput.value.trim();
+    
+    if (code) {
+        // 有提取码：价格可修改
+        priceInput.disabled = false;
+        priceInput.min = 0;
+        priceInput.max = 10;
+        if (priceHint) {
+            priceHint.innerHTML = '✅ 已填写提取码，可设置价格（0-10油滴）';
+            priceHint.className = 'text-xs text-green-600 mt-1';
+        }
+    } else {
+        // 无提取码：强制价格为0且不可修改
+        priceInput.value = 0;
+        priceInput.disabled = true;
+        if (priceHint) {
+            priceHint.innerHTML = '⚠️ 未填写提取码，资源将自动设为免费（0油滴）';
+            priceHint.className = 'text-xs text-amber-600 mt-1';
+        }
+    }
+}
+
+// 监听提取码输入变化
+document.getElementById('id_extract_code').addEventListener('input', function() {
+    updatePriceByExtractCode();
+});
+
+// 页面加载时执行一次
+document.addEventListener('DOMContentLoaded', function() {
+    updatePriceByExtractCode();
+});
+
+// 识别按钮点击后也更新价格状态
+document.getElementById('extract-btn').addEventListener('click', function() {
+    // 原有识别逻辑执行后，延迟一下更新价格状态
+    setTimeout(updatePriceByExtractCode, 100);
+});
 
 // ===== 自动识别链接和提取码（支持百度网盘、阿里云盘、夸克） =====
 document.getElementById('extract-btn').addEventListener('click', function() {
