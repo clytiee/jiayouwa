@@ -347,7 +347,7 @@
 				<div x-show="!showExtractCode && !hasExtractCode" 
 					 class="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
 					<p class="text-sm text-gray-500">
-						🔒 该资源暂无提取码，请联系上传者获取
+						ℹ️ 该资源暂无提取码，请直接打开链接或评论询问发布者
 					</p>
 				</div>
 
@@ -519,6 +519,7 @@ function resourceDetail() {
 		isUploader: {{ is_uploader|yesno:"true,false" }},
 		hasPurchased: {{ has_purchased|yesno:"true,false" }},
 		canSeeExtract: {{ can_see_extract|yesno:"true,false" }},
+		hasExtractCode: {{ has_extract_code|yesno:"true,false" }},
         
 		prev() {
 			this.stopAutoplay();
