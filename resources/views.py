@@ -381,37 +381,59 @@ def resource_download(request, resource_id):
     
     # 1. 上传者本人 → 直接返回链接
     if user.id == resource.uploader.id:
+        # ✅ 增加下载次数
+        Resource.objects.filter(id=resource_id).update(download_count=models.F('download_count') + 1)
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
             'is_free': True,
+            'extract_code': resource.extract_code or '',
+            'can_see_extract': True,
             'message': '本人资源，免费下载'
         })
     
-    # 2. 已购买过 → 直接返回链接
+    # 2. 已购买过 → 直接返回链接（不计入下载次数，避免刷榜）
     if Download.objects.filter(user=user, resource=resource).exists():
         return JsonResponse({
             'success': True,
             'download_url': resource.download_url,
             'is_free': False,
+            'extract_code': resource.extract_code or '',
+            'can_see_extract': True,
             'message': '已购买，重新下载'
         })
     
-    # ===== 3. 检查每日免费额度 =====
+    # ===== 3. 免费资源（price=0）直接下载 =====
+    if resource.price == 0:
+        Download.objects.create(
+            user=user,
+            resource=resource,
+            oil_paid=0,
+            is_free_trial=False
+        )
+        # ✅ 增加下载次数
+        Resource.objects.filter(id=resource_id).update(download_count=models.F('download_count') + 1)
+        return JsonResponse({
+            'success': True,
+            'download_url': resource.download_url,
+            'is_free': True,
+            'extract_code': resource.extract_code or '',
+            'can_see_extract': True,
+            'message': '🆓 免费资源'
+        })
+    
+    # ===== 4. 检查每日免费额度 =====
     today = timezone.now().date()
     
-    # 如果上次免费日期不是今天，重置计数
     if user.last_free_date != today:
         user.daily_free_downloads = 0
         user.last_free_date = today
+        user.save()
     
-    # 如果今日免费次数 < 1，可以免费下载
     if user.daily_free_downloads < 1:
-        # 使用免费额度
         user.daily_free_downloads += 1
         user.save()
         
-        # 记录下载（标记为免费试用）
         Download.objects.create(
             user=user,
             resource=resource,
@@ -419,7 +441,9 @@ def resource_download(request, resource_id):
             is_free_trial=True
         )
         
-        # 给上传者加油滴（平台补贴）
+        # ✅ 增加下载次数
+        Resource.objects.filter(id=resource_id).update(download_count=models.F('download_count') + 1)
+        
         OilService.add_oil(
             resource.uploader, 
             1, 
@@ -431,34 +455,18 @@ def resource_download(request, resource_id):
             'success': True,
             'download_url': resource.download_url,
             'is_free': True,
+            'extract_code': resource.extract_code or '',
+            'can_see_extract': True,
             'message': '✅ 今日免费下载已使用，剩余 0 次'
         })
     
-    # ===== 4. 免费额度已用完，用油滴支付 =====
-    
-    # 如果是免费资源（price=0），直接下载
-    if resource.price == 0:
-        Download.objects.create(
-            user=user,
-            resource=resource,
-            oil_paid=0,
-            is_free_trial=False
-        )
-        return JsonResponse({
-            'success': True,
-            'download_url': resource.download_url,
-            'is_free': True,
-            'message': '🆓 免费资源'
-        })
-    
-    # 检查油滴是否足够
+    # ===== 5. 免费额度已用完，用油滴支付 =====
     if user.oil_balance < resource.price:
         return JsonResponse({
             'success': False,
             'error': f'💧 油滴不足！需要 {resource.price} 油滴，当前 {user.oil_balance} 油滴。今日免费额度已用完，请明天再来或赚取更多油滴。'
         })
     
-    # 扣除油滴
     success = OilService.download_payment(user, resource, resource.price)
     if not success:
         return JsonResponse({
@@ -466,7 +474,6 @@ def resource_download(request, resource_id):
             'error': '支付失败，请稍后重试'
         })
     
-    # 记录下载
     Download.objects.create(
         user=user,
         resource=resource,
@@ -474,7 +481,9 @@ def resource_download(request, resource_id):
         is_free_trial=False
     )
     
-    # 给上传者加油滴
+    # ✅ 增加下载次数
+    Resource.objects.filter(id=resource_id).update(download_count=models.F('download_count') + 1)
+    
     OilService.upload_earning(resource.uploader, resource, resource.price)
     
     return JsonResponse({
@@ -482,6 +491,8 @@ def resource_download(request, resource_id):
         'download_url': resource.download_url,
         'is_free': False,
         'oil_paid': resource.price,
+        'extract_code': resource.extract_code or '',
+        'can_see_extract': True,
         'message': f'✅ 已支付 {resource.price} 油滴，下载成功'
     })
 

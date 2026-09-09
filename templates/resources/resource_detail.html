@@ -286,7 +286,7 @@
 					{% elif user.is_authenticated %}
 					<!-- 登录用户，未购买，付费资源 -->
 					<button @click="handleDownload()" class="btn-primary px-6 py-2" :disabled="downloading">
-						<span x-show="!downloading">💰 支付并下载</span>
+						<span x-show="!downloading">💰 支付油滴获取提取码</span>
 						<span x-show="downloading">⏳ 处理中...</span>
 					</button>
 					{% else %}
@@ -842,9 +842,32 @@ function resourceDetail() {
             }
         },
 		
-		// 打开链接
-		openLink() {
-			if (this.downloadUrl) {
+		// 打开链接（先记录下载，再打开）
+		async openLink() {
+			if (!this.downloadUrl) return;
+			
+			// 如果是免费资源或已购买或上传者，先调用后端记录下载
+			if (this.resourcePrice === 0 || this.isUploader || this.hasPurchased) {
+				try {
+					const resp = await fetch("{% url 'resources:download' resource.id %}", {
+						method: 'POST',
+						headers: {'X-CSRFToken': '{{ csrf_token }}'}
+					});
+					const data = await resp.json();
+					if (data.success) {
+						// 更新下载次数显示（如果需要）
+						// 然后打开链接
+						window.open(this.downloadUrl, '_blank');
+					} else {
+						this.errorMessage = data.error || '记录下载失败';
+					}
+				} catch(e) {
+					console.error('记录下载错误:', e);
+					// 即使记录失败，也允许打开链接（降级处理）
+					window.open(this.downloadUrl, '_blank');
+				}
+			} else {
+				// 付费资源直接打开链接（不记录）
 				window.open(this.downloadUrl, '_blank');
 			}
 		},
