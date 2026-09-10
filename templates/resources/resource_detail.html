@@ -285,8 +285,12 @@
 					</button>
 					{% elif user.is_authenticated %}
 					<!-- 登录用户，未购买，付费资源 -->
-					<button @click="handleDownload()" class="btn-primary px-6 py-2" :disabled="downloading">
-						<span x-show="!downloading">💰 支付油滴获取提取码</span>
+					<button @click="handleDownload()" class="btn-primary px-6 py-2" :disabled="downloading"
+						x-data="{ hasFreeTrial: {% if free_downloads_left > 0 %}true{% else %}false{% endif %} }">
+						<span x-show="!downloading">
+							<span x-show="hasFreeTrial">🎁 今日免费下载</span>
+							<span x-show="!hasFreeTrial">💰 支付 {{ resource.price }} 油滴</span>
+						</span>
 						<span x-show="downloading">⏳ 处理中...</span>
 					</button>
 					{% else %}

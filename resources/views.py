@@ -365,6 +365,7 @@ def resource_detail(request, resource_id):
         'related_resources': related_resources,
         'comment_count': comments.count(),
         'has_extract_code': has_extract_code,
+        'free_downloads_left': user.free_downloads_left if user.is_authenticated else 0,
     }
     
     return render(request, 'resources/resource_detail.html', context)
