@@ -170,4 +170,11 @@
     </div>
     {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if query %}
+    trackBehavior('search', null, {query: '{{ query|escapejs }}'});
+    {% endif %}
+});
+</script>
 {% endblock %}

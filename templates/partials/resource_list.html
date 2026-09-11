@@ -5,7 +5,9 @@
     <!-- ===== 列表模式：纯文本，紧凑 ===== -->
     <div class="space-y-3">
         {% for resource in resources %}
-        <a href="/resource/{{ resource.id }}/" class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover px-5 py-3">
+        <a href="/resource/{{ resource.id }}/"
+		onclick="trackBehavior('click', {{ resource.id }}, {position: {{ forloop.counter }}})"
+		class="block bg-white rounded-xl card-shadow hover:shadow-lg transition-all duration-200 overflow-hidden frog-hover px-5 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0 pr-4">
                     <div class="flex items-center gap-2">

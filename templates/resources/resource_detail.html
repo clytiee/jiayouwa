@@ -327,7 +327,7 @@
 							🔗 打开链接
 						</button>
 						<!-- 复制按钮 -->
-						<button @click="copyText(downloadUrl)" 
+						<button @click="copyText(downloadUrl, 'link')" 
 								class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
 							📋 复制
 						</button>
@@ -340,7 +340,7 @@
 					<div class="flex items-center space-x-2 mt-1">
 						<input type="text" :value="extractCode" readonly 
 							   class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-mono">
-						<button @click="copyText(extractCode)" 
+						<button @click="copyText(extractCode, 'code')" 
 								class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
 							📋 复制
 						</button>
@@ -587,6 +587,9 @@ function resourceDetail() {
                 const data = await resp.json();
                 this.isCollected = data.collected;
                 this.collectCount = data.count;
+				if (data.collected) {
+					trackBehavior('collect', {{ resource.id }});
+				}
             } catch(e) {
                 console.error(e);
             }
@@ -625,6 +628,7 @@ function resourceDetail() {
 					this.downCount = data.down_count;
 					this.avgRating = data.avg_rating;
 					this.userRating = type;
+					trackBehavior(type === 'up' ? 'upvote' : 'downvote', {{ resource.id }});
 				}
 			} catch(e) {
 				console.error('评分错误:', e);
@@ -659,12 +663,14 @@ function resourceDetail() {
 			// 如果已显示提取码，直接打开链接
 			if (this.showExtractCode) {
 				this.openLink();
+				trackBehavior('download', {{ resource.id }});
 				return;
 			}
 			
 			// 未付费的付费资源，执行支付
 			if (!this.showExtractCode && this.resourcePrice > 0 && !this.isUploader && !this.hasPurchased) {
 				await this.payAndDownload();
+				trackBehavior('download', {{ resource.id }});
 				return;
 			}
 			
@@ -688,6 +694,7 @@ function resourceDetail() {
 						}
 						this.downloadMessage = '✅ 下载成功！';
 						setTimeout(() => { this.downloadMessage = ''; }, 3000);
+						trackBehavior('free_download', {{ resource.id }});
 					} else {
 						this.errorMessage = data.error || '获取下载信息失败';
 					}
@@ -766,10 +773,11 @@ function resourceDetail() {
 		},
 
 		// 复制文本
-		copyText(text) {
+		copyText(text, type = 'link') {
 			navigator.clipboard.writeText(text).then(() => {
 				this.downloadMessage = '✅ 已复制到剪贴板！';
 				setTimeout(() => { this.downloadMessage = ''; }, 3000);
+				trackBehavior('copy_' + type, {{ resource.id }});
 			});
 		},
 		
@@ -821,6 +829,7 @@ function resourceDetail() {
 				if (data.up_count !== undefined) {
 					document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
 					document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+					trackBehavior(type === 'up' ? 'comment_up' : 'comment_down', {{ resource.id }}, {comment_id: commentId});
 				}
 			} catch(e) {
 				console.error('投票错误:', e);
@@ -863,6 +872,7 @@ function resourceDetail() {
 						// 更新下载次数显示（如果需要）
 						// 然后打开链接
 						window.open(this.downloadUrl, '_blank');
+						trackBehavior('open_link', {{ resource.id }});
 					} else {
 						this.errorMessage = data.error || '记录下载失败';
 					}
@@ -930,6 +940,7 @@ window.voteComment = async function(commentId, type) {
         if (data.up_count !== undefined) {
             document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
             document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+			trackBehavior(type === 'up' ? 'comment_up' : 'comment_down', {{ resource.id }}, {comment_id: commentId});
         }
     } catch(e) {
         console.error('投票错误:', e);
@@ -1013,6 +1024,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				countSpan.textContent = parseInt(countSpan.textContent) + 1;
 			}
 			
+			trackBehavior('comment', {{ resource.id }});
 		} else {
 			alert(data.error || '评论发布失败，请稍后重试');
 		}
@@ -1054,6 +1066,17 @@ function createCommentHTML(comment) {
         </div>
     `;
 }
+// 记录浏览行为（含停留时长）
+let startTime = Date.now();
+window.addEventListener('beforeunload', function() {
+    const duration = Math.round((Date.now() - startTime) / 1000);
+    // 使用 sendBeacon 确保数据发送
+    navigator.sendBeacon('/api/track/', new Blob([JSON.stringify({
+        action: 'view',
+        resource_id: {{ resource.id }},
+        extra_data: {stay_duration: duration}
+    })], {type: 'application/json'}));
+});
 </script>
 
 

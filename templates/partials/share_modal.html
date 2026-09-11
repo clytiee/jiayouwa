@@ -108,6 +108,7 @@ function shareModal() {
                     this.shareUrl = data.share_url;
                     this.shareId = data.share_id;
                     this.shareText = `🐸 我在加油哇发现了一个好资源：${this.title}\n学习路上，一起加油哇！\n${this.shareUrl}`;
+					trackBehavior('share', this.resourceId);
                 } else {
                     alert('生成分享链接失败：' + data.error);
                 }
