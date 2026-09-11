@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from resources.models import Resource
 from users.models import User
 from resources.vector_search import VectorSearch
-
+from recommendations.services import BehaviorService
 
 def home_view(request):
     view_mode = request.GET.get('mode')
@@ -61,6 +61,11 @@ def ranking_view(request):
     
     user_rank = None
     if request.user.is_authenticated:
+        BehaviorService.track(
+            user=request.user,
+            action='page_ranking',
+            request=request
+        )
         higher_count = User.objects.filter(
             is_active=True,
             is_banned=False,

@@ -33,6 +33,7 @@ class Behavior(models.Model):
     """
     
     ACTION_CHOICES = (
+        # 资源相关
         ('view', '浏览'),
         ('click', '点击'),
         ('search', '搜索'),
@@ -48,6 +49,26 @@ class Behavior(models.Model):
         ('comment', '评论'),
         ('comment_up', '评论点赞'),
         ('comment_down', '评论点踩'),
+
+        # 用户相关
+        ('register', '注册'),
+        ('login', '登录'),
+        ('logout', '退出登录'),
+        
+        # 页面浏览
+        ('page_profile', '浏览个人主页'),
+        ('page_my_resources', '浏览我的资源'),
+        ('page_my_collections', '浏览我的收藏'),
+        ('page_my_downloads', '浏览我的下载'),
+        ('page_my_follows', '浏览我的关注'),
+        ('page_my_history', '浏览浏览历史'),
+        ('page_my_shares', '浏览分享历史'),
+        ('page_my_earnings', '浏览收益统计'),
+        ('page_profile_edit', '浏览账号设置'),
+        ('page_ranking', '浏览排行榜'),
+        ('page_notifications', '浏览消息中心'),
+        ('view_notification', '查看消息通知'),
+        ('delete_notification', '删除消息'),
     )
     
     user = models.ForeignKey(

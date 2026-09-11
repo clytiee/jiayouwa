@@ -22,6 +22,7 @@ from transactions.services import OilService
 from shares.models import Share
 from notifications.models import Notification
 from users.services import ExpService
+from recommendations.services import BehaviorService
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,13 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
+
+            # ✅ 记录注册行为
+            BehaviorService.track(
+                user=user,
+                action='register',
+                request=request
+            )
             
             # 保存邀请码到 session
             invite_code = form.cleaned_data.get('invite_code')
@@ -265,6 +273,13 @@ def login_view(request):
                     return render(request, 'users/login.html', {'form': form})
                 
                 login(request, user)
+
+                # ✅ 记录登录行为
+                BehaviorService.track(
+                    user=user,
+                    action='login',
+                    request=request
+                )
                 
                 OilService.daily_login_bonus(user)
                 
@@ -286,6 +301,13 @@ def login_view(request):
 
 def logout_view(request):
     """用户登出"""
+    # ✅ 记录退出行为（在 logout 之前）
+    if request.user.is_authenticated:
+        BehaviorService.track(
+            user=request.user,
+            action='logout',
+            request=request
+        )
     logout(request)
     messages.info(request, '已成功登出')
     return redirect('index')
@@ -295,6 +317,7 @@ def logout_view(request):
 def profile_view(request):
     """用户个人主页"""
     user = request.user
+    BehaviorService.track(user=request.user, action='page_profile', request=request)
     
     # 统计数据
     resource_count = Resource.objects.filter(uploader=user, status='published').count()
@@ -377,6 +400,7 @@ def profile_view(request):
 @login_required
 def profile_edit_view(request):
     """编辑个人资料"""
+    BehaviorService.track(user=request.user, action='page_profile_edit', request=request)
     user = request.user
     
     if request.method == 'POST':
@@ -418,6 +442,7 @@ def profile_edit_view(request):
 @login_required
 def my_resources_view(request):
     """我的资源列表"""
+    BehaviorService.track(user=request.user, action='page_my_resources', request=request)
     resources = Resource.objects.filter(uploader=request.user).order_by('-created_at')
     paginator = Paginator(resources, 20)
     page = request.GET.get('page', 1)
@@ -428,6 +453,7 @@ def my_resources_view(request):
 @login_required
 def my_collections_view(request):
     """我的收藏"""
+    BehaviorService.track(user=request.user, action='page_my_collections', request=request)
     collections = Collect.objects.filter(user=request.user).select_related('resource').order_by('-created_at')
     paginator = Paginator(collections, 20)
     page = request.GET.get('page', 1)
@@ -438,6 +464,7 @@ def my_collections_view(request):
 @login_required
 def my_downloads_view(request):
     """我的下载"""
+    BehaviorService.track(user=request.user, action='page_my_downloads', request=request)
     downloads = Download.objects.filter(user=request.user).select_related('resource').order_by('-last_downloaded_at')
     paginator = Paginator(downloads, 20)
     page = request.GET.get('page', 1)
@@ -448,6 +475,7 @@ def my_downloads_view(request):
 @login_required
 def my_follows_view(request):
     """我的关注"""
+    BehaviorService.track(user=request.user, action='page_my_follows', request=request)
     follows = Follow.objects.filter(follower=request.user).select_related('following').order_by('-created_at')
     paginator = Paginator(follows, 20)
     page = request.GET.get('page', 1)
@@ -458,6 +486,7 @@ def my_follows_view(request):
 @login_required
 def my_history_view(request):
     """浏览历史"""
+    BehaviorService.track(user=request.user, action='page_my_history', request=request)
     history = BrowseHistory.objects.filter(user=request.user).select_related('resource').order_by('-viewed_at')
     paginator = Paginator(history, 20)
     page = request.GET.get('page', 1)
@@ -477,6 +506,7 @@ def clear_history_view(request):
 @login_required
 def my_shares_view(request):
     """分享历史"""
+    BehaviorService.track(user=request.user, action='page_my_shares', request=request)
     shares = Share.objects.filter(sharer=request.user).order_by('-created_at')
     paginator = Paginator(shares, 20)
     page = request.GET.get('page', 1)
@@ -487,6 +517,7 @@ def my_shares_view(request):
 @login_required
 def my_earnings_view(request):
     """收益统计"""
+    BehaviorService.track(user=request.user, action='page_my_earnings', request=request)
     user = request.user
     transactions = OilTransaction.objects.filter(user=user).order_by('-created_at')
     
