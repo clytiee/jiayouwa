@@ -172,7 +172,7 @@
             <!-- 上传者信息 -->
             <div class="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
                 <div class="flex items-center space-x-3">
-                    {% include 'partials/user_avatar.html' with user=user size='32px' %}
+                    {% include 'partials/user_avatar.html' with user=resource.uploader size='32px' %}
                     <div>
                         <div class="font-medium text-gray-800">
                             {{ resource.uploader.first_name|default:resource.uploader.username }}
