@@ -20,6 +20,7 @@ urlpatterns = [
     path('<int:resource_id>/collect/', views.toggle_collect, name='toggle_collect'),
     path('<int:resource_id>/rate/', views.rate_resource, name='rate_resource'),
     path('<int:resource_id>/comment/', views.add_comment, name='add_comment'),
+    path('<int:resource_id>/report-invalid/', views.report_invalid, name='report_invalid'),
     path('comment/<int:comment_id>/vote/', views.vote_comment, name='vote_comment'),
     
     # 用户关注

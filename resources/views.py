@@ -556,7 +556,7 @@ def report_invalid(request, resource_id):
         recipient=resource.uploader,
         sender=request.user,
         title=f'⚠️ 资源链接失效报告',
-        content=f'用户 {request.user.first_name|default:request.user.username} 报告资源《{resource.title}》的下载链接可能已失效，请核查。',
+        content=f'用户 {request.user.first_name or request.user.username} 报告资源《{resource.title}》的下载链接可能已失效，请核查。',
         message_type='system',
         related_resource=resource
     )
@@ -569,7 +569,7 @@ def report_invalid(request, resource_id):
             recipient=admin,
             sender=request.user,
             title=f'⚠️ 资源链接失效报告',
-            content=f'用户 {request.user.first_name|default:request.user.username} 报告资源《{resource.title}》链接失效，请核查。',
+            content=f'用户 {request.user.first_name or request.user.username} 报告资源《{resource.title}》的下载链接可能已失效，请核查。',
             message_type='system',
             related_resource=resource
         )
