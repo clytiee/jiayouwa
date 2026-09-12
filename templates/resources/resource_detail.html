@@ -415,7 +415,7 @@
             {% for comment in comments %}
             <div class="comment-item p-4 bg-gray-50 rounded-xl" id="comment-{{ comment.id }}">
                 <div class="flex items-start space-x-3">
-					{% include 'partials/user_avatar.html' with user=user size='32px' %}
+					{% include 'partials/user_avatar.html' with user=comment.user size='32px' %}
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center space-x-2">
                             <span class="font-medium text-gray-800 text-sm">
