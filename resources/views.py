@@ -604,7 +604,8 @@ def toggle_collect(request, resource_id):
                 resource.uploader,
                 1,
                 'collect_reward',
-                f'你的资源《{resource.title}》被 {request.user.first_name or request.user.username} 收藏了'
+                f'你的资源《{resource.title}》被 {request.user.first_name or request.user.username} 收藏了',
+                related_resource=resource
             )
             collect.has_rewarded = True
             collect.save()
