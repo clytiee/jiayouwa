@@ -520,6 +520,8 @@ def free_download(request, resource_id):
         'success': True,
         'download_url': resource.download_url,
         'is_free': True,
+        'extract_code': resource.extract_code or '',
+        'can_see_extract': True,
         'message': '🎉 首次免费下载成功！注册登录后可下载更多资源'
     })
 
