@@ -300,7 +300,14 @@ def resource_detail(request, resource_id):
     # 游客免费下载判断
     can_download_free_trial = False
     if not user.is_authenticated:
-        can_download_free_trial = not request.session.get('has_used_free_trial', False)
+        # 检查这个资源是否已经免费下载过
+        downloaded_resources = request.session.get('free_downloaded_resources', [])
+        if resource_id in downloaded_resources:
+            # 下载过这个资源，可以继续查看
+            can_see_extract = True
+        else:
+            # 没下载过这个资源，检查是否还有免费额度
+            can_download_free_trial = not request.session.get('has_used_free_trial', False)
     else:
         if not has_purchased and not user.has_used_free_trial and not is_uploader:
             can_download_free_trial = True
@@ -504,14 +511,20 @@ def resource_download(request, resource_id):
 def free_download(request, resource_id):
     """游客免费下载"""
     resource = get_object_or_404(Resource, id=resource_id, status='published')
+
+    # 记录下载过的资源 ID（用于刷新后仍可查看）
+    downloaded_resources = request.session.get('free_downloaded_resources', [])
     
-    # 检查是否已用过免费下载
-    if request.session.get('has_used_free_trial', False):
-        messages.warning(request, '您已经使用过免费下载机会，请注册登录后下载更多资源')
-        return redirect('users:register')
+    if resource_id not in downloaded_resources:
+        # 检查是否已用过免费下载
+        if request.session.get('has_used_free_trial', False):
+            messages.warning(request, '您已经使用过免费下载机会，请注册登录后下载更多资源')
+            return redirect('users:register')
     
-    # 记录免费下载（不存入数据库，仅session标记）
-    request.session['has_used_free_trial'] = True
+        downloaded_resources.append(resource_id)
+        request.session['free_downloaded_resources'] = downloaded_resources
+        # 记录免费下载（不存入数据库，仅session标记）
+        request.session['has_used_free_trial'] = True
     
     # 记录下载（游客不关联用户）
     # 这里可以通过session_id记录，暂不实现
@@ -520,6 +533,8 @@ def free_download(request, resource_id):
         'success': True,
         'download_url': resource.download_url,
         'is_free': True,
+        'extract_code': resource.extract_code or '',
+        'can_see_extract': True,
         'message': '🎉 首次免费下载成功！注册登录后可下载更多资源'
     })
 
