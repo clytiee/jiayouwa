@@ -205,6 +205,9 @@ ZHIPU_API_KEY = os.getenv('ZHIPU_API_KEY', '')
 HASHIDS_SALT = 'jiayouwa_invite_salt_2024'  # 生产环境请改成一个复杂的字符串
 HASHIDS_MIN_LENGTH = 6
 
+# 免费额度冷却时间（小时）
+FREE_QUOTA_COOLDOWN_HOURS = 1
+
 # ===== 关键词 -> 推荐标签 映射表（预设优先，AI补充） =====
 KEYWORD_TAG_MAP = {
     # ===== 英语启蒙 =====

@@ -784,7 +784,8 @@ function resourceDetail() {
 					this.freeTrialUsed = true;
 					setTimeout(() => { this.downloadMessage = ''; }, 3000);
 				} else {
-					this.errorMessage = data.error || '下载失败';
+					// ✅ 显示冷却提示
+					this.errorMessage = data.error || '免费额度暂时用完，请稍后再试，或注册获取10油滴';
 				}
 			} catch(e) {
 				this.errorMessage = '网络错误';

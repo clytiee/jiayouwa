@@ -203,3 +203,58 @@ class CommentVote(models.Model):
     
     def __str__(self):
         return f"{self.user.username} {self.vote_type} 了评论 {self.comment.id}"
+
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+
+
+class GlobalFreeQuota(models.Model):
+    """全局免费下载额度池"""
+    is_available = models.BooleanField(default=True, verbose_name='当前是否可用')
+    used_at = models.DateTimeField(null=True, blank=True, verbose_name='上次使用时间')
+    
+    class Meta:
+        db_table = 'core_global_free_quota'
+        verbose_name = '全局免费额度'
+        verbose_name_plural = '全局免费额度'
+    
+    @classmethod
+    def get_quota(cls):
+        """获取唯一实例"""
+        obj, created = cls.objects.get_or_create(id=1)
+        return obj
+    
+    @property
+    def can_use(self):
+        """当前是否可用"""
+        if self.is_available:
+            return True
+        # 检查是否已过冷却时间（1小时）
+        cooldown = timedelta(hours=settings.FREE_QUOTA_COOLDOWN_HOURS)
+        if self.used_at:
+            elapsed = timezone.now() - self.used_at
+            if elapsed >= cooldown:
+                # 冷却结束，自动释放
+                self.is_available = True
+                self.save()
+                return True
+        return False
+    
+    def consume(self):
+        """消耗额度"""
+        if not self.can_use:
+            return False
+        self.is_available = False
+        self.used_at = timezone.now()
+        self.save()
+        return True
+    
+    @property
+    def next_available_time(self):
+        """下次可用时间"""
+        if self.is_available:
+            return None
+        if self.used_at:
+            return self.used_at + timedelta(hours=1)
+        return None
