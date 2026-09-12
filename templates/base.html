@@ -507,6 +507,127 @@
 			}, 1500);
 		}
 	}
+	
+	// ===== 收藏特效合集 =====
+	function getCenter(el) {
+		const rect = el.getBoundingClientRect();
+		return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+	}
+
+	// 方案A：爱心飘升
+	function effectHeartRise(x, y) {
+		const count = 8;
+		for (let i = 0; i < count; i++) {
+			const heart = document.createElement('div');
+			heart.className = 'confetti-particle';
+			heart.textContent = '❤️';
+			heart.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${14 + Math.random() * 10}px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(heart);
+			const offsetX = (Math.random() - 0.5) * 80;
+			const offsetY = -80 - Math.random() * 80;
+			heart.animate([
+				{ transform: 'translate(-50%, -50%) scale(0.3)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1.3)`, opacity: 0 }
+			], { duration: 1000 + Math.random() * 500, easing: 'ease-out', fill: 'forwards', delay: i * 40 });
+			setTimeout(() => heart.remove(), 1800);
+		}
+	}
+
+	// 方案B：爱心爆炸
+	function effectHeartBurst(x, y) {
+		const count = 12;
+		const colors = ['❤️', '💖', '💗', '💓', '🧡'];
+		for (let i = 0; i < count; i++) {
+			const heart = document.createElement('div');
+			heart.className = 'confetti-particle';
+			heart.textContent = colors[i % colors.length];
+			heart.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${12 + Math.random() * 8}px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(heart);
+			const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+			const distance = 60 + Math.random() * 80;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			heart.animate([
+				{ transform: 'translate(-50%, -50%) scale(0.2)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+			], { duration: 700 + Math.random() * 300, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+			setTimeout(() => heart.remove(), 1100);
+		}
+	}
+
+	// 方案C：爱心脉冲
+	function effectHeartPulse(x, y, btn) {
+		if (btn) {
+			btn.animate([
+				{ transform: 'scale(1)' },
+				{ transform: 'scale(1.15)', offset: 0.3 },
+				{ transform: 'scale(0.95)', offset: 0.6 },
+				{ transform: 'scale(1)' }
+			], { duration: 500, easing: 'ease-out' });
+		}
+		const pulse = document.createElement('div');
+		pulse.className = 'confetti-particle';
+		pulse.textContent = '❤️';
+		pulse.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:20px;pointer-events:none;z-index:9999;`;
+		document.body.appendChild(pulse);
+		pulse.animate([
+			{ transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0.8 },
+			{ transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+		], { duration: 600, easing: 'ease-out', fill: 'forwards' });
+		setTimeout(() => pulse.remove(), 700);
+	}
+
+	// 方案D：爱心入袋
+	function effectHeartFly(x, y) {
+		const targetX = window.innerWidth - 60;
+		const targetY = 30;
+		const heart = document.createElement('div');
+		heart.className = 'confetti-particle';
+		heart.textContent = '❤️';
+		heart.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:20px;pointer-events:none;z-index:9999;`;
+		document.body.appendChild(heart);
+		heart.animate([
+			{ transform: 'translate(-50%, -50%) scale(0.8)', opacity: 1, offset: 0 },
+			{ transform: `translate(calc(-50% + ${(targetX - x) * 0.4}px), calc(-50% - 60px)) scale(1.2)`, opacity: 1, offset: 0.4 },
+			{ transform: `translate(calc(-50% + ${targetX - x}px), calc(-50% + ${targetY - y}px)) scale(0.3)`, opacity: 0, offset: 1 }
+		], { duration: 900, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' });
+		setTimeout(() => heart.remove(), 1000);
+	}
+
+	// 方案E：星光闪烁
+	function effectSparkle(x, y) {
+		const count = 12;
+		for (let i = 0; i < count; i++) {
+			const star = document.createElement('div');
+			star.className = 'confetti-particle';
+			star.textContent = Math.random() > 0.5 ? '✨' : '⭐';
+			star.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${10 + Math.random() * 12}px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(star);
+			const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+			const distance = 30 + Math.random() * 60;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			star.animate([
+				{ transform: 'translate(-50%, -50%) scale(0) rotate(0deg)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1) rotate(180deg)`, opacity: 1, offset: 0.5 },
+				{ transform: `translate(calc(-50% + ${offsetX * 1.3}px), calc(-50% + ${offsetY * 1.3}px)) scale(0) rotate(360deg)`, opacity: 0 }
+			], { duration: 800 + Math.random() * 400, easing: 'ease-out', fill: 'forwards', delay: Math.random() * 150 });
+			setTimeout(() => star.remove(), 1300);
+		}
+	}
+
+	// ===== 随机收藏特效 =====
+	function showRandomCollectEffect(x, y, btn) {
+		const effects = [
+			effectHeartRise,
+			effectHeartBurst,
+			(x, y) => effectHeartPulse(x, y, btn),
+			effectHeartFly,
+			effectSparkle,
+		];
+		const random = effects[Math.floor(Math.random() * effects.length)];
+		random(x, y);
+	}
 	</script>
 </body>
 </html>

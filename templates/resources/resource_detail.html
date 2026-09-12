@@ -225,7 +225,7 @@
 				</div>
                 
                 <!-- 收藏 -->
-                <button @click="toggleCollect()" 
+                <button @click="toggleCollect(event)" 
                         class="flex items-center space-x-1 px-4 py-1.5 rounded-full border transition"
                         :class="isCollected ? 'border-red-400 bg-red-50 text-red-500' : 'border-gray-200 hover:border-gray-300'">
                     <span x-text="isCollected ? '❤️' : '🤍'"></span>
@@ -578,7 +578,7 @@ function resourceDetail() {
 		},
 
         // 收藏
-        async toggleCollect() {
+        async toggleCollect(event) {
             try {
                 const resp = await fetch("{% url 'resources:toggle_collect' resource.id %}", {
                     method: 'POST',
@@ -589,6 +589,19 @@ function resourceDetail() {
                 this.collectCount = data.count;
 				if (data.collected) {
 					trackBehavior('collect', {{ resource.id }});
+					
+					// ✅ 随机收藏特效
+					if (event) {
+						const btn = event.target.closest('button');
+						if (btn) {
+							const rect = btn.getBoundingClientRect();
+							showRandomCollectEffect(
+								rect.left + rect.width / 2,
+								rect.top + rect.height / 2,
+								btn
+							);
+						}
+					}
 				}
             } catch(e) {
                 console.error(e);
