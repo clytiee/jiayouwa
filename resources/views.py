@@ -308,7 +308,7 @@ def resource_detail(request, resource_id):
     # ===== 收藏状态 =====
     is_collected = False
     if user.is_authenticated:
-        is_collected = Collect.objects.filter(user=user, resource=resource).exists()
+        is_collected = Collect.objects.filter(user=user, resource=resource, is_active=True).exists()
     
     # ===== 关注状态 =====
     is_following = False
@@ -565,24 +565,49 @@ def toggle_collect(request, resource_id):
     
     collect, created = Collect.objects.get_or_create(
         user=request.user,
-        resource=resource
+        resource=resource,
+        defaults={'is_active': True}
     )
     
     if not created:
-        collect.delete()
-        Resource.objects.filter(id=resource_id).update(collect_count=models.F('collect_count') - 1)
-        return JsonResponse({'collected': False, 'count': resource.collect_count - 1})
+        # 已存在记录，切换 is_active
+        if collect.is_active:
+            # 取消收藏
+            collect.is_active = False
+            collect.save()
+            Resource.objects.filter(id=resource_id).update(collect_count=models.F('collect_count') - 1)
+            return JsonResponse({'collected': False, 'count': resource.collect_count - 1})
+        else:
+            # 重新收藏
+            collect.is_active = True
+            collect.save()
+            Resource.objects.filter(id=resource_id).update(collect_count=models.F('collect_count') + 1)
+            
+            # ✅ 只有没给过奖励才给
+            if resource.uploader != request.user and not collect.has_rewarded:
+                OilService.add_oil(
+                    resource.uploader,
+                    1,
+                    'collect_reward',
+                    f'你的资源《{resource.title}》被 {request.user.first_name or request.user.username} 收藏了'
+                )
+                collect.has_rewarded = True
+                collect.save()
+            
+            return JsonResponse({'collected': True, 'count': resource.collect_count + 1})
     else:
+        # 新建记录（首次收藏）
         Resource.objects.filter(id=resource_id).update(collect_count=models.F('collect_count') + 1)
         
-        # ✅ 只有收藏的不是自己发布的资源，才给油滴奖励
         if resource.uploader != request.user:
             OilService.add_oil(
-                request.user, 
-                1, 
-                'collect_reward', 
-                f'收藏了资源《{resource.title}》'
+                resource.uploader,
+                1,
+                'collect_reward',
+                f'你的资源《{resource.title}》被 {request.user.first_name or request.user.username} 收藏了'
             )
+            collect.has_rewarded = True
+            collect.save()
         
         return JsonResponse({'collected': True, 'count': resource.collect_count + 1})
 

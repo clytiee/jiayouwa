@@ -112,6 +112,8 @@ class Collect(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='用户')
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, verbose_name='资源')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='收藏时间')
+    is_active = models.BooleanField(default=True, verbose_name='是否收藏中')
+    has_rewarded = models.BooleanField(default=False, verbose_name='是否已给发布者奖励')
     
     class Meta:
         db_table = 'resources_collect'

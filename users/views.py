@@ -454,7 +454,7 @@ def my_resources_view(request):
 def my_collections_view(request):
     """我的收藏"""
     BehaviorService.track(user=request.user, action='page_my_collections', request=request)
-    collections = Collect.objects.filter(user=request.user).select_related('resource').order_by('-created_at')
+    collections = Collect.objects.filter(user=request.user, is_active=True).select_related('resource').order_by('-created_at')
     paginator = Paginator(collections, 20)
     page = request.GET.get('page', 1)
     collections_page = paginator.get_page(page)
