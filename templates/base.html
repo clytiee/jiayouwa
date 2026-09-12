@@ -219,19 +219,7 @@
 						<!-- 🆕 免费额度提示 -->
 						{% if user.is_authenticated %}
 						<div class="text-xs text-gray-400 hidden md:block">
-							
-							{% if user.last_free_date|date:"Y-m-d" != today %}
-								{% with free_left=1 %}
-									今日免费：<span class="text-green-600 font-medium">1</span> 次
-								{% endwith %}
-							{% else %}
-								{% with free_left=1|add:user.daily_free_downloads|add:-1 %}
-									今日免费：<span class="{% if free_left > 0 %}text-green-600{% else %}text-gray-400{% endif %} font-medium">
-										{{ free_left }}
-									</span> 次
-								{% endwith %}
-							{% endif %}
-							
+							今日免费：<span class="{% if user.free_downloads_left > 0 %}text-green-600{% else %}text-gray-400{% endif %} font-medium">{{ user.free_downloads_left }}</span> 次
 						</div>
 						{% endif %}
 						
