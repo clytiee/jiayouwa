@@ -449,7 +449,8 @@ def resource_download(request, resource_id):
             resource.uploader, 
             1, 
             'upload_earning', 
-            f'用户通过免费额度下载了《{resource.title}》'
+            f'用户通过免费额度下载了《{resource.title}》',
+            related_resource=resource
         )
         
         return JsonResponse({

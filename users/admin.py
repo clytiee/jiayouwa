@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     
     fieldsets = UserAdmin.fieldsets + (
         ('加油哇扩展信息', {
-            'fields': ('oil_balance', 'level', 'exp', 'level_title', 'avatar', 'has_used_free_trial', 'invited_by', 'daily_login_date', 'is_banned'),
+            'fields': ('oil_balance', 'level', 'exp', 'level_title', 'avatar', 'has_used_free_trial', 'daily_free_downloads', 'last_free_date', 'invited_by', 'daily_login_date', 'is_banned'),
         }),
     )
 
