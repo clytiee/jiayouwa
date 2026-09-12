@@ -408,10 +408,59 @@ def profile_edit_view(request):
         first_name = request.POST.get('first_name', '').strip()
         if first_name:
             user.first_name = first_name
-            user.save()
-            messages.success(request, '✅ 昵称已更新！')
         else:
             messages.error(request, '❌ 昵称不能为空')
+            return redirect('users:profile_edit')
+        
+        # ✅ 上传头像
+        avatar_file = request.FILES.get('avatar')
+        if avatar_file:
+            # 校验文件类型
+            if not avatar_file.content_type.startswith('image/'):
+                messages.error(request, '❌ 请上传图片文件')
+            # 校验文件大小（2MB）
+            elif avatar_file.size > 2 * 1024 * 1024:
+                messages.error(request, '❌ 头像不能超过 2MB')
+            else:
+                try:
+                    from PIL import Image
+                    from io import BytesIO
+                    from django.core.files.base import ContentFile
+                    
+                    img = Image.open(avatar_file)
+                    if img.mode == 'RGBA':
+                        img = img.convert('RGB')
+                    
+                    # 裁剪为正方形
+                    w, h = img.size
+                    size = min(w, h)
+                    left = (w - size) // 2
+                    top = (h - size) // 2
+                    img = img.crop((left, top, left + size, top + size))
+                    
+                    # 缩放到 200x200
+                    img = img.resize((200, 200), Image.LANCZOS)
+                    
+                    # 保存为 JPEG
+                    output = BytesIO()
+                    img.save(output, format='JPEG', quality=85, optimize=True)
+                    output.seek(0)
+                    
+                    # 删除旧头像
+                    if user.avatar:
+                        user.avatar.delete(save=False)
+                    
+                    user.avatar.save(
+                        f'user_{user.id}_avatar.jpg',
+                        ContentFile(output.read()),
+                        save=False
+                    )
+                    messages.success(request, '✅ 头像已更新！')
+                except Exception as e:
+                    logger.error(f'头像处理失败: {e}')
+                    messages.error(request, '❌ 头像处理失败，请重试')
+        
+        user.save()
         
         # 修改密码
         old_password = request.POST.get('old_password')
@@ -437,7 +486,6 @@ def profile_edit_view(request):
         return redirect('users:profile_edit')
     
     return render(request, 'users/profile_edit.html')
-
 
 @login_required
 def my_resources_view(request):

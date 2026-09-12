@@ -172,7 +172,7 @@
             <!-- 上传者信息 -->
             <div class="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
                 <div class="flex items-center space-x-3">
-                    <span class="avatar-frog">🐸</span>
+                    {% include 'partials/user_avatar.html' with user=user size='32px' %}
                     <div>
                         <div class="font-medium text-gray-800">
                             {{ resource.uploader.first_name|default:resource.uploader.username }}
@@ -415,7 +415,7 @@
             {% for comment in comments %}
             <div class="comment-item p-4 bg-gray-50 rounded-xl" id="comment-{{ comment.id }}">
                 <div class="flex items-start space-x-3">
-                    <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
+					{% include 'partials/user_avatar.html' with user=user size='32px' %}
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center space-x-2">
                             <span class="font-medium text-gray-800 text-sm">
@@ -1077,7 +1077,7 @@ function createCommentHTML(comment) {
     return `
         <div class="comment-item p-4 bg-gray-50 rounded-xl" id="comment-${comment.id}">
             <div class="flex items-start space-x-3">
-                <span class="avatar-frog avatar-frog-sm flex-shrink-0">🐸</span>
+                {% include 'partials/user_avatar.html' with user=user %}
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center space-x-2">
                         <span class="font-medium text-gray-800 text-sm">${comment.username}</span>

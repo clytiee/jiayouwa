@@ -17,22 +17,35 @@
     
     <div class="bg-white rounded-2xl card-shadow overflow-hidden">
         
-        <!-- ===== 头像 ===== -->
-        <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="text-sm font-medium text-gray-700">👤 头像</h3>
-            <div class="flex items-center space-x-4 mt-3">
-                <div class="avatar-frog avatar-frog-lg">🐸</div>
-                <div>
-                    <p class="text-sm text-gray-600">当前使用默认头像 🐸</p>
-                    <p class="text-xs text-gray-400">自定义头像功能开发中...</p>
-                </div>
-            </div>
-        </div>
-        
         <!-- ===== 基本信息 ===== -->
-        <form method="POST" class="divide-y divide-gray-100">
+        <form method="POST" enctype="multipart/form-data" class="divide-y divide-gray-100">
             {% csrf_token %}
             
+			<!-- ===== 头像 ===== -->
+			<div class="px-6 py-4 border-b border-gray-100">
+				<h3 class="text-sm font-medium text-gray-700">👤 头像</h3>
+				<div class="flex items-center space-x-4 mt-3">
+					<!-- 当前头像 -->
+					<div class="avatar-preview">
+						{% if user.avatar %}
+						<img src="{{ user.avatar.url }}" alt="头像" class="w-20 h-20 rounded-full object-cover border-2 border-green-200">
+						{% else %}
+						{% include 'partials/user_avatar.html' with user=user %}
+						{% endif %}
+					</div>
+					<div>
+						<label for="avatar-input" class="btn-primary text-sm py-1.5 px-4 cursor-pointer inline-block">
+							📷 上传头像
+						</label>
+						<input type="file" id="avatar-input" name="avatar" accept="image/*" class="hidden">
+						<p class="text-xs text-gray-400 mt-1">支持 JPG/PNG，最大 2MB，自动裁剪为正方形</p>
+						{% if user.avatar %}
+						<p class="text-xs text-green-600 mt-1">✅ 当前使用自定义头像</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+        
             <div class="px-6 py-4">
                 <h3 class="text-sm font-medium text-gray-700 mb-3">📋 基本信息</h3>
                 
@@ -191,6 +204,24 @@ document.getElementById('clearHistoryModal').addEventListener('click', function(
 });
 document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
     if (e.target === this) closeDeleteAccount();
+});
+
+document.getElementById('avatar-input')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+        alert('头像不能超过 2MB');
+        this.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const preview = document.querySelector('.avatar-preview');
+        preview.innerHTML = `<img src="${ev.target.result}" class="w-20 h-20 rounded-full object-cover border-2 border-green-200">`;
+    };
+    reader.readAsDataURL(file);
 });
 </script>
 {% endblock %}

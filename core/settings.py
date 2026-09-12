@@ -208,6 +208,10 @@ HASHIDS_MIN_LENGTH = 6
 # 免费额度冷却时间（小时）
 FREE_QUOTA_COOLDOWN_HOURS = 1
 
+# ===== 媒体文件配置（头像上传） =====
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # ===== 关键词 -> 推荐标签 映射表（预设优先，AI补充） =====
 KEYWORD_TAG_MAP = {
     # ===== 英语启蒙 =====

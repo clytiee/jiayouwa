@@ -1,0 +1,11 @@
+{% if user.avatar %}
+<img src="{{ user.avatar.url }}" alt="{{ user.first_name|default:user.username }}" 
+     class="rounded-full object-cover" 
+     style="width: {{ size|default:'40px' }}; height: {{ size|default:'40px' }};">
+{% else %}
+<span class="avatar-frog" 
+	style="width: {{ size|default:'40px' }}; height: {{ size|default:'40px' }}; 
+	font-size: calc({{ size|default:'40px' }} * 0.6);">
+	🐸
+</span>
+{% endif %}

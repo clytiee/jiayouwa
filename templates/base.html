@@ -277,7 +277,7 @@
 								
 								<!-- 点击头像 → 进入我的主页 -->
 								<a href="{% url 'users:profile' %}" class="block p-0.5 hover:opacity-80 transition" title="我的主页">
-									<span class="avatar-frog">🐸</span>
+									{% include 'partials/user_avatar.html' with user=user size='40px' %}
 								</a>
 								
 								<!-- 点击用户名 → 切换下拉菜单 -->

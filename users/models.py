@@ -12,11 +12,12 @@ class User(AbstractUser):
     # AbstractUser 已提供: username, email, password, is_active, date_joined, last_login
     
     # 自定义字段
-    avatar = models.URLField(
-        max_length=500,
+    avatar = models.ImageField(
+        upload_to='avatars/%Y/%m/',
         blank=True,
         null=True,
-        help_text="用户自定义头像URL，为空则显示默认青蛙头像"
+        verbose_name='头像',
+        help_text="上传自定义头像，为空则显示默认青蛙头像"
     )
     
     oil_balance = models.IntegerField(default=0, help_text="油滴余额")
