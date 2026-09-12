@@ -244,7 +244,8 @@
 				</button>
 				{% endif %}
                 
-				<!-- 分享按钮 -->
+				<!-- 分享按钮（仅登录用户可见） -->
+				{% if user.is_authenticated %}
 				<button @click="$dispatch('open-share-modal', {
 					resourceId: {{ resource.id }},
 					title: '{{ resource.title|escapejs }}',
@@ -253,6 +254,7 @@
 				class="flex items-center space-x-1 px-4 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 transition">
 				📤 分享
 				</button>
+				{% endif %}
 
                 <!-- 油滴价格 & 下载 -->
 				<div class="ml-auto flex items-center space-x-3">
