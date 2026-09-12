@@ -206,7 +206,7 @@
                 
                 <!-- 评分（👍/👎） -->
 				<div class="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
-					<button @click="rate('up')" 
+					<button @click="rate('up', $event)" 
 							class="vote-btn text-gray-400 hover:text-green-500 text-lg px-1"
 							:class="userRating === 'up' ? 'active-up' : ''">
 						👍
@@ -610,7 +610,7 @@ function resourceDetail() {
         },
         
         // 评分
-        async rate(type) {
+        async rate(type, event) {
 			if (this.userRating === type) return;
 			try {
 				const resp = await fetch(`/resource/{{ resource.id }}/rate/`, {
@@ -629,6 +629,12 @@ function resourceDetail() {
 					this.avgRating = data.avg_rating;
 					this.userRating = type;
 					trackBehavior(type === 'up' ? 'upvote' : 'downvote', {{ resource.id }});
+					
+					// ✅ 点赞时撒花
+					if (type === 'up') {
+						const rect = event.target.getBoundingClientRect();
+						showConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+					}
 				}
 			} catch(e) {
 				console.error('评分错误:', e);
@@ -926,7 +932,7 @@ function resourceDetail() {
 }
 
 // ===== 全局投票函数（供动态插入的评论使用） =====
-window.voteComment = async function(commentId, type) {
+window.voteComment = async function(commentId, type, event) {
     try {
         const resp = await fetch(`/resource/comment/${commentId}/vote/`, {  // ← 改成 /resource/
             method: 'POST',
@@ -940,6 +946,16 @@ window.voteComment = async function(commentId, type) {
         if (data.up_count !== undefined) {
             document.querySelector(`.comment-up-${commentId}`).textContent = data.up_count;
             document.querySelector(`.comment-down-${commentId}`).textContent = data.down_count;
+			
+			// ✅ 评论点赞时撒花
+            if (type === 'up' && event) {
+                const btn = event.target.closest('button');
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    showConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                }
+            }
+			
 			trackBehavior(type === 'up' ? 'comment_up' : 'comment_down', {{ resource.id }}, {comment_id: commentId});
         }
     } catch(e) {
@@ -1054,7 +1070,7 @@ function createCommentHTML(comment) {
                     </div>
                     <p class="text-gray-700 text-sm mt-1">${comment.content}</p>
                     <div class="flex items-center space-x-4 mt-2 text-xs">
-                        <button onclick="window.voteComment(${comment.id}, 'up')" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
+                        <button onclick="window.voteComment(${comment.id}, 'up', event)" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
                             👍 <span class="comment-up-${comment.id}">0</span>
                         </button>
                         <button onclick="window.voteComment(${comment.id}, 'down')" class="vote-btn text-gray-400 hover:text-red-500 flex items-center space-x-1">
