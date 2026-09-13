@@ -193,7 +193,7 @@
                 
                 <!-- Logo -->
 				<a href="/" class="flex items-center space-x-2 flex-shrink-0">
-					<img src="/static/logo.png" alt="加油哇" class="h-8 w-8">
+					<img src="/static/logo.png" alt="加油哇" class="h-8 w-8" onclick="playFrogSound(event)">
 					<span class="text-xl font-bold text-gray-800">加油哇</span>
 					<span class="hidden sm:inline text-sm text-gray-400">学习路上，一起加油哇！</span>
 				</a>
@@ -212,7 +212,9 @@
                     
                     {% if user.is_authenticated %}
                         <!-- 🆕 排行榜（消息中心左边） -->
-						<a href="{% url 'ranking' %}" class="text-gray-500 hover:text-green-600 transition text-sm font-medium">
+						<a href="{% url 'ranking' %}" 
+							onclick="playRankingEffect(event)"
+							class="text-gray-500 hover:text-green-600 transition text-sm font-medium">
 							🏆 排行榜
 						</a>
 
@@ -615,6 +617,280 @@
 		];
 		const random = effects[Math.floor(Math.random() * effects.length)];
 		random(x, y);
+	}
+	// ===== 排行榜随机特效 =====
+	function getRankingCenter(el) {
+		const rect = el.getBoundingClientRect();
+		return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+	}
+
+	// 方案A：皇冠加冕
+	function effectCrown(x, y) {
+		const crown = document.createElement('div');
+		crown.className = 'confetti-particle';
+		crown.textContent = '👑';
+		crown.style.cssText = `position:fixed;left:${x}px;top:${y - 300}px;font-size:80px;pointer-events:none;z-index:9999;filter:drop-shadow(0 0 20px rgba(255,193,7,0.8));`;
+		document.body.appendChild(crown);
+		
+		crown.animate([
+			{ transform: 'translate(-50%, -50%) scale(0.3) rotate(-20deg)', opacity: 0 },
+			{ transform: 'translate(-50%, -50%) scale(1.4) rotate(0deg)', opacity: 1, offset: 0.6 },
+			{ transform: 'translate(-50%, -50%) scale(1.2) rotate(0deg)', opacity: 1, offset: 0.8 },
+			{ transform: 'translate(-50%, -50%) scale(1.5) rotate(0deg)', opacity: 0 }
+		], { duration: 1200, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' });
+		
+		const count = 20;
+		for (let i = 0; i < count; i++) {
+			const ray = document.createElement('div');
+			ray.className = 'confetti-particle';
+			ray.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:4px;height:30px;background:linear-gradient(to bottom, #FFD700, transparent);border-radius:2px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(ray);
+			
+			const angle = (Math.PI * 2 * i) / count;
+			const distance = 100 + Math.random() * 80;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			
+			ray.animate([
+				{ transform: `translate(-50%, -50%) rotate(${angle}rad) scaleY(0)`, opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) rotate(${angle}rad) scaleY(2)`, opacity: 0 }
+			], { duration: 800 + Math.random() * 300, easing: 'ease-out', fill: 'forwards', delay: 200 + Math.random() * 200 });
+			
+			setTimeout(() => ray.remove(), 1400);
+		}
+		
+		setTimeout(() => crown.remove(), 1400);
+	}
+
+	// 方案B：金色奖杯
+	function effectTrophy(x, y) {
+		const trophy = document.createElement('div');
+		trophy.className = 'confetti-particle';
+		trophy.textContent = '🏆';
+		trophy.style.cssText = `position:fixed;left:${x}px;top:${y + 100}px;font-size:70px;pointer-events:none;z-index:9999;filter:drop-shadow(0 0 20px rgba(255,193,7,0.8));`;
+		document.body.appendChild(trophy);
+		
+		trophy.animate([
+			{ transform: 'translate(-50%, -50%) scale(0.3) translateY(100px)', opacity: 0 },
+			{ transform: 'translate(-50%, -50%) scale(1.3) translateY(-20px)', opacity: 1, offset: 0.6 },
+			{ transform: 'translate(-50%, -50%) scale(1) translateY(0px)', opacity: 1, offset: 0.8 },
+			{ transform: 'translate(-50%, -50%) scale(1.5) translateY(-30px)', opacity: 0 }
+		], { duration: 1200, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' });
+		
+		const count = 25;
+		const colors = ['#FFD700', '#FFC107', '#FFEB3B', '#FFA000', '#FFE082'];
+		
+		for (let i = 0; i < count; i++) {
+			const particle = document.createElement('div');
+			particle.className = 'confetti-particle';
+			const size = 4 + Math.random() * 8;
+			particle.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${colors[i % colors.length]};border-radius:50%;box-shadow:0 0 8px ${colors[i % colors.length]};pointer-events:none;z-index:9999;`;
+			document.body.appendChild(particle);
+			
+			const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+			const distance = 80 + Math.random() * 120;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			
+			particle.animate([
+				{ transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1)`, opacity: 0.8, offset: 0.5 },
+				{ transform: `translate(calc(-50% + ${offsetX * 1.3}px), calc(-50% + ${offsetY * 1.3}px)) scale(0)`, opacity: 0 }
+			], { duration: 900 + Math.random() * 400, easing: 'ease-out', fill: 'forwards', delay: 200 + Math.random() * 200 });
+			
+			setTimeout(() => particle.remove(), 1500);
+		}
+		
+		setTimeout(() => trophy.remove(), 1400);
+	}
+
+	// 方案C：金色星星
+	function effectGoldStar(x, y) {
+		const count = 16;
+		const emojis = ['⭐', '🌟', '✨', '💫'];
+		
+		for (let i = 0; i < count; i++) {
+			const star = document.createElement('div');
+			star.className = 'confetti-particle';
+			star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+			star.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${16 + Math.random() * 14}px;pointer-events:none;z-index:9999;filter:drop-shadow(0 0 8px rgba(255,193,7,0.9));`;
+			document.body.appendChild(star);
+			
+			const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+			const distance = 60 + Math.random() * 100;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			
+			star.animate([
+				{ transform: 'translate(-50%, -50%) scale(0) rotate(0deg)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1.3) rotate(180deg)`, opacity: 1, offset: 0.5 },
+				{ transform: `translate(calc(-50% + ${offsetX * 1.4}px), calc(-50% + ${offsetY * 1.4}px)) scale(0) rotate(360deg)`, opacity: 0 }
+			], { duration: 900 + Math.random() * 400, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards', delay: Math.random() * 100 });
+			
+			setTimeout(() => star.remove(), 1500);
+		}
+	}
+
+	// 方案D：烟花绽放
+	function effectFirework(x, y) {
+		const bursts = [
+			{ delay: 0, color: '#FFD700' },
+			{ delay: 200, color: '#FFC107' },
+			{ delay: 400, color: '#FFEB3B' }
+		];
+		
+		bursts.forEach(burst => {
+			setTimeout(() => {
+				const count = 30;
+				for (let i = 0; i < count; i++) {
+					const particle = document.createElement('div');
+					particle.className = 'confetti-particle';
+					const size = 3 + Math.random() * 5;
+					particle.style.cssText = `position:fixed;left:${x + (Math.random() - 0.5) * 30}px;top:${y + (Math.random() - 0.5) * 30}px;width:${size}px;height:${size}px;background:${burst.color};border-radius:50%;box-shadow:0 0 10px ${burst.color};pointer-events:none;z-index:9999;`;
+					document.body.appendChild(particle);
+					
+					const angle = (Math.PI * 2 * i) / count;
+					const distance = 60 + Math.random() * 90;
+					const offsetX = Math.cos(angle) * distance;
+					const offsetY = Math.sin(angle) * distance;
+					
+					particle.animate([
+						{ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+						{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(0)`, opacity: 0 }
+					], { duration: 1000 + Math.random() * 400, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+					
+					setTimeout(() => particle.remove(), 1400);
+				}
+			}, burst.delay);
+		});
+	}
+
+	// 方案E：勋章闪耀
+	function effectMedal(x, y) {
+		const medal = document.createElement('div');
+		medal.className = 'confetti-particle';
+		medal.textContent = '🎖️';
+		medal.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:60px;pointer-events:none;z-index:9999;filter:drop-shadow(0 0 15px rgba(255,193,7,0.9));`;
+		document.body.appendChild(medal);
+		
+		medal.animate([
+			{ transform: 'translate(-50%, -50%) scale(0) rotate(-180deg)', opacity: 0 },
+			{ transform: 'translate(-50%, -50%) scale(1.2) rotate(0deg)', opacity: 1, offset: 0.5 },
+			{ transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1, offset: 0.7 },
+			{ transform: 'translate(-50%, -50%) scale(1.4) rotate(0deg)', opacity: 0 }
+		], { duration: 1200, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' });
+		
+		for (let i = 0; i < 3; i++) {
+			setTimeout(() => {
+				const ring = document.createElement('div');
+				ring.className = 'confetti-particle';
+				ring.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:40px;height:40px;border-radius:50%;border:3px solid #FFD700;box-shadow:0 0 20px #FFD700;pointer-events:none;z-index:9999;`;
+				document.body.appendChild(ring);
+				
+				ring.animate([
+					{ transform: 'translate(-50%, -50%) scale(0.5)', opacity: 1 },
+					{ transform: 'translate(-50%, -50%) scale(4)', opacity: 0 }
+				], { duration: 1000, easing: 'ease-out', fill: 'forwards' });
+				
+				setTimeout(() => ring.remove(), 1100);
+			}, i * 200);
+		}
+		
+		setTimeout(() => medal.remove(), 1400);
+	}
+
+	// ===== 排行榜：随机特效 + 延迟跳转 =====
+	function playRankingEffect(event) {
+		event.preventDefault();
+		
+		const link = event.currentTarget;
+		const { x, y } = getRankingCenter(link);
+		
+		const effects = [
+			effectCrown,
+			effectTrophy,
+			effectGoldStar,
+			effectFirework,
+			effectMedal,
+		];
+		const random = effects[Math.floor(Math.random() * effects.length)];
+		random(x, y);
+		
+		// 延迟 400ms 后跳转，让特效有时间展示
+		setTimeout(() => {
+			window.location.href = link.href;
+		}, 500);
+	}
+	// ===== 收藏榜：爱心特效 + 延迟跳转 =====
+	function playCollectRankEffect(event) {
+		event.preventDefault();
+		
+		const link = event.currentTarget;
+		const rect = link.getBoundingClientRect();
+		const x = rect.left + rect.width / 2;
+		const y = rect.top + rect.height / 2;
+		
+		// 爱心飘升 + 爱心爆炸 组合
+		const count = 12;
+		const colors = ['❤️', '💖', '💗', '💓', '🧡', '💝'];
+		
+		// 1. 爱心飘升
+		for (let i = 0; i < 6; i++) {
+			const heart = document.createElement('div');
+			heart.className = 'confetti-particle';
+			heart.textContent = colors[Math.floor(Math.random() * colors.length)];
+			heart.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${14 + Math.random() * 10}px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(heart);
+			
+			const offsetX = (Math.random() - 0.5) * 80;
+			const offsetY = -80 - Math.random() * 80;
+			
+			heart.animate([
+				{ transform: 'translate(-50%, -50%) scale(0.3)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1.3)`, opacity: 0 }
+			], { duration: 1000 + Math.random() * 500, easing: 'ease-out', fill: 'forwards', delay: i * 40 });
+			
+			setTimeout(() => heart.remove(), 1800);
+		}
+		
+		// 2. 爱心爆炸
+		for (let i = 0; i < count; i++) {
+			const heart = document.createElement('div');
+			heart.className = 'confetti-particle';
+			heart.textContent = colors[i % colors.length];
+			heart.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${12 + Math.random() * 8}px;pointer-events:none;z-index:9999;`;
+			document.body.appendChild(heart);
+			
+			const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+			const distance = 60 + Math.random() * 80;
+			const offsetX = Math.cos(angle) * distance;
+			const offsetY = Math.sin(angle) * distance;
+			
+			heart.animate([
+				{ transform: 'translate(-50%, -50%) scale(0.2)', opacity: 1 },
+				{ transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+			], { duration: 700 + Math.random() * 300, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+			
+			setTimeout(() => heart.remove(), 1100);
+		}
+		
+		// 延迟 400ms 后跳转
+		setTimeout(() => {
+			window.location.href = link.href;
+		}, 400);
+	}
+	// ===== 青蛙叫声 =====
+	function playFrogSound(event) {
+		event.preventDefault();  // 阻止跳转（如果想先播放再跳转）
+		
+		const audio = new Audio('/static/sounds/frog.mp3');
+		audio.volume = 0.5;
+		audio.play().catch(e => console.log('播放失败:', e));
+		
+		// 延迟 300ms 后跳转（可选）
+		// setTimeout(() => {
+		//     window.location.href = event.currentTarget.closest('a').href;
+		// }, 300);
 	}
 	</script>
 </body>

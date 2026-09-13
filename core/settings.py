@@ -146,7 +146,7 @@ DEFAULT_SETTINGS = {
     'oil_collect_reward': 1,
     'oil_comment_up_reward': 1,
     'oil_price_min': 0,
-    'oil_price_max': 10,
+    'oil_price_max': 5,
     'free_trial_enabled': True,
 }
 
