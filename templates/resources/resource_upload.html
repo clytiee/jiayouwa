@@ -116,11 +116,14 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">
                 描述 <span class="text-red-500">*</span>
             </label>
-            <textarea name="description" id="id_description" rows="4"
-                      placeholder="请详细描述资源内容，帮助其他家长了解这个资源..."
-                      class="input-field {% if form.description.errors %}error{% endif %}"
-                      required>{{ form.description.value|default:'' }}</textarea>
+            <textarea name="description" id="id_description" rows="6"
+                    placeholder="支持 Markdown 语法&#10;&#10;例如：&#10;## 资源特点&#10;- 特点1&#10;- 特点2&#10;&#10;**加粗** *斜体* [链接](url)"
+                    class="input-field {% if form.description.errors %}error{% endif %}"
+                    required>{{ form.description.value|default:'' }}</textarea>
             <div class="char-count" id="descCount">0 / 5000</div>
+            <p class="text-xs text-gray-400 mt-1">
+                💡 支持 Markdown：**加粗**、*斜体*、## 标题、- 列表、[链接](url)
+            </p>
             {% if form.description.errors %}
             <p class="text-red-500 text-xs mt-1">{{ form.description.errors.0 }}</p>
             {% endif %}

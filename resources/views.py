@@ -12,6 +12,8 @@ from datetime import date
 import json
 import base64
 import logging
+import markdown
+import bleach
 from PIL import Image
 from io import BytesIO
 
@@ -28,6 +30,21 @@ logger = logging.getLogger(__name__)
 
 # resources/views.py 中的 resource_upload 函数
 from .tag_service import TagService
+
+ALLOWED_TAGS = [
+    'p', 'br', 'strong', 'em', 'u', 's', 'del',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li',
+    'blockquote', 'code', 'pre',
+    'a', 'img',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+    'hr',
+]
+
+ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title', 'target', 'rel'],
+    'img': ['src', 'alt', 'title'],
+}
 
 @login_required
 def resource_upload(request):
@@ -359,7 +376,19 @@ def resource_detail(request, resource_id):
             status='published',
             tags__overlap=resource.tags
         ).exclude(id=resource.id)[:6]
-    
+
+    # ✅ 渲染 Markdown + 过滤危险标签
+    raw_html = markdown.markdown(
+        resource.description or '',
+        extensions=['extra', 'nl2br', 'sane_lists']
+    )
+    description_html = bleach.clean(
+        raw_html,
+        tags=ALLOWED_TAGS,
+        attributes=ALLOWED_ATTRIBUTES,
+        strip=True
+    )
+
     context = {
         'resource': resource,
         'is_uploader': is_uploader,
@@ -373,6 +402,7 @@ def resource_detail(request, resource_id):
         'comment_count': comments.count(),
         'has_extract_code': has_extract_code,
         'free_downloads_left': user.free_downloads_left if user.is_authenticated else 0,
+        'description_html': description_html,
     }
     
     return render(request, 'resources/resource_detail.html', context)

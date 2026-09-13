@@ -176,7 +176,75 @@
 		}
 
 		[x-cloak] { display: none !important; }
-    </style>
+
+		/* ===== Markdown 渲染样式 ===== */
+		.prose h1 { font-size: 1.5em; font-weight: bold; margin: 0.8em 0 0.4em; color: #333; }
+		.prose h2 { font-size: 1.3em; font-weight: bold; margin: 0.8em 0 0.4em; color: #333; }
+		.prose h3 { font-size: 1.1em; font-weight: bold; margin: 0.6em 0 0.3em; color: #333; }
+		.prose p { margin: 0.5em 0; color: #555; }
+		.prose ul, .prose ol { margin: 0.5em 0; padding-left: 1.5em; }
+		.prose li { margin: 0.2em 0; color: #555; }
+		.prose strong { font-weight: bold; color: #333; }
+		.prose em { font-style: italic; }
+		.prose code {
+			background: #f0f0f0;
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-family: 'Courier New', monospace;
+			font-size: 0.9em;
+		}
+		.prose pre {
+			background: #2d2d2d;
+			color: #f8f8f2;
+			padding: 12px;
+			border-radius: 8px;
+			overflow-x: auto;
+			margin: 0.8em 0;
+		}
+		.prose pre code {
+			background: transparent;
+			color: inherit;
+			padding: 0;
+		}
+		.prose blockquote {
+			border-left: 4px solid #66BB6A;
+			padding-left: 12px;
+			margin: 0.8em 0;
+			color: #777;
+			font-style: italic;
+		}
+		.prose a {
+			color: #4CAF50;
+			text-decoration: underline;
+		}
+		.prose a:hover {
+			color: #388E3C;
+		}
+		.prose img {
+			max-width: 100%;
+			border-radius: 8px;
+			margin: 0.5em 0;
+		}
+		.prose hr {
+			border: none;
+			border-top: 1px solid #e0e0e0;
+			margin: 1em 0;
+		}
+		.prose table {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 0.8em 0;
+		}
+		.prose th, .prose td {
+			border: 1px solid #e0e0e0;
+			padding: 6px 12px;
+			text-align: left;
+		}
+		.prose th {
+			background: #f5f5f5;
+			font-weight: bold;
+		}
+	</style>
     {% block extra_css %}{% endblock %}
 </head>
 <body x-data="{ 

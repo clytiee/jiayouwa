@@ -197,8 +197,8 @@
             </div>
             
             <!-- 描述 -->
-            <div class="mt-4 p-4 bg-gray-50 rounded-xl">
-                <p class="text-gray-600 text-sm whitespace-pre-wrap">{{ resource.description }}</p>
+            <div class="mt-4 p-4 bg-gray-50 rounded-xl prose">
+                {{ description_html|safe }}
             </div>
             
             <!-- ===== 操作栏 ===== -->
