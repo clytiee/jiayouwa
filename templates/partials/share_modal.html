@@ -133,28 +133,30 @@ function shareModal() {
             alert(`📱 分享到 ${channel}：\n\n${this.shareText}`);
         },
         
-        fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.select();
-            textarea.setSelectionRange(0, text.length);
-            
-            try {
-                const success = document.execCommand('copy');
-                if (success) {
-                    this.showToast('✅ 文案已复制，快去分享吧！ 🎉');
-                } else {
-                    this.showToast('❌ 复制失败，请手动复制');
-                }
-            } catch (e) {
-                this.showToast('❌ 复制失败，请手动复制');
-            }
-            document.body.removeChild(textarea);
-        },
+        fallbackCopy(text, successMessage = '✅ 文案已复制，快去分享吧！ 🎉') {
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			textarea.style.position = 'fixed';
+			textarea.style.left = '-9999px';
+			textarea.style.top = '-9999px';
+			document.body.appendChild(textarea);
+			textarea.select();
+			textarea.setSelectionRange(0, text.length);
+			
+			try {
+				const success = document.execCommand('copy');
+				if (success) {
+					this.showToast(successMessage);
+					this.copied = true;
+					setTimeout(() => { this.copied = false; }, 2000);
+				} else {
+					this.showToast('❌ 复制失败，请手动复制');
+				}
+			} catch (e) {
+				this.showToast('❌ 复制失败，请手动复制');
+			}
+			document.body.removeChild(textarea);
+		},
         
         showToast(message) {
             const oldToast = document.querySelector('.share-toast');
@@ -197,20 +199,27 @@ function shareModal() {
         },
         
         async copyLink() {
-            try {
-                await navigator.clipboard.writeText(this.shareUrl);
-                this.copied = true;
-                setTimeout(() => { this.copied = false; }, 2000);
-            } catch(e) {
-                const input = document.querySelector('input[type="text"]');
-                if (input) {
-                    input.select();
-                    document.execCommand('copy');
-                    this.copied = true;
-                    setTimeout(() => { this.copied = false; }, 2000);
-                }
-            }
-        },
+			const url = this.shareUrl;
+			if (!url) {
+				this.showToast('❌ 分享链接还没生成，请稍候');
+				return;
+			}
+			
+			// 优先用 Clipboard API（HTTPS 环境）
+			if (navigator.clipboard && window.isSecureContext) {
+				try {
+					await navigator.clipboard.writeText(url);
+					this.copied = true;
+					setTimeout(() => { this.copied = false; }, 2000);
+					return;
+				} catch(e) {
+					console.log('Clipboard API 失败，降级到 execCommand');
+				}
+			}
+			
+			// 降级方案（HTTP 环境也能用）
+			this.fallbackCopy(url, '✅ 分享链接已复制！');
+		},
         
         generateImage() {
             this.imageGenerated = true;
