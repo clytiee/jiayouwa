@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 from .views import home_view, ranking_view, toggle_view_mode, search_view
 from core.admin import dashboard_view
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('contact/', include('contact.urls')),
     path('api/', include('recommendations.urls')),
+    path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
 ]
 
 if settings.DEBUG:

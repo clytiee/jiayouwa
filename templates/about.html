@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}关于我们 - 加油哇 🐸{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-8">
+    
+    <!-- 头部 -->
+    <div class="text-center mb-10">
+        <div class="text-6xl mb-4">🐸</div>
+        <h1 class="text-3xl font-bold text-gray-800">关于加油哇</h1>
+        <p class="text-gray-400 mt-2">学习路上，一起加油哇！</p>
+    </div>
+    
+    <!-- 我们是谁 -->
+    <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">🌟 我们是谁</h2>
+        <p class="text-gray-600 leading-relaxed">
+            加油哇是一个专注于 <strong>英语启蒙、国学经典、STEM 教育</strong> 的学习资源分享交流社区。
+            我们相信，好的学习资源不应该被埋没，每一位家长和老师都值得拥有一个高效发现优质资源的平台。
+        </p>
+        <p class="text-gray-600 leading-relaxed mt-3">
+            在这里，你可以像刷短视频一样轻松发现学习资源，也可以分享你珍藏的好资源，帮助更多家庭和孩子。
+        </p>
+    </div>
+    
+    <!-- 我们关注什么 -->
+    <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">📚 我们关注什么</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-50 rounded-xl p-5">
+                <div class="text-3xl mb-2">🔤</div>
+                <h3 class="font-bold text-gray-800 mb-2">英语启蒙</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    自然拼读、分级读物、原版教材、英语动画、儿歌童谣……帮助孩子在语言黄金期建立英语语感。
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-5">
+                <div class="text-3xl mb-2">📜</div>
+                <h3 class="font-bold text-gray-800 mb-2">国学经典</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    古诗词、三字经、千字文、经典蒙学……让孩子在传统文化中汲取智慧，涵养品格。
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-5">
+                <div class="text-3xl mb-2">🔬</div>
+                <h3 class="font-bold text-gray-800 mb-2">STEM 教育</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    科学实验、编程启蒙、数学思维、创意工程……培养孩子的探索精神和创新能力。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 我们有什么不同 -->
+    <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">✨ 我们有什么不同</h2>
+        <div class="space-y-4">
+            <div class="flex items-start space-x-3">
+                <span class="text-2xl flex-shrink-0">🤖</span>
+                <div>
+                    <h3 class="font-bold text-gray-800">AI 推荐，越用越懂你（后续开放）</h3>
+                    <p class="text-sm text-gray-600">告别繁琐的分类浏览，AI 根据你的兴趣自动推荐合适的学习资源。</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-3">
+                <span class="text-2xl flex-shrink-0">💰</span>
+                <div>
+                    <h3 class="font-bold text-gray-800">小油滴，激励分享</h3>
+                    <p class="text-sm text-gray-600">分享资源获得油滴，下载资源消耗油滴。让每一次分享都有回报。</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-3">
+                <span class="text-2xl flex-shrink-0">🐸</span>
+                <div>
+                    <h3 class="font-bold text-gray-800">温暖社区，共同成长</h3>
+                    <p class="text-sm text-gray-600">家长和老师在这里互相交流、彼此帮助，一起为孩子的成长加油。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 我们的承诺 -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl card-shadow p-6 sm:p-8 mb-6 border border-green-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">🤝 我们的承诺</h2>
+        <ul class="space-y-2 text-sm text-gray-600">
+            <li>✅ 我们只做资源的索引和推荐，不存储任何资源文件</li>
+            <li>✅ 我们尊重每一位用户的隐私，行为数据仅用于优化推荐</li>
+            <li>✅ 我们坚持免费与共享，用社区的力量让好资源流动起来</li>
+            <li>✅ 我们持续改进，让发现好资源变得更简单</li>
+        </ul>
+    </div>
+    
+    <!-- 联系我们 -->
+    <div class="text-center text-gray-400 text-sm">
+        <p>📧 有问题或建议？<a href="{% url 'contact:create' %}" class="text-green-600 hover:underline">联系我们</a></p>
+        <p class="mt-2">© 2026 加油哇 · 学习路上，一起加油哇！</p>
+    </div>
+    
+</div>
+{% endblock %}
