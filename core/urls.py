@@ -3,12 +3,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import home_view, ranking_view, toggle_view_mode, search_view
+from core.admin import dashboard_view
 
 urlpatterns = [
     path('', home_view, name='index'),
     path('ranking/', ranking_view, name='ranking'),
     path('toggle-mode/', toggle_view_mode, name='toggle_mode'),
     path('search/', search_view, name='search'),  # ← 添加搜索
+    path('admin/dashboard/', admin.site.admin_view(dashboard_view), name='admin_dashboard'),
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
     path('resource/', include('resources.urls')),

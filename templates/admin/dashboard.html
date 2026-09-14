@@ -1,0 +1,112 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main" style="padding: 20px;">
+    <h1 style="margin-bottom: 20px;">📊 数据概览</h1>
+    
+    <!-- 核心指标卡片 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #417690;">
+            <div style="font-size: 28px; font-weight: bold; color: #417690;">{{ total_users }}</div>
+            <div style="color: #666; font-size: 13px; margin-top: 4px;">总用户数</div>
+            {% if new_users_today > 0 %}
+            <div style="color: #28a745; font-size: 12px; margin-top: 4px;">今日 +{{ new_users_today }}</div>
+            {% endif %}
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #79aec8;">
+            <div style="font-size: 28px; font-weight: bold; color: #79aec8;">{{ active_users_7d }}</div>
+            <div style="color: #666; font-size: 13px; margin-top: 4px;">7日活跃</div>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #f5a623;">
+            <div style="font-size: 28px; font-weight: bold; color: #f5a623;">{{ total_resources }}</div>
+            <div style="color: #666; font-size: 13px; margin-top: 4px;">总资源数</div>
+            {% if new_resources_today > 0 %}
+            <div style="color: #28a745; font-size: 12px; margin-top: 4px;">今日 +{{ new_resources_today }}</div>
+            {% endif %}
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ba2121;">
+            <div style="font-size: 28px; font-weight: bold; color: #ba2121;">{{ total_downloads }}</div>
+            <div style="color: #666; font-size: 13px; margin-top: 4px;">总下载量</div>
+            {% if downloads_today > 0 %}
+            <div style="color: #28a745; font-size: 12px; margin-top: 4px;">今日 +{{ downloads_today }}</div>
+            {% endif %}
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #e91e63;">
+            <div style="font-size: 28px; font-weight: bold; color: #e91e63;">{{ total_collects }}</div>
+            <div style="color: #666; font-size: 13px; margin-top: 4px;">总收藏数</div>
+        </div>
+		<!-- 在总收藏数卡片后面插入 -->
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #9c27b0;">
+			<div style="font-size: 28px; font-weight: bold; color: #9c27b0;">{{ total_comments }}</div>
+			<div style="color: #666; font-size: 13px; margin-top: 4px;">总评论数</div>
+		</div>
+
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #00bcd4;">
+			<div style="font-size: 28px; font-weight: bold; color: #00bcd4;">{{ total_shares }}</div>
+			<div style="color: #666; font-size: 13px; margin-top: 4px;">总分享数</div>
+		</div>
+    </div>
+    
+    <!-- 热门资源 -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="background: #417690; padding: 12px 20px;">
+            <h2 style="font-size: 14px; margin: 0; color: white; font-weight: 500;">🔥 热门资源 Top 10</h2>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; color: #ccc;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+                    <th style="text-align: left; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500;">标题</th>
+                    <th style="text-align: right; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500; width: 100px;">下载</th>
+                    <th style="text-align: right; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500; width: 100px;">收藏</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in top_resources %}
+                <tr style="border-bottom: 1px solid #f5f5f5;">
+                    <td style="padding: 10px 20px; font-size: 13px;">{{ r.title }}</td>
+                    <td style="text-align: right; padding: 10px 20px; font-size: 13px;">{{ r.download_count }}</td>
+                    <td style="text-align: right; padding: 10px 20px; font-size: 13px;">{{ r.collect_count }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-size: 13px;">暂无数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 油滴排行 -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="background: #417690; padding: 12px 20px;">
+            <h2 style="font-size: 14px; margin: 0; color: white; font-weight: 500;">💰 油滴 Top 10</h2>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; color: #ccc;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+                    <th style="text-align: left; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500;">用户</th>
+                    <th style="text-align: right; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500; width: 100px;">油滴</th>
+                    <th style="text-align: right; padding: 10px 20px; font-size: 12px; color: #ccc; font-weight: 500; width: 100px;">等级</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in top_users %}
+                <tr style="border-bottom: 1px solid #f5f5f5;">
+                    <td style="padding: 10px 20px; font-size: 13px;">{{ u.first_name|default:u.username }}</td>
+                    <td style="text-align: right; padding: 10px 20px; font-size: 13px;">{{ u.oil_balance }}</td>
+                    <td style="text-align: right; padding: 10px 20px; font-size: 13px;">Lv.{{ u.level }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-size: 13px;">暂无数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

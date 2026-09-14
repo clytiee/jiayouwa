@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="/admin/dashboard/" 
+       style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #66BB6A, #388E3C); color: white; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        📊 查看数据概览
+    </a>
+</div>
+
+{{ block.super }}
+{% endblock %}
