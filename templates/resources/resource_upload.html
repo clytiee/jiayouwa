@@ -128,7 +128,25 @@
             <p class="text-red-500 text-xs mt-1">{{ form.description.errors.0 }}</p>
             {% endif %}
         </div>
-
+        {% if is_edit %}
+        <!-- 标签（仅编辑时显示） -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                🏷️ 标签（可选）
+            </label>
+            <input type="text" name="tags" id="id_tags"
+                value="{{ tags_str }}"
+                placeholder="输入标签，用逗号分隔，如：数学, 三年级, 思维训练"
+                class="input-field {% if form.tags.errors %}error{% endif %}"
+                maxlength="100">
+            <p class="text-xs text-gray-400 mt-1">
+                💡 多个标签用逗号分隔，最多 5 个
+            </p>
+            {% if form.tags.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.tags.errors.0 }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
         <!-- 预览图上传 -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-1.5">

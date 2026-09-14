@@ -73,12 +73,16 @@ def resource_upload(request):
             # ✅ 预设标签匹配（本地，零成本，即时生效）
             preset_tags = TagService.get_preset_tags(resource.title, resource.description)
             
-            # 如果有预设标签，先保存（用户马上能看到）
-            if preset_tags:
+            # ✅ 如果用户手动填了标签，优先用用户的
+            if resource.tags:
+                # 用户已填标签，不覆盖
+                pass
+            elif preset_tags:
+                # 用户没填，用预设标签
+                # 如果有预设标签，先保存（用户马上能看到）
                 resource.tags = preset_tags[:5]
-                resource.ai_tags_generated = False  # 标记AI还未生成
+                resource.ai_tags_generated = False
                 resource.save()
-                logger.info(f'[预设标签] 资源 {resource.id} 匹配到: {preset_tags[:5]}')
             
             # 🆕 异步调用 AI 补充标签（不阻塞响应）
             import threading
@@ -117,9 +121,17 @@ def resource_upload(request):
             messages.error(request, '发布失败，请检查表单中的错误。')
     else:
         form = ResourceUploadForm()
-    
+
+    # ✅ 格式化标签为逗号分隔字符串
+    tags_str = ''
+    if form.instance and form.instance.pk:
+        tags = form.instance.tags
+        if isinstance(tags, list) and tags:
+            tags_str = ', '.join(tags)    
+
     context = {
         'form': form,
+        'tags_str': tags_str,
         'max_price': settings.DEFAULT_SETTINGS.get('oil_price_max', 10),
         'min_price': settings.DEFAULT_SETTINGS.get('oil_price_min', 0),
     }
@@ -204,9 +216,17 @@ def resource_edit(request, resource_id):
         # GET 请求：正常显示编辑页面
         form = ResourceUploadForm(instance=resource)
         existing_images = json.dumps(resource.cover_images or [])
-    
+
+    # ✅ 格式化标签为逗号分隔字符串
+    tags_str = ''
+    if form.instance and form.instance.pk:
+        tags = form.instance.tags
+        if isinstance(tags, list) and tags:
+            tags_str = ', '.join(tags)
+
     context = {
         'form': form,
+        'tags_str': tags_str,
         'resource': resource,
         'is_edit': True,
         'existing_images': existing_images,

@@ -3,13 +3,39 @@ from django.conf import settings
 from .models import Resource
 import re
 
+class TagsInput(forms.TextInput):
+    """自定义 tags 输入框，把 list 转成逗号分隔字符串"""
+    
+    def format_value(self, value):
+        """把各种形式的值转为干净的逗号分隔字符串"""
+        if value is None:
+            return ''
+        
+        # list：直接 join
+        if isinstance(value, list):
+            return ', '.join(value) if value else ''
+        
+        # 字符串：清理引号、方括号
+        if isinstance(value, str):
+            v = value.strip()
+            # 去掉首尾引号
+            v = v.strip('"').strip("'")
+            # 去掉方括号
+            v = v.strip('[').strip(']')
+            if not v:
+                return ''
+            # 分割后逐项清理
+            items = [item.strip().strip('"').strip("'") for item in v.split(',')]
+            return ', '.join([i for i in items if i])
+        
+        return ''
 
 class ResourceUploadForm(forms.ModelForm):
     """资源发布表单"""
     
     class Meta:
         model = Resource
-        fields = ['title', 'description', 'download_url', 'extract_code', 'price']
+        fields = ['title', 'description', 'download_url', 'extract_code', 'price', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'input-field',
@@ -35,6 +61,11 @@ class ResourceUploadForm(forms.ModelForm):
                 'max': 10,
                 'placeholder': '0-10油滴'
             }),
+            'tags': TagsInput(attrs={
+                'class': 'input-field',
+                'placeholder': '输入标签，用逗号分隔，如：数学, 三年级, 思维训练',
+                'id': 'id_tags',
+            }),
         }
     
     def __init__(self, *args, **kwargs):
@@ -46,6 +77,34 @@ class ResourceUploadForm(forms.ModelForm):
          # 🆕 价格字段不必填（由视图层控制）
         self.fields['price'].required = False
         self.fields['extract_code'].required = False   
+        # ✅ tags 字段：可选，用逗号分隔的字符串
+        self.fields['tags'].required = False
+        self.fields['tags'].label = '标签'
+        self.fields['tags'].help_text = '用逗号分隔，如：数学, 三年级, 思维训练'
+        
+        # 编辑时，把 list 转成逗号分隔的字符串
+        if self.instance and self.instance.pk:
+            instance_tags = self.instance.tags
+            # 处理各种可能的值
+            if isinstance(instance_tags, list) and instance_tags:
+                self.initial['tags'] = ', '.join(instance_tags)
+            else:
+                self.initial['tags'] = ''
+        else:
+            self.initial['tags'] = ''
+
+        # ✅ 把 tags 字段改为普通文本输入，避免 JSON 校验
+        self.fields['tags'] = forms.CharField(
+            required=False,
+            label='标签',
+            help_text='用逗号分隔，如：数学, 三年级, 思维训练',
+            widget=forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': '输入标签，用逗号分隔，如：数学, 三年级, 思维训练',
+                'id': 'id_tags',
+                'maxlength': '100',
+            })
+        )
 
     def clean_download_url(self):
         """验证下载链接格式，并自动提取提取码"""
@@ -113,6 +172,29 @@ class ResourceUploadForm(forms.ModelForm):
             raise forms.ValidationError(f'价格必须在 {min_price} 到 {max_price} 油滴之间')
         return price
     
+    def clean_tags(self):
+        """把逗号分隔的字符串转为 list"""
+        tags = self.cleaned_data.get('tags')
+        
+        # 如果是 list，直接返回
+        if isinstance(tags, list):
+            return tags
+        
+        # 如果是字符串
+        if isinstance(tags, str):
+            tags = tags.strip()
+            # 空字符串返回空列表
+            if not tags:
+                return []
+            # 去掉可能的引号
+            tags = tags.strip('"').strip("'")
+            tags = tags.replace('，', ',')
+            tag_list = [t.strip() for t in tags.split(',') if t.strip()]
+            return tag_list[:5]
+        
+        # 其他情况返回空列表
+        return []
+
     def clean(self):
         """全局校验：收费资源必须有提取码"""
         cleaned_data = super().clean()
