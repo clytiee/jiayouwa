@@ -427,6 +427,35 @@ def resource_detail(request, resource_id):
     
     return render(request, 'resources/resource_detail.html', context)
 
+@login_required
+@require_POST
+def update_tags(request, resource_id):
+    """单独更新资源标签（仅上传者本人）"""
+    resource = get_object_or_404(Resource, id=resource_id, uploader=request.user)
+    
+    try:
+        data = json.loads(request.body)
+        tags = data.get('tags', [])
+        
+        # 校验
+        if not isinstance(tags, list):
+            return JsonResponse({'success': False, 'error': '标签格式错误'})
+        
+        # 清理：去空格、去空值、去重、最多5个
+        cleaned = []
+        for tag in tags:
+            t = str(tag).strip()
+            if t and t not in cleaned:
+                cleaned.append(t)
+        cleaned = cleaned[:5]
+        
+        resource.tags = cleaned
+        resource.save()
+        
+        return JsonResponse({'success': True, 'tags': cleaned})
+    except Exception as e:
+        logger.error(f'[更新标签] 失败: {e}')
+        return JsonResponse({'success': False, 'error': str(e)})
 
 # ========== 下载处理 ==========
 
