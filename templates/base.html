@@ -251,6 +251,7 @@
     mobileMenu: false, 
     notificationOpen: false, 
     userMenuOpen: false,
+	searchFocused: false,
     showExtractCode: false,
     hasExtractCode: false,
     shareText: ''
@@ -272,6 +273,8 @@
                 <div class="flex-1 max-w-md mx-2 sm:mx-4">
 					<form action="/search/" method="GET" class="relative">
 						<input type="text" name="q" placeholder="搜索资源..." 
+							@focus="searchFocused = true"
+							@blur="searchFocused = false"
 							class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full bg-gray-50 focus:bg-white focus:border-green-400 focus:outline-none transition-all text-sm">
 						<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
 					</form>
@@ -284,6 +287,7 @@
                         <!-- 🆕 排行榜（消息中心左边） -->
 						<a href="{% url 'ranking' %}" 
 							onclick="playRankingEffect(event)"
+							:class="{ 'hidden sm:inline': searchFocused }"
 							class="text-gray-500 hover:text-green-600 transition text-sm font-medium">
 							🏆<span class="hidden sm:inline"> 排行榜</span>
 						</a>
@@ -296,7 +300,7 @@
 						{% endif %}
 						
 						<!-- 消息通知 -->
-						<div x-data="{ open: false }" class="relative">
+						<div x-data="{ open: false }" :class="{ 'hidden sm:block': searchFocused }" class="relative">
 							<button @click="open = !open" 
 									@click.away="open = false"
 									class="relative p-2 rounded-full hover:bg-gray-100 transition">
