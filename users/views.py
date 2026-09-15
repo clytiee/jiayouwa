@@ -281,8 +281,6 @@ def login_view(request):
                     request=request
                 )
                 
-                OilService.daily_login_bonus(user)
-                
                 if not remember:
                     request.session.set_expiry(0)
                 
