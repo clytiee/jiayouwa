@@ -137,15 +137,36 @@ def search_view(request):
         search_performed = True
         
         if match_type == 'exact':
-            # 🎯 精确匹配：标题包含所有关键词（无关顺序）
+            # 🎯 精确匹配：标题、标签、作者都匹配所有关键词（无关顺序）
             keywords = query.split()
-            q_filter = Q(status='published')
-            for kw in keywords:
-                q_filter &= Q(title__icontains=kw)
             
+            # 标题匹配
+            title_q = Q()
+            for kw in keywords:
+                title_q &= Q(title__icontains=kw)
+            
+            # 标签匹配（JSONField，用 Python 过滤）
+            all_published = Resource.objects.filter(status='published').only('id', 'tags', 'title', 'uploader_id')
+            tag_matched_ids = []
+            for r in all_published:
+                if r.tags:
+                    tags_str = ' '.join(str(tag) for tag in r.tags).lower()
+                    if all(kw.lower() in tags_str for kw in keywords):
+                        tag_matched_ids.append(r.id)
+            
+            # 作者匹配
+            uploader_q = Q()
+            for kw in keywords:
+                uploader_q &= Q(uploader__username__icontains=kw) | Q(uploader__first_name__icontains=kw)
+            
+            # 合并三种匹配
             keyword_results = Resource.objects.filter(
-                q_filter
-            ).select_related('uploader').order_by('-created_at')
+                Q(status='published') & (
+                    title_q |
+                    Q(id__in=tag_matched_ids) |
+                    uploader_q
+                )
+            ).select_related('uploader').order_by('-created_at').distinct()
             
             final_resources = list(keyword_results)
             result_count = len(final_resources)
