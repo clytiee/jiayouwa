@@ -3,7 +3,8 @@ from django.urls import path  # ← 添加这行
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils.html import format_html
-from .models import Resource, Collect, Download, Comment, CommentVote
+from .models import Resource, Collect, Download, Comment, CommentVote, Sticker, StickerPack
+from .sticker_service import clear_sticker_cache
 from .vector_search import VectorSearch
 
 @admin.register(Resource)
@@ -126,3 +127,78 @@ class CommentAdmin(admin.ModelAdmin):
 class CommentVoteAdmin(admin.ModelAdmin):
     list_display = ['user', 'comment', 'vote_type', 'created_at']
     list_filter = ['vote_type', 'created_at']
+
+
+# ===== 评论表情包 =====
+
+class StickerInline(admin.TabularInline):
+    model = Sticker
+    extra = 3
+    fields = ['name', 'image', 'image_preview', 'sort_order', 'is_active']
+    readonly_fields = ['image_preview']
+
+    def image_preview(self, obj):
+        if obj.pk and obj.image:
+            return format_html('<img src="{}" style="height:48px;object-fit:contain;">', obj.image.url)
+        return '—'
+    image_preview.short_description = '预览'
+
+
+@admin.register(StickerPack)
+class StickerPackAdmin(admin.ModelAdmin):
+    list_display = ['id', 'icon', 'name', 'sort_order', 'is_active', 'sticker_count', 'created_at']
+    list_editable = ['sort_order', 'is_active']
+    search_fields = ['name']
+    inlines = [StickerInline]
+
+    def sticker_count(self, obj):
+        return obj.stickers.count()
+    sticker_count.short_description = '表情数量'
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        clear_sticker_cache()
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        clear_sticker_cache()
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+        clear_sticker_cache()
+
+
+@admin.register(Sticker)
+class StickerAdmin(admin.ModelAdmin):
+    list_display = ['id', 'preview', 'name', 'pack', 'token_display', 'sort_order', 'is_active', 'created_at']
+    list_filter = ['pack', 'is_active']
+    list_editable = ['sort_order', 'is_active']
+    search_fields = ['name', 'pack__name']
+    readonly_fields = ['preview', 'token_display']
+    fields = ['pack', 'name', 'image', 'preview', 'sort_order', 'is_active', 'uploader']
+
+    def preview(self, obj):
+        if obj.pk and obj.image:
+            return format_html('<img src="{}" style="height:56px;object-fit:contain;">', obj.image.url)
+        return '—'
+    preview.short_description = '预览'
+
+    def token_display(self, obj):
+        if not obj.pk:
+            return '保存后生成'
+        return format_html('<code>{}</code>', obj.token)
+    token_display.short_description = '评论标记'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.uploader_id:
+            obj.uploader = request.user
+        super().save_model(request, obj, form, change)
+        clear_sticker_cache()
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        clear_sticker_cache()
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+        clear_sticker_cache()

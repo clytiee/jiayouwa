@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -203,6 +206,62 @@ class CommentVote(models.Model):
     
     def __str__(self):
         return f"{self.user.username} {self.vote_type} 了评论 {self.comment.id}"
+
+
+def sticker_image_path(instance, filename):
+    """表情包图片存储路径：media/stickers/<pack_id>/<uuid>.<ext>"""
+    ext = os.path.splitext(filename)[1].lower() or '.png'
+    pack_id = instance.pack_id or 0
+    return f'stickers/{pack_id}/{uuid.uuid4().hex}{ext}'
+
+
+class StickerPack(models.Model):
+    """表情包分组（自定义表情）"""
+
+    name = models.CharField(max_length=50, unique=True, verbose_name='分组名称')
+    icon = models.CharField(max_length=10, default='🐸', verbose_name='分组图标',
+                            help_text='显示在选择器标签上的字符，如 😀 / 🐸')
+    sort_order = models.IntegerField(default=0, verbose_name='排序', help_text='数字越小越靠前')
+    is_active = models.BooleanField(default=True, verbose_name='启用')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        db_table = 'resources_stickerpack'
+        ordering = ['sort_order', 'id']
+        verbose_name = '表情包分组'
+        verbose_name_plural = '表情包分组'
+
+    def __str__(self):
+        return f"{self.icon} {self.name}"
+
+
+class Sticker(models.Model):
+    """自定义表情包"""
+
+    pack = models.ForeignKey(StickerPack, on_delete=models.CASCADE,
+                             related_name='stickers', verbose_name='分组')
+    name = models.CharField(max_length=50, verbose_name='表情名称')
+    image = models.ImageField(upload_to=sticker_image_path, verbose_name='表情图片')
+    sort_order = models.IntegerField(default=0, verbose_name='排序', help_text='数字越小越靠前')
+    is_active = models.BooleanField(default=True, verbose_name='启用')
+    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                 on_delete=models.SET_NULL, verbose_name='上传者')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        db_table = 'resources_sticker'
+        ordering = ['sort_order', 'id']
+        verbose_name = '自定义表情包'
+        verbose_name_plural = '自定义表情包'
+
+    def __str__(self):
+        return f"{self.pack.name} - {self.name}"
+
+    @property
+    def token(self):
+        """评论内容中使用的占位标记"""
+        return f'[sticker:{self.id}]'
+
 
 from django.db import models
 from django.utils import timezone

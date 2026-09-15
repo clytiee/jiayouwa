@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load comment_extras %}
 
 {% block title %}{{ resource.title }} - 加油哇 🐸{% endblock %}
 
@@ -74,6 +75,177 @@
 		animation: highlightFlash 1.5s ease-out 3;
 		border: 2px solid #f59e0b;
 		border-radius: 12px;
+	}
+
+	/* ===== 评论表情包选择器 ===== */
+	.comment-tool-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px 10px;
+		font-size: 13px;
+		color: #4b5563;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: all .15s;
+	}
+	.comment-tool-btn:hover {
+		background: #f0fdf4;
+		border-color: #86efac;
+		color: #15803d;
+	}
+	.comment-tool-btn.active {
+		background: #dcfce7;
+		border-color: #4ade80;
+		color: #15803d;
+	}
+	.picker-panel {
+		margin-top: 8px;
+		background: #fff;
+		border: 1px solid #e5e7eb;
+		border-radius: 14px;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, .07);
+		padding: 8px;
+	}
+	.picker-tabs {
+		display: flex;
+		gap: 4px;
+		overflow-x: auto;
+		padding-bottom: 6px;
+		border-bottom: 1px solid #f3f4f6;
+		scrollbar-width: thin;
+	}
+	.picker-tab {
+		flex: 0 0 auto;
+		padding: 2px 8px;
+		font-size: 16px;
+		line-height: 1.6;
+		background: transparent;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		opacity: .6;
+		transition: all .15s;
+	}
+	.picker-tab:hover { background: #f3f4f6; opacity: 1; }
+	.picker-tab.active { background: #dcfce7; opacity: 1; }
+	.picker-body {
+		max-height: 210px;
+		overflow-y: auto;
+		padding-top: 6px;
+		/* 始终预留滚动条宽度：否则滚动条出现/消失会改变网格可用宽度，
+		   导致最后一个 emoji 换行、内容高度再变化，形成抖动 */
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overscroll-behavior: contain;
+	}
+	.picker-body::-webkit-scrollbar { width: 8px; }
+	.picker-body::-webkit-scrollbar-track { background: transparent; }
+	.picker-body::-webkit-scrollbar-thumb {
+		background: #d1d5db;
+		border-radius: 4px;
+	}
+	.picker-body::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+	/* 老浏览器不支持 scrollbar-gutter 时，用常显滚动条兜底（滚动条宽度恒定即不会抖动） */
+	@supports not (scrollbar-gutter: stable) {
+		.picker-body { overflow-y: scroll; }
+	}
+	.emoji-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+		gap: 2px;
+		/* 用内边距吸收 hover 缩放（transform）产生的溢出，避免撑出滚动区域 */
+		padding: 4px 2px 8px;
+	}
+	.emoji-item {
+		font-size: 20px;
+		line-height: 1;
+		padding: 5px 0;
+		background: transparent;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: transform .12s, background .12s;
+	}
+	.emoji-item:hover { background: #f3f4f6; transform: scale(1.18); }
+	.sticker-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+		gap: 6px;
+		padding: 4px 2px 8px;
+	}
+	.sticker-item {
+		padding: 3px;
+		background: #fff;
+		border: 1px solid #f3f4f6;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: all .15s;
+	}
+	.sticker-item:hover {
+		border-color: #86efac;
+		background: #f0fdf4;
+		transform: translateY(-2px);
+	}
+	.sticker-item img {
+		width: 100%;
+		height: 58px;
+		object-fit: contain;
+		display: block;
+	}
+	.picker-empty {
+		padding: 22px 12px;
+		text-align: center;
+		font-size: 13px;
+		color: #9ca3af;
+		line-height: 1.9;
+	}
+	/* 已选表情 chips */
+	.sticker-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 8px;
+	}
+	.sticker-chip {
+		position: relative;
+		width: 54px;
+		height: 54px;
+		padding: 2px;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 10px;
+	}
+	.sticker-chip img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.sticker-chip .chip-remove {
+		position: absolute;
+		top: -6px;
+		right: -6px;
+		width: 18px;
+		height: 18px;
+		line-height: 16px;
+		font-size: 12px;
+		color: #fff;
+		background: #ef4444;
+		border: none;
+		border-radius: 50%;
+		cursor: pointer;
+	}
+	/* 评论里渲染出来的表情图片 */
+	.comment-content { line-height: 1.7; word-break: break-word; }
+	.comment-sticker {
+		display: inline-block;
+		height: 72px;
+		max-width: 160px;
+		vertical-align: middle;
+		margin: 2px 3px;
+		border-radius: 8px;
 	}
 </style>
 {% endblock %}
@@ -435,6 +607,8 @@
     </div>
     
     <!-- ===== 评论区 ===== -->
+    {{ emoji_categories|json_script:"jyw-emoji-data" }}
+    {{ sticker_packs|json_script:"jyw-sticker-data" }}
     <div class="mt-6 bg-white rounded-2xl card-shadow p-6">
         <h3 class="text-lg font-bold text-gray-800 mb-4">
 			💬 评论（<span class="comment-count">{{ comment_count }}</span>）
@@ -447,12 +621,42 @@
 				{% csrf_token %}
 				<input type="hidden" name="parent_id" id="parent_id" value="">
 				<textarea name="content" id="comment-content" rows="3" 
-						  placeholder="写下你的想法...（支持顶/踩，优质评论会获得油滴奖励）"
-						  class="input-field" required></textarea>
-				<button type="submit" id="comment-submit" class="btn-primary mt-2 px-6 py-2 text-sm">
-					📤 发布评论
-				</button>
-				<span id="comment-loading" class="text-sm text-gray-400 ml-3 hidden">⏳ 发布中...</span>
+						  placeholder="写下你的想法...（支持 emoji、表情包，优质评论会获得油滴奖励）"
+						  class="input-field"></textarea>
+
+				<!-- 工具栏 -->
+				<div class="flex items-center gap-2 mt-2 flex-wrap">
+					<button type="button" id="emoji-toggle" class="comment-tool-btn" title="插入 emoji 表情">
+						😀 表情
+					</button>
+					<button type="button" id="sticker-toggle" class="comment-tool-btn" title="插入自定义表情包">
+						🐸 表情包
+					</button>
+					<button type="submit" id="comment-submit" class="btn-primary px-6 py-2 text-sm">
+						📤 发布评论
+					</button>
+					<span id="comment-loading" class="text-sm text-gray-400 ml-3 hidden">⏳ 发布中...</span>
+					<span class="text-xs text-gray-400 ml-auto hidden sm:inline">Ctrl + Enter 快速发布</span>
+				</div>
+
+				<!-- 已选表情包预览 -->
+				<div id="sticker-chips" class="sticker-chips hidden"></div>
+
+				<!-- emoji 面板 -->
+				<div id="emoji-panel" class="picker-panel hidden">
+					<div class="picker-tabs" id="emoji-tabs"></div>
+					<div class="picker-body">
+						<div class="emoji-grid" id="emoji-grid"></div>
+					</div>
+				</div>
+
+				<!-- 自定义表情包面板 -->
+				<div id="sticker-panel" class="picker-panel hidden">
+					<div class="picker-tabs" id="sticker-tabs"></div>
+					<div class="picker-body">
+						<div class="sticker-grid" id="sticker-grid"></div>
+					</div>
+				</div>
 			</form>
 		</div>
 		{% else %}
@@ -476,7 +680,7 @@
                             <span class="text-xs text-gray-400">🐸 Lv.{{ comment.user.level }}</span>
                             <span class="text-xs text-gray-400">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
                         </div>
-                        <p class="text-gray-700 text-sm mt-1">{{ comment.content }}</p>
+                        <div class="comment-content text-gray-700 text-sm mt-1">{{ comment.content|render_comment }}</div>
                         <!-- 评论操作 -->
                         <div class="flex items-center space-x-4 mt-2 text-xs">
                             <button onclick="window.voteComment({{ comment.id }}, 'up')" 
@@ -1149,9 +1353,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitBtn = document.getElementById('comment-submit');
         const loading = document.getElementById('comment-loading');
         const parentId = document.getElementById('parent_id');
-        
-        if (!content.value.trim()) {
-            alert('请输入评论内容');
+        const pending = window.CommentStickers || { items: [] };
+
+        if (!content.value.trim() && pending.items.length === 0) {
+            alert('请输入评论内容或选择一个表情包');
             return;
         }
         
@@ -1164,6 +1369,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (parentId.value) {
             formData.append('parent_id', parentId.value);
         }
+        // 已选的自定义表情包
+        pending.items.forEach(item => formData.append('stickers', item.token));
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
         
         fetch(window.location.pathname + 'comment/', {
@@ -1191,6 +1398,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			
 			// 3. 清空输入框
 			content.value = '';
+			window.CommentStickers && window.CommentStickers.clear();
 			
 			// 4. 显示成功提示
 			const successMsg = document.createElement('div');
@@ -1242,7 +1450,7 @@ function createCommentHTML(comment) {
                         <span class="text-xs text-gray-400">🐸 Lv.${comment.level}</span>
                         <span class="text-xs text-gray-400">${time}</span>
                     </div>
-                    <p class="text-gray-700 text-sm mt-1">${comment.content}</p>
+                    <div class="comment-content text-gray-700 text-sm mt-1">${comment.content_html || ''}</div>
                     <div class="flex items-center space-x-4 mt-2 text-xs">
                         <button onclick="window.voteComment(${comment.id}, 'up', event)" class="vote-btn text-gray-400 hover:text-green-500 flex items-center space-x-1">
                             👍 <span class="comment-up-${comment.id}">0</span>
@@ -1267,6 +1475,290 @@ window.addEventListener('beforeunload', function() {
         extra_data: {stay_duration: duration}
     })], {type: 'application/json'}));
 });
+
+// ===== 评论表情包：emoji + 自定义表情 =====
+(function () {
+    const emojiDataEl = document.getElementById('jyw-emoji-data');
+    const stickerDataEl = document.getElementById('jyw-sticker-data');
+    const textarea = document.getElementById('comment-content');
+    const form = document.getElementById('comment-form');
+    const emojiToggle = document.getElementById('emoji-toggle');
+    const stickerToggle = document.getElementById('sticker-toggle');
+    const emojiPanel = document.getElementById('emoji-panel');
+    const stickerPanel = document.getElementById('sticker-panel');
+    const emojiTabs = document.getElementById('emoji-tabs');
+    const emojiGrid = document.getElementById('emoji-grid');
+    const stickerTabs = document.getElementById('sticker-tabs');
+    const stickerGrid = document.getElementById('sticker-grid');
+    const chipsBox = document.getElementById('sticker-chips');
+
+    if (!textarea || !form || !emojiToggle || !stickerToggle) return;
+
+    const RECENT_KEY = 'jyw_recent_emojis';
+    const RECENT_MAX = 24;
+    const MAX_STICKERS = 9;
+
+    const parse = (el, fallback) => {
+        if (!el) return fallback;
+        try { return JSON.parse(el.textContent) || fallback; } catch (e) { return fallback; }
+    };
+
+    let categories = parse(emojiDataEl, []);
+    let packs = parse(stickerDataEl, []);
+    let stickersFetched = false;
+
+    let currentCat = null;
+    let currentPack = null;
+    const selected = [];   // { id, name, url, token }
+
+    /* ---------- 工具 ---------- */
+    function readRecent() {
+        try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; }
+    }
+
+    function pushRecent(emoji) {
+        let list = readRecent().filter(e => e !== emoji);
+        list.unshift(emoji);
+        list = list.slice(0, RECENT_MAX);
+        try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    function insertAtCursor(text) {
+        const start = textarea.selectionStart === null ? textarea.value.length : textarea.selectionStart;
+        const end = textarea.selectionEnd === null ? start : textarea.selectionEnd;
+        textarea.value = textarea.value.slice(0, start) + text + textarea.value.slice(end);
+        const pos = start + text.length;
+        textarea.selectionStart = textarea.selectionEnd = pos;
+        textarea.focus();
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function closePanels(except) {
+        if (except !== 'emoji') { emojiPanel.classList.add('hidden'); emojiToggle.classList.remove('active'); }
+        if (except !== 'sticker') { stickerPanel.classList.add('hidden'); stickerToggle.classList.remove('active'); }
+    }
+
+    /* ---------- emoji 面板 ---------- */
+    function catList() {
+        const recent = readRecent();
+        return recent.length
+            ? [{ key: '__recent', name: '最近使用', icon: '🕘', emojis: recent }].concat(categories)
+            : categories.slice();
+    }
+
+    function renderEmojiTabs() {
+        const list = catList();
+        if (!list.length) return;
+        if (!currentCat || !list.some(c => c.key === currentCat)) {
+            currentCat = list[0].key;
+        }
+        emojiTabs.innerHTML = '';
+        list.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'picker-tab' + (cat.key === currentCat ? ' active' : '');
+            btn.textContent = cat.icon;
+            btn.title = cat.name;
+            btn.addEventListener('click', (e) => {
+                // 切换分类时不要关闭浮层（按钮会被重绘，需阻止冒泡到 document）
+                e.stopPropagation();
+                currentCat = cat.key;
+                renderEmojiTabs();
+                renderEmojiGrid();
+            });
+            emojiTabs.appendChild(btn);
+        });
+    }
+
+    function renderEmojiGrid() {
+        const cat = catList().find(c => c.key === currentCat);
+        emojiGrid.innerHTML = '';
+        if (!cat || !cat.emojis.length) {
+            const empty = document.createElement('div');
+            empty.className = 'picker-empty';
+            empty.textContent = '还没有使用记录，点点上面的表情试试～';
+            emojiGrid.appendChild(empty);
+            return;
+        }
+        cat.emojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'emoji-item';
+            btn.textContent = emoji;
+            btn.title = emoji;
+            btn.addEventListener('click', () => {
+                insertAtCursor(emoji);
+                pushRecent(emoji);
+            });
+            emojiGrid.appendChild(btn);
+        });
+    }
+
+    /* ---------- 自定义表情包面板 ---------- */
+    function renderStickerTabs() {
+        stickerTabs.innerHTML = '';
+        if (!packs.length) return;
+        if (!currentPack || !packs.some(p => p.id === currentPack)) {
+            currentPack = packs[0].id;
+        }
+        packs.forEach(pack => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'picker-tab' + (pack.id === currentPack ? ' active' : '');
+            btn.textContent = pack.icon || '🐸';
+            btn.title = pack.name;
+            btn.addEventListener('click', (e) => {
+                // 切换分组时不要关闭浮层（按钮会被重绘，需阻止冒泡到 document）
+                e.stopPropagation();
+                currentPack = pack.id;
+                renderStickerTabs();
+                renderStickerGrid();
+            });
+            stickerTabs.appendChild(btn);
+        });
+    }
+
+    function renderStickerGrid() {
+        const pack = packs.find(p => p.id === currentPack);
+        stickerGrid.innerHTML = '';
+        if (!pack) {
+            const empty = document.createElement('div');
+            empty.className = 'picker-empty';
+            empty.innerHTML = '还没有自定义表情包 🐸<br>管理员可在后台「资源 → 表情包分组」中上传添加';
+            stickerGrid.appendChild(empty);
+            return;
+        }
+        pack.stickers.forEach(sticker => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'sticker-item';
+            btn.title = sticker.name;
+            const img = document.createElement('img');
+            img.src = sticker.url;
+            img.alt = sticker.name;
+            img.loading = 'lazy';
+            btn.appendChild(img);
+            btn.addEventListener('click', () => addSticker(sticker));
+            stickerGrid.appendChild(btn);
+        });
+    }
+
+    function renderChips() {
+        chipsBox.innerHTML = '';
+        if (!selected.length) {
+            chipsBox.classList.add('hidden');
+            return;
+        }
+        chipsBox.classList.remove('hidden');
+        selected.forEach((item, index) => {
+            const chip = document.createElement('div');
+            chip.className = 'sticker-chip';
+            chip.title = item.name;
+            const img = document.createElement('img');
+            img.src = item.url;
+            img.alt = item.name;
+            chip.appendChild(img);
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'chip-remove';
+            remove.textContent = '×';
+            remove.title = '移除';
+            remove.addEventListener('click', () => {
+                selected.splice(index, 1);
+                renderChips();
+            });
+            chip.appendChild(remove);
+            chipsBox.appendChild(chip);
+        });
+    }
+
+    function addSticker(sticker) {
+        if (selected.length >= MAX_STICKERS) {
+            alert('一条评论最多添加 ' + MAX_STICKERS + ' 个表情包');
+            return;
+        }
+        selected.push(sticker);
+        renderChips();
+    }
+
+    /* ---------- 懒加载表情包（后台新增后可获取到最新数据） ---------- */
+    function hasStickers() {
+        return packs.some(p => p.stickers && p.stickers.length);
+    }
+
+    function ensureStickers() {
+        if (hasStickers() || stickersFetched) return;
+        stickersFetched = true;
+        fetch('{% url "resources:sticker_list" %}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.packs) && data.packs.length) {
+                    packs = data.packs;
+                    currentPack = null;
+                    renderStickerTabs();
+                    renderStickerGrid();
+                }
+            })
+            .catch(() => {})
+            .finally(() => { stickersFetched = false; });
+    }
+
+    /* ---------- 事件绑定 ---------- */
+    emojiToggle.addEventListener('click', () => {
+        const isHidden = emojiPanel.classList.contains('hidden');
+        closePanels('emoji');
+        emojiPanel.classList.toggle('hidden', !isHidden);
+        emojiToggle.classList.toggle('active', isHidden);
+        if (isHidden) {
+            renderEmojiTabs();
+            renderEmojiGrid();
+        }
+    });
+
+    stickerToggle.addEventListener('click', () => {
+        const isHidden = stickerPanel.classList.contains('hidden');
+        closePanels('sticker');
+        stickerPanel.classList.toggle('hidden', !isHidden);
+        stickerToggle.classList.toggle('active', isHidden);
+        if (isHidden) {
+            ensureStickers();
+            renderStickerTabs();
+            renderStickerGrid();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        // 目标已被重绘移除（如点击分类 tab / 删除已选表情）时不要关闭浮层
+        if (!target || !document.contains(target)) return;
+        if (emojiPanel.contains(target) || stickerPanel.contains(target)) return;
+        if (emojiToggle.contains(target) || stickerToggle.contains(target)) return;
+        if (chipsBox.contains(target)) return;
+        closePanels();
+    });
+
+    textarea.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        }
+        if (e.key === 'Escape') closePanels();
+    });
+
+    // 供评论提交逻辑使用
+    window.CommentStickers = {
+        items: selected,
+        clear() {
+            selected.length = 0;
+            renderChips();
+        }
+    };
+})();
 </script>
 
 

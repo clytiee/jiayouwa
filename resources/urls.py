@@ -23,6 +23,9 @@ urlpatterns = [
     path('<int:resource_id>/report-invalid/', views.report_invalid, name='report_invalid'),
     path('comment/<int:comment_id>/vote/', views.vote_comment, name='vote_comment'),
     path('<int:resource_id>/update-tags/', views.update_tags, name='update_tags'),
+
+    # 评论表情包
+    path('stickers/', views.sticker_list, name='sticker_list'),
     
     # 用户关注
     path('user/<int:user_id>/follow/', views.toggle_follow, name='toggle_follow'),

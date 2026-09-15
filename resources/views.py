@@ -12,6 +12,7 @@ from datetime import date
 import json
 import base64
 import logging
+import re
 import markdown
 import bleach
 from PIL import Image
@@ -19,6 +20,15 @@ from io import BytesIO
 
 from .forms import ResourceUploadForm
 from .models import Resource, Collect, Download, Comment, CommentVote
+from .emoji_data import EMOJI_CATEGORIES
+from .sticker_service import (
+    MAX_STICKERS_PER_COMMENT,
+    STICKER_TOKEN_RE,
+    extract_sticker_ids,
+    plain_content,
+    render_comment_html,
+    serialize_sticker_packs,
+)
 from transactions.services import OilService
 from users.models import User, Follow
 from recommendations.models import BrowseHistory
@@ -423,6 +433,9 @@ def resource_detail(request, resource_id):
         'has_extract_code': has_extract_code,
         'free_downloads_left': user.free_downloads_left if user.is_authenticated else 0,
         'description_html': description_html,
+        # 评论表情包：emoji 分类 + 自定义表情包
+        'emoji_categories': EMOJI_CATEGORIES,
+        'sticker_packs': serialize_sticker_packs(),
     }
     
     return render(request, 'resources/resource_detail.html', context)
@@ -781,21 +794,39 @@ def rate_resource(request, resource_id):
 @login_required
 @require_POST
 def add_comment(request, resource_id):
-    """添加评论（AJAX）"""
+    """添加评论（AJAX，支持 emoji 与自定义表情包）"""
     resource = get_object_or_404(Resource, id=resource_id)
     content = request.POST.get('content', '').strip()
     parent_id = request.POST.get('parent_id')
-    
-    if not content:
+    # 表情包 token 可以单独提交（前端以 chips 形式收集）
+    stickers = request.POST.getlist('stickers')
+
+    if stickers:
+        tokens = []
+        for raw in stickers:
+            match = re.fullmatch(r'\[sticker:(\d+)\]', str(raw).strip()) or re.fullmatch(r'(\d+)', str(raw).strip())
+            if match:
+                tokens.append(f'[sticker:{match.group(1)}]')
+        if tokens:
+            # 表情追加在文字之后，允许重复发送同一个表情
+            content = (content + '\n' + ''.join(tokens)).strip() if content else ''.join(tokens)
+
+    sticker_ids = extract_sticker_ids(content)
+    sticker_count = len(STICKER_TOKEN_RE.findall(content))
+
+    if not content and not sticker_ids:
         return JsonResponse({'success': False, 'error': '评论内容不能为空'})
-    
+
     if len(content) > 1000:
         return JsonResponse({'success': False, 'error': '评论内容不能超过1000字'})
-    
+
+    if sticker_count > MAX_STICKERS_PER_COMMENT:
+        return JsonResponse({'success': False, 'error': f'最多只能发送 {MAX_STICKERS_PER_COMMENT} 个表情包'})
+
     parent = None
     if parent_id:
         parent = get_object_or_404(Comment, id=parent_id)
-    
+
     comment = Comment.objects.create(
         user=request.user,
         resource=resource,
@@ -803,20 +834,21 @@ def add_comment(request, resource_id):
         content=content,
         audit_status='visible'
     )
-    
+
     # 发送通知
     if resource.uploader != request.user:
         from notifications.models import Notification
         username = request.user.first_name or request.user.username  # ← 修复这里
+        preview = plain_content(content, fallback='[表情包]')[:50]
         Notification.objects.create(
             recipient=resource.uploader,
             sender=request.user,
             title=f'新评论：{resource.title}',
-            content=f'{username} 评论了你的资源：{content[:50]}...',
+            content=f'{username} 评论了你的资源：{preview}...',
             message_type='comment',
             related_resource=resource
         )
-    
+
     return JsonResponse({
         'success': True,
         'comment': {
@@ -824,9 +856,15 @@ def add_comment(request, resource_id):
             'username': request.user.first_name or request.user.username,
             'level': request.user.level,
             'content': comment.content,
+            'content_html': render_comment_html(comment.content),
             'created_at': comment.created_at.isoformat(),
         }
     })
+
+
+def sticker_list(request):
+    """自定义表情包列表 API（供评论框表情选择器使用）"""
+    return JsonResponse({'success': True, 'packs': serialize_sticker_packs()})
 
 
 @login_required
