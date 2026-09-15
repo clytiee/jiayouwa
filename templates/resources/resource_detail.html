@@ -86,7 +86,7 @@
         <a href="/" class="hover:text-green-600">首页</a>
         <span>›</span>
         {% if resource.tags %}
-        <a href="/search/?q={{ resource.tags.0 }}" class="hover:text-green-600">#{{ resource.tags.0 }}</a>
+        <a href="/search/?q={{ resource.tags.0|urlencode }}" class="hover:text-green-600">#{{ resource.tags.0 }}</a>
         {% endif %}
         <span>›</span>
         <span class="text-gray-600 truncate">{{ resource.title }}</span>
@@ -162,7 +162,9 @@
 				<!-- 只读展示模式 -->
 				<div x-show="!editing" class="flex flex-wrap gap-1.5 items-center">
 					<template x-for="(tag, index) in tags" :key="index">
-						<span class="bg-green-50 text-green-700 text-xs px-3 py-1 rounded-full" x-text="'#' + tag"></span>
+						<a :href="'/search/?q=' + encodeURIComponent(tag)"
+						class="bg-green-50 text-green-700 text-xs px-3 py-1 rounded-full hover:bg-green-100 transition"
+						x-text="'#' + tag"></a>
 					</template>
 					<template x-if="tags.length === 0">
 						<span class="text-xs text-gray-400">暂无标签</span>
