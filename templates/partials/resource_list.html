@@ -85,16 +85,11 @@
 				<div class="p-3">
 					<h3 class="text-sm font-medium text-gray-800 line-clamp-2">{{ resource.title }}</h3>
 					
-					<!-- 发布人和标签同行 -->
+					<!-- 发布人和下载量同行 -->
 					<div class="mt-1 flex items-center justify-between">
-						<div class="flex items-center gap-1 text-[10px] text-gray-400">
-							<span>👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
-							<span class="text-green-600">🐸 Lv.{{ resource.uploader.level }}</span>
-							{% if resource.tags %}
-							{% for tag in resource.tags|slice:":2" %}
-							<span class="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
-							{% endfor %}
-							{% endif %}
+						<div class="flex items-center gap-1 text-[10px] text-gray-400 min-w-0">
+							<span class="truncate">👤 {{ resource.uploader.first_name|default:resource.uploader.username }}</span>
+							<span class="text-green-600 flex-shrink-0">🐸 Lv.{{ resource.uploader.level }}</span>
 						</div>
 						<!-- 下载数和浏览量移到右侧 -->
 						<div class="flex items-center gap-2 text-[10px] text-gray-400 flex-shrink-0">
@@ -102,6 +97,15 @@
 							<span>👁️ {{ resource.view_count }}</span>
 						</div>
 					</div>
+
+					<!-- 标签单独一行 -->
+					{% if resource.tags %}
+					<div class="mt-1 flex flex-wrap gap-1">
+						{% for tag in resource.tags|slice:":3" %}
+						<span class="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded-full">#{{ tag }}</span>
+						{% endfor %}
+					</div>
+					{% endif %}
 				</div>
 			</a>
 		</div>
